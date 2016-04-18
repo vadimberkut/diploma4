@@ -62,6 +62,9 @@
     <ClInclude Include="OpenedImageData\OpenedImageData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ColorProcessing\ColorSpace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">

@@ -39,54 +39,10 @@ namespace WindowsFormApp {
 
 
 	/**************************************************/
-
-	#pragma pack(push)
-	#pragma pack(1)
-	// Заголовок файла
-	struct bmpFILEHEADER
-	{
-		unsigned char	bfType[2]; //(смещение  0, длина 2) Символы BM
-		//WORD	bfType;			   //(смещение  0, длина 2) Символы BM
-		DWORD	bfSize;			   //(Смещение  2, длина 4) Размер файла в байтах
-		WORD	bfReserved1;	   //(Смещение  6, длина 2) Зарезервированы и должны содержать ноль
-		WORD	bfReserved2;	   //(Смещение  8, длина 2) Зарезервированы и должны содержать ноль
-		DWORD	bfOffBits;		   //(Смещение 10, длина 4) Смещение, с которого начинается само изображение(растр) 
-	};
-	#pragma pack(pop)
-
-	// Заголовок Bitmap
-	struct bmpINFOHEADER
-	{
-		DWORD biSize;			//(смещение  14, длина 4) Размер заголовка BITMAP (в байтах)
-		LONG biWidth;			//(смещение  18, длина 4) Ширина изображения в пикселях
-		LONG biHeight;			//(смещение  22, длина 4) Высота изображения в пикселях
-		WORD biPlanes;			//(смещение  26, длина 2) Число плоскостей
-		WORD biBitCount;		//(смещение  28, длина 2) Бит/пиксел: 1, 4, 8 или 24
-		DWORD biCompression;	//(смещение  30, длина 4) Тип сжатия(0 - несжатое изображение), способ хранения
-		DWORD biSizeImage;		//(смещение  34, длина 4) 0 или размер сжатого изображения в байтах
-		LONG biXPelsPerMeter;	//(смещение  38, длина 4) Горизонтальное разрешение, пиксел/м
-		LONG biYPelsPerMeter;	//(смещение  42, длина 4) Вертикальное разрешение, пиксел/м
-		DWORD biClrUsed;		//(смещение  46, длина 4) Количество используемых цветов
-		DWORD biClrImportant;	//(смещение  50, длина 4) Количество "важных" цветов.Количество ячеек от начала таблицы цветов до последней используемой (включая её саму)
-	};
-
-	//заголовки структур bmp
-	bmpFILEHEADER hdBMP;
-	bmpINFOHEADER InfoHeader;
-	
 	bool OPEN=false;//указывает бьл ли открыт файл
-	int size=0;//размер массива с пикселями
-	unsigned char *buffer = nullptr;//одномерный массив с пикселями
-	unsigned char *bufferBackup = nullptr;
-	unsigned char *shadowMask = nullptr;
+
 	char* myPath_char="";//путь к файлу
 	char *char_pathCopyBMP = "copyBMP.bmp";
-	
-	double compr_coef=1.0;
-	unsigned char marker='@';
-	
-	int size_palette=0;
-	unsigned char* palette=nullptr;//палитра
 	
 	cv::Mat imgBGR;
 	cv::Mat imgBGRRes;
@@ -123,7 +79,8 @@ namespace WindowsFormApp {
 
 	private: System::Windows::Forms::Button^  button1open;
 	private: System::Windows::Forms::OpenFileDialog^  openFileDialog1;
-	private: System::Windows::Forms::PictureBox^  pictureBox1;
+	private: System::Windows::Forms::PictureBox^  pictureBoxImgBGRRes;
+
 
 
 
@@ -139,10 +96,12 @@ namespace WindowsFormApp {
 		/*my variables*/
 		Stream^ myStream;
 		String^ myPath;
-		
+	private: System::Windows::Forms::TextBox^  textBoxImgInfo;
+
+
 		/**/
 
-	private: System::Windows::Forms::TextBox^  textBox2info;
+
 	private: System::Windows::Forms::Button^  button2save;
 	private: System::Windows::Forms::Button^  button6Close;
 	private: System::Windows::Forms::Button^  button7colorCorrection;
@@ -156,10 +115,12 @@ namespace WindowsFormApp {
 	private: System::Windows::Forms::Label^  labelBlue;
 	private: System::Windows::Forms::Label^  labelRGB;
 	private: System::Windows::Forms::Button^  button1;
-private: System::Windows::Forms::PictureBox^  pictureBox2;
+	private: System::Windows::Forms::PictureBox^  pictureBoxImgBGR;
+	private: System::Windows::Forms::PictureBox^  pictureBoxImgShadowMask;
 
 
-private: System::Windows::Forms::PictureBox^  pictureBox3;
+
+
 
 
 
@@ -202,7 +163,10 @@ private: System::Windows::Forms::Label^  label3;
 private: System::Windows::Forms::TextBox^  textBoxMSSMinRegionSize;
 private: System::Windows::Forms::Button^  buttonMSSApply;
 private: System::Windows::Forms::Button^  buttonMSSDefault;
-private: System::Windows::Forms::PictureBox^  pictureBox4;
+private: System::Windows::Forms::Label^  label1;
+private: System::Windows::Forms::Label^  label9;
+private: System::Windows::Forms::Label^  label10;
+
 
 
 
@@ -218,8 +182,8 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->textBox1open = (gcnew System::Windows::Forms::TextBox());
 			this->button1open = (gcnew System::Windows::Forms::Button());
 			this->openFileDialog1 = (gcnew System::Windows::Forms::OpenFileDialog());
-			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
-			this->textBox2info = (gcnew System::Windows::Forms::TextBox());
+			this->pictureBoxImgBGRRes = (gcnew System::Windows::Forms::PictureBox());
+			this->textBoxImgInfo = (gcnew System::Windows::Forms::TextBox());
 			this->button2save = (gcnew System::Windows::Forms::Button());
 			this->button3exit = (gcnew System::Windows::Forms::Button());
 			this->button6Close = (gcnew System::Windows::Forms::Button());
@@ -234,8 +198,8 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->labelBlue = (gcnew System::Windows::Forms::Label());
 			this->labelRGB = (gcnew System::Windows::Forms::Label());
 			this->button1 = (gcnew System::Windows::Forms::Button());
-			this->pictureBox2 = (gcnew System::Windows::Forms::PictureBox());
-			this->pictureBox3 = (gcnew System::Windows::Forms::PictureBox());
+			this->pictureBoxImgBGR = (gcnew System::Windows::Forms::PictureBox());
+			this->pictureBoxImgShadowMask = (gcnew System::Windows::Forms::PictureBox());
 			this->buttonAdditive = (gcnew System::Windows::Forms::Button());
 			this->buttonBasicLightModel = (gcnew System::Windows::Forms::Button());
 			this->buttonYCbCr = (gcnew System::Windows::Forms::Button());
@@ -262,17 +226,18 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->textBoxMSSMinRegionSize = (gcnew System::Windows::Forms::TextBox());
 			this->buttonMSSApply = (gcnew System::Windows::Forms::Button());
 			this->buttonMSSDefault = (gcnew System::Windows::Forms::Button());
-			this->pictureBox4 = (gcnew System::Windows::Forms::PictureBox());
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->BeginInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->BeginInit();
+			this->label1 = (gcnew System::Windows::Forms::Label());
+			this->label9 = (gcnew System::Windows::Forms::Label());
+			this->label10 = (gcnew System::Windows::Forms::Label());
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGRRes))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGR))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgShadowMask))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// textBox1open
 			// 
 			this->textBox1open->Enabled = false;
-			this->textBox1open->Location = System::Drawing::Point(8, 693);
+			this->textBox1open->Location = System::Drawing::Point(8, 635);
 			this->textBox1open->Multiline = true;
 			this->textBox1open->Name = L"textBox1open";
 			this->textBox1open->Size = System::Drawing::Size(623, 16);
@@ -280,7 +245,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// button1open
 			// 
-			this->button1open->Location = System::Drawing::Point(8, 579);
+			this->button1open->Location = System::Drawing::Point(8, 523);
 			this->button1open->Name = L"button1open";
 			this->button1open->Size = System::Drawing::Size(193, 22);
 			this->button1open->TabIndex = 1;
@@ -292,27 +257,27 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			this->openFileDialog1->FileName = L"openFileDialog1";
 			// 
-			// pictureBox1
+			// pictureBoxImgBGRRes
 			// 
-			this->pictureBox1->Location = System::Drawing::Point(1165, 1);
-			this->pictureBox1->Name = L"pictureBox1";
-			this->pictureBox1->Size = System::Drawing::Size(460, 400);
-			this->pictureBox1->TabIndex = 2;
-			this->pictureBox1->TabStop = false;
-			this->pictureBox1->Click += gcnew System::EventHandler(this, &Form1::pictureBox1_Click);
+			this->pictureBoxImgBGRRes->Location = System::Drawing::Point(944, 23);
+			this->pictureBoxImgBGRRes->Name = L"pictureBoxImgBGRRes";
+			this->pictureBoxImgBGRRes->Size = System::Drawing::Size(460, 400);
+			this->pictureBoxImgBGRRes->TabIndex = 2;
+			this->pictureBoxImgBGRRes->TabStop = false;
+			this->pictureBoxImgBGRRes->Click += gcnew System::EventHandler(this, &Form1::pictureBoxImgBGRRes_Click);
 			// 
-			// textBox2info
+			// textBoxImgInfo
 			// 
-			this->textBox2info->Location = System::Drawing::Point(8, 1);
-			this->textBox2info->Multiline = true;
-			this->textBox2info->Name = L"textBox2info";
-			this->textBox2info->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
-			this->textBox2info->Size = System::Drawing::Size(196, 147);
-			this->textBox2info->TabIndex = 3;
+			this->textBoxImgInfo->Location = System::Drawing::Point(217, 495);
+			this->textBoxImgInfo->Multiline = true;
+			this->textBoxImgInfo->Name = L"textBoxImgInfo";
+			this->textBoxImgInfo->ScrollBars = System::Windows::Forms::ScrollBars::Vertical;
+			this->textBoxImgInfo->Size = System::Drawing::Size(196, 130);
+			this->textBoxImgInfo->TabIndex = 3;
 			// 
 			// button2save
 			// 
-			this->button2save->Location = System::Drawing::Point(8, 607);
+			this->button2save->Location = System::Drawing::Point(8, 551);
 			this->button2save->Name = L"button2save";
 			this->button2save->Size = System::Drawing::Size(193, 22);
 			this->button2save->TabIndex = 5;
@@ -322,7 +287,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// button3exit
 			// 
-			this->button3exit->Location = System::Drawing::Point(8, 663);
+			this->button3exit->Location = System::Drawing::Point(8, 607);
 			this->button3exit->Name = L"button3exit";
 			this->button3exit->Size = System::Drawing::Size(193, 22);
 			this->button3exit->TabIndex = 6;
@@ -332,7 +297,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// button6Close
 			// 
-			this->button6Close->Location = System::Drawing::Point(8, 635);
+			this->button6Close->Location = System::Drawing::Point(8, 579);
 			this->button6Close->Name = L"button6Close";
 			this->button6Close->Size = System::Drawing::Size(193, 22);
 			this->button6Close->TabIndex = 15;
@@ -343,7 +308,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// button7colorCorrection
 			// 
 			this->button7colorCorrection->Enabled = false;
-			this->button7colorCorrection->Location = System::Drawing::Point(108, 246);
+			this->button7colorCorrection->Location = System::Drawing::Point(569, 487);
 			this->button7colorCorrection->Name = L"button7colorCorrection";
 			this->button7colorCorrection->Size = System::Drawing::Size(98, 22);
 			this->button7colorCorrection->TabIndex = 16;
@@ -353,7 +318,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxRed
 			// 
-			this->textBoxRed->Location = System::Drawing::Point(10, 220);
+			this->textBoxRed->Location = System::Drawing::Point(471, 461);
 			this->textBoxRed->Multiline = true;
 			this->textBoxRed->Name = L"textBoxRed";
 			this->textBoxRed->Size = System::Drawing::Size(44, 20);
@@ -362,7 +327,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxGreen
 			// 
-			this->textBoxGreen->Location = System::Drawing::Point(59, 220);
+			this->textBoxGreen->Location = System::Drawing::Point(520, 461);
 			this->textBoxGreen->Multiline = true;
 			this->textBoxGreen->Name = L"textBoxGreen";
 			this->textBoxGreen->Size = System::Drawing::Size(44, 20);
@@ -371,7 +336,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxBlue
 			// 
-			this->textBoxBlue->Location = System::Drawing::Point(108, 220);
+			this->textBoxBlue->Location = System::Drawing::Point(569, 461);
 			this->textBoxBlue->Multiline = true;
 			this->textBoxBlue->Name = L"textBoxBlue";
 			this->textBoxBlue->Size = System::Drawing::Size(44, 20);
@@ -380,7 +345,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxRGB
 			// 
-			this->textBoxRGB->Location = System::Drawing::Point(157, 220);
+			this->textBoxRGB->Location = System::Drawing::Point(618, 461);
 			this->textBoxRGB->Multiline = true;
 			this->textBoxRGB->Name = L"textBoxRGB";
 			this->textBoxRGB->Size = System::Drawing::Size(49, 20);
@@ -390,7 +355,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// buttonRestoreImage
 			// 
 			this->buttonRestoreImage->Enabled = false;
-			this->buttonRestoreImage->Location = System::Drawing::Point(8, 551);
+			this->buttonRestoreImage->Location = System::Drawing::Point(8, 495);
 			this->buttonRestoreImage->Name = L"buttonRestoreImage";
 			this->buttonRestoreImage->Size = System::Drawing::Size(193, 22);
 			this->buttonRestoreImage->TabIndex = 21;
@@ -401,7 +366,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// labelRed
 			// 
 			this->labelRed->AutoSize = true;
-			this->labelRed->Location = System::Drawing::Point(7, 204);
+			this->labelRed->Location = System::Drawing::Point(468, 445);
 			this->labelRed->Name = L"labelRed";
 			this->labelRed->Size = System::Drawing::Size(27, 13);
 			this->labelRed->TabIndex = 22;
@@ -410,7 +375,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// labelGreen
 			// 
 			this->labelGreen->AutoSize = true;
-			this->labelGreen->Location = System::Drawing::Point(56, 204);
+			this->labelGreen->Location = System::Drawing::Point(517, 445);
 			this->labelGreen->Name = L"labelGreen";
 			this->labelGreen->Size = System::Drawing::Size(36, 13);
 			this->labelGreen->TabIndex = 23;
@@ -419,7 +384,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// labelBlue
 			// 
 			this->labelBlue->AutoSize = true;
-			this->labelBlue->Location = System::Drawing::Point(108, 204);
+			this->labelBlue->Location = System::Drawing::Point(569, 445);
 			this->labelBlue->Name = L"labelBlue";
 			this->labelBlue->Size = System::Drawing::Size(28, 13);
 			this->labelBlue->TabIndex = 24;
@@ -428,7 +393,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// labelRGB
 			// 
 			this->labelRGB->AutoSize = true;
-			this->labelRGB->Location = System::Drawing::Point(154, 204);
+			this->labelRGB->Location = System::Drawing::Point(615, 445);
 			this->labelRGB->Name = L"labelRGB";
 			this->labelRGB->Size = System::Drawing::Size(30, 13);
 			this->labelRGB->TabIndex = 25;
@@ -436,7 +401,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(10, 246);
+			this->button1->Location = System::Drawing::Point(471, 487);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(95, 22);
 			this->button1->TabIndex = 26;
@@ -444,29 +409,28 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->button1->UseVisualStyleBackColor = true;
 			this->button1->Click += gcnew System::EventHandler(this, &Form1::button1_Click);
 			// 
-			// pictureBox2
+			// pictureBoxImgBGR
 			// 
-			this->pictureBox2->Location = System::Drawing::Point(233, 1);
-			this->pictureBox2->Name = L"pictureBox2";
-			this->pictureBox2->Size = System::Drawing::Size(460, 400);
-			this->pictureBox2->TabIndex = 52;
-			this->pictureBox2->TabStop = false;
-			this->pictureBox2->Click += gcnew System::EventHandler(this, &Form1::pictureBox2_Click);
+			this->pictureBoxImgBGR->Location = System::Drawing::Point(12, 23);
+			this->pictureBoxImgBGR->Name = L"pictureBoxImgBGR";
+			this->pictureBoxImgBGR->Size = System::Drawing::Size(460, 400);
+			this->pictureBoxImgBGR->TabIndex = 52;
+			this->pictureBoxImgBGR->TabStop = false;
 			// 
-			// pictureBox3
+			// pictureBoxImgShadowMask
 			// 
-			this->pictureBox3->Location = System::Drawing::Point(699, 1);
-			this->pictureBox3->Name = L"pictureBox3";
-			this->pictureBox3->Size = System::Drawing::Size(460, 400);
-			this->pictureBox3->TabIndex = 61;
-			this->pictureBox3->TabStop = false;
-			this->pictureBox3->Click += gcnew System::EventHandler(this, &Form1::pictureBox3_Click);
+			this->pictureBoxImgShadowMask->Location = System::Drawing::Point(478, 23);
+			this->pictureBoxImgShadowMask->Name = L"pictureBoxImgShadowMask";
+			this->pictureBoxImgShadowMask->Size = System::Drawing::Size(460, 400);
+			this->pictureBoxImgShadowMask->TabIndex = 61;
+			this->pictureBoxImgShadowMask->TabStop = false;
+			this->pictureBoxImgShadowMask->Click += gcnew System::EventHandler(this, &Form1::pictureBoxImgShadowMask_Click);
 			// 
 			// buttonAdditive
 			// 
-			this->buttonAdditive->Location = System::Drawing::Point(992, 570);
+			this->buttonAdditive->Location = System::Drawing::Point(890, 481);
 			this->buttonAdditive->Name = L"buttonAdditive";
-			this->buttonAdditive->Size = System::Drawing::Size(109, 39);
+			this->buttonAdditive->Size = System::Drawing::Size(109, 24);
 			this->buttonAdditive->TabIndex = 65;
 			this->buttonAdditive->Text = L"Additive shadow removal ";
 			this->buttonAdditive->UseVisualStyleBackColor = true;
@@ -474,9 +438,9 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonBasicLightModel
 			// 
-			this->buttonBasicLightModel->Location = System::Drawing::Point(1107, 569);
+			this->buttonBasicLightModel->Location = System::Drawing::Point(1005, 480);
 			this->buttonBasicLightModel->Name = L"buttonBasicLightModel";
-			this->buttonBasicLightModel->Size = System::Drawing::Size(109, 40);
+			this->buttonBasicLightModel->Size = System::Drawing::Size(109, 25);
 			this->buttonBasicLightModel->TabIndex = 66;
 			this->buttonBasicLightModel->Text = L"Basic Light Model";
 			this->buttonBasicLightModel->UseVisualStyleBackColor = true;
@@ -484,9 +448,9 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonYCbCr
 			// 
-			this->buttonYCbCr->Location = System::Drawing::Point(1222, 570);
+			this->buttonYCbCr->Location = System::Drawing::Point(1120, 481);
 			this->buttonYCbCr->Name = L"buttonYCbCr";
-			this->buttonYCbCr->Size = System::Drawing::Size(75, 40);
+			this->buttonYCbCr->Size = System::Drawing::Size(75, 25);
 			this->buttonYCbCr->TabIndex = 68;
 			this->buttonYCbCr->Text = L"YCbCr";
 			this->buttonYCbCr->UseVisualStyleBackColor = true;
@@ -494,7 +458,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// button1Shadow2Lab
 			// 
-			this->button1Shadow2Lab->Location = System::Drawing::Point(1107, 621);
+			this->button1Shadow2Lab->Location = System::Drawing::Point(1005, 529);
 			this->button1Shadow2Lab->Name = L"button1Shadow2Lab";
 			this->button1Shadow2Lab->Size = System::Drawing::Size(109, 25);
 			this->button1Shadow2Lab->TabIndex = 70;
@@ -504,7 +468,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// button11RemveLab
 			// 
-			this->button11RemveLab->Location = System::Drawing::Point(1107, 649);
+			this->button11RemveLab->Location = System::Drawing::Point(1005, 557);
 			this->button11RemveLab->Name = L"button11RemveLab";
 			this->button11RemveLab->Size = System::Drawing::Size(109, 25);
 			this->button11RemveLab->TabIndex = 71;
@@ -514,7 +478,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// button1Shadow4Math
 			// 
-			this->button1Shadow4Math->Location = System::Drawing::Point(1337, 621);
+			this->button1Shadow4Math->Location = System::Drawing::Point(1120, 526);
 			this->button1Shadow4Math->Name = L"button1Shadow4Math";
 			this->button1Shadow4Math->Size = System::Drawing::Size(109, 25);
 			this->button1Shadow4Math->TabIndex = 73;
@@ -524,7 +488,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonShadow0YCbCr
 			// 
-			this->buttonShadow0YCbCr->Location = System::Drawing::Point(992, 622);
+			this->buttonShadow0YCbCr->Location = System::Drawing::Point(890, 530);
 			this->buttonShadow0YCbCr->Name = L"buttonShadow0YCbCr";
 			this->buttonShadow0YCbCr->Size = System::Drawing::Size(109, 25);
 			this->buttonShadow0YCbCr->TabIndex = 74;
@@ -534,7 +498,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonHandleEdges
 			// 
-			this->buttonHandleEdges->Location = System::Drawing::Point(1107, 680);
+			this->buttonHandleEdges->Location = System::Drawing::Point(1005, 588);
 			this->buttonHandleEdges->Name = L"buttonHandleEdges";
 			this->buttonHandleEdges->Size = System::Drawing::Size(109, 25);
 			this->buttonHandleEdges->TabIndex = 75;
@@ -544,7 +508,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonTestMEANSHIFT
 			// 
-			this->buttonTestMEANSHIFT->Location = System::Drawing::Point(417, 604);
+			this->buttonTestMEANSHIFT->Location = System::Drawing::Point(514, 561);
 			this->buttonTestMEANSHIFT->Name = L"buttonTestMEANSHIFT";
 			this->buttonTestMEANSHIFT->Size = System::Drawing::Size(109, 25);
 			this->buttonTestMEANSHIFT->TabIndex = 76;
@@ -554,7 +518,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonBasicLightModelLAB
 			// 
-			this->buttonBasicLightModelLAB->Location = System::Drawing::Point(1452, 684);
+			this->buttonBasicLightModelLAB->Location = System::Drawing::Point(1201, 481);
 			this->buttonBasicLightModelLAB->Name = L"buttonBasicLightModelLAB";
 			this->buttonBasicLightModelLAB->Size = System::Drawing::Size(136, 25);
 			this->buttonBasicLightModelLAB->TabIndex = 78;
@@ -565,7 +529,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// textBoxGrayAvg
 			// 
 			this->textBoxGrayAvg->Enabled = false;
-			this->textBoxGrayAvg->Location = System::Drawing::Point(1451, 622);
+			this->textBoxGrayAvg->Location = System::Drawing::Point(1245, 537);
 			this->textBoxGrayAvg->Multiline = true;
 			this->textBoxGrayAvg->Name = L"textBoxGrayAvg";
 			this->textBoxGrayAvg->Size = System::Drawing::Size(40, 20);
@@ -575,7 +539,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// textBoxGrayDev
 			// 
 			this->textBoxGrayDev->Enabled = false;
-			this->textBoxGrayDev->Location = System::Drawing::Point(1497, 622);
+			this->textBoxGrayDev->Location = System::Drawing::Point(1291, 537);
 			this->textBoxGrayDev->Multiline = true;
 			this->textBoxGrayDev->Name = L"textBoxGrayDev";
 			this->textBoxGrayDev->Size = System::Drawing::Size(40, 20);
@@ -584,7 +548,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxShadowDetectionThreshold
 			// 
-			this->textBoxShadowDetectionThreshold->Location = System::Drawing::Point(1543, 623);
+			this->textBoxShadowDetectionThreshold->Location = System::Drawing::Point(1337, 538);
 			this->textBoxShadowDetectionThreshold->Multiline = true;
 			this->textBoxShadowDetectionThreshold->Name = L"textBoxShadowDetectionThreshold";
 			this->textBoxShadowDetectionThreshold->Size = System::Drawing::Size(40, 20);
@@ -594,7 +558,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// label5
 			// 
 			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(1540, 607);
+			this->label5->Location = System::Drawing::Point(1334, 522);
 			this->label5->Name = L"label5";
 			this->label5->Size = System::Drawing::Size(43, 13);
 			this->label5->TabIndex = 83;
@@ -603,7 +567,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// label6
 			// 
 			this->label6->AutoSize = true;
-			this->label6->Location = System::Drawing::Point(1449, 606);
+			this->label6->Location = System::Drawing::Point(1243, 521);
 			this->label6->Name = L"label6";
 			this->label6->Size = System::Drawing::Size(29, 13);
 			this->label6->TabIndex = 84;
@@ -612,7 +576,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// label7
 			// 
 			this->label7->AutoSize = true;
-			this->label7->Location = System::Drawing::Point(1494, 607);
+			this->label7->Location = System::Drawing::Point(1288, 522);
 			this->label7->Name = L"label7";
 			this->label7->Size = System::Drawing::Size(44, 13);
 			this->label7->TabIndex = 85;
@@ -620,7 +584,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonRemoveUsingConstant
 			// 
-			this->buttonRemoveUsingConstant->Location = System::Drawing::Point(417, 576);
+			this->buttonRemoveUsingConstant->Location = System::Drawing::Point(514, 533);
 			this->buttonRemoveUsingConstant->Name = L"buttonRemoveUsingConstant";
 			this->buttonRemoveUsingConstant->Size = System::Drawing::Size(142, 25);
 			this->buttonRemoveUsingConstant->TabIndex = 86;
@@ -631,7 +595,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(696, 613);
+			this->label2->Location = System::Drawing::Point(719, 533);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(67, 13);
 			this->label2->TabIndex = 96;
@@ -640,7 +604,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(696, 590);
+			this->label3->Location = System::Drawing::Point(719, 510);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(75, 13);
 			this->label3->TabIndex = 95;
@@ -648,7 +612,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxMSSColorRadius
 			// 
-			this->textBoxMSSColorRadius->Location = System::Drawing::Point(777, 613);
+			this->textBoxMSSColorRadius->Location = System::Drawing::Point(800, 533);
 			this->textBoxMSSColorRadius->Multiline = true;
 			this->textBoxMSSColorRadius->Name = L"textBoxMSSColorRadius";
 			this->textBoxMSSColorRadius->Size = System::Drawing::Size(63, 20);
@@ -657,7 +621,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxMSSSpatialRadius
 			// 
-			this->textBoxMSSSpatialRadius->Location = System::Drawing::Point(777, 587);
+			this->textBoxMSSSpatialRadius->Location = System::Drawing::Point(800, 507);
 			this->textBoxMSSSpatialRadius->Multiline = true;
 			this->textBoxMSSSpatialRadius->Name = L"textBoxMSSSpatialRadius";
 			this->textBoxMSSSpatialRadius->Size = System::Drawing::Size(63, 20);
@@ -667,7 +631,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(696, 561);
+			this->label4->Location = System::Drawing::Point(719, 481);
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(162, 13);
 			this->label4->TabIndex = 97;
@@ -676,7 +640,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// label8
 			// 
 			this->label8->AutoSize = true;
-			this->label8->Location = System::Drawing::Point(696, 639);
+			this->label8->Location = System::Drawing::Point(719, 559);
 			this->label8->Name = L"label8";
 			this->label8->Size = System::Drawing::Size(77, 13);
 			this->label8->TabIndex = 99;
@@ -684,7 +648,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// textBoxMSSMinRegionSize
 			// 
-			this->textBoxMSSMinRegionSize->Location = System::Drawing::Point(777, 639);
+			this->textBoxMSSMinRegionSize->Location = System::Drawing::Point(800, 559);
 			this->textBoxMSSMinRegionSize->Multiline = true;
 			this->textBoxMSSMinRegionSize->Name = L"textBoxMSSMinRegionSize";
 			this->textBoxMSSMinRegionSize->Size = System::Drawing::Size(63, 20);
@@ -693,7 +657,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonMSSApply
 			// 
-			this->buttonMSSApply->Location = System::Drawing::Point(777, 662);
+			this->buttonMSSApply->Location = System::Drawing::Point(800, 582);
 			this->buttonMSSApply->Name = L"buttonMSSApply";
 			this->buttonMSSApply->Size = System::Drawing::Size(63, 23);
 			this->buttonMSSApply->TabIndex = 100;
@@ -703,7 +667,7 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			// 
 			// buttonMSSDefault
 			// 
-			this->buttonMSSDefault->Location = System::Drawing::Point(710, 662);
+			this->buttonMSSDefault->Location = System::Drawing::Point(733, 582);
 			this->buttonMSSDefault->Name = L"buttonMSSDefault";
 			this->buttonMSSDefault->Size = System::Drawing::Size(63, 23);
 			this->buttonMSSDefault->TabIndex = 101;
@@ -711,21 +675,51 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->buttonMSSDefault->UseVisualStyleBackColor = true;
 			this->buttonMSSDefault->Click += gcnew System::EventHandler(this, &Form1::buttonMSSDefault_Click);
 			// 
-			// pictureBox4
+			// label1
 			// 
-			this->pictureBox4->Location = System::Drawing::Point(484, 125);
-			this->pictureBox4->Name = L"pictureBox4";
-			this->pictureBox4->Size = System::Drawing::Size(460, 400);
-			this->pictureBox4->TabIndex = 102;
-			this->pictureBox4->TabStop = false;
+			this->label1->AutoSize = true;
+			this->label1->BackColor = System::Drawing::SystemColors::Control;
+			this->label1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->label1->Location = System::Drawing::Point(9, 7);
+			this->label1->Name = L"label1";
+			this->label1->Size = System::Drawing::Size(73, 13);
+			this->label1->TabIndex = 102;
+			this->label1->Text = L"Original image";
+			// 
+			// label9
+			// 
+			this->label9->AutoSize = true;
+			this->label9->BackColor = System::Drawing::SystemColors::Control;
+			this->label9->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->label9->Location = System::Drawing::Point(475, 8);
+			this->label9->Name = L"label9";
+			this->label9->Size = System::Drawing::Size(105, 13);
+			this->label9->TabIndex = 103;
+			this->label9->Text = L"Shadow mask image";
+			// 
+			// label10
+			// 
+			this->label10->AutoSize = true;
+			this->label10->BackColor = System::Drawing::SystemColors::Control;
+			this->label10->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->label10->Location = System::Drawing::Point(945, 7);
+			this->label10->Name = L"label10";
+			this->label10->Size = System::Drawing::Size(68, 13);
+			this->label10->TabIndex = 104;
+			this->label10->Text = L"Result image";
 			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
-			this->ClientSize = System::Drawing::Size(1637, 721);
-			this->Controls->Add(this->pictureBox4);
+			this->ClientSize = System::Drawing::Size(1416, 662);
+			this->Controls->Add(this->label10);
+			this->Controls->Add(this->label9);
+			this->Controls->Add(this->label1);
 			this->Controls->Add(this->buttonMSSDefault);
 			this->Controls->Add(this->buttonMSSApply);
 			this->Controls->Add(this->label8);
@@ -752,8 +746,8 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->Controls->Add(this->buttonYCbCr);
 			this->Controls->Add(this->buttonBasicLightModel);
 			this->Controls->Add(this->buttonAdditive);
-			this->Controls->Add(this->pictureBox3);
-			this->Controls->Add(this->pictureBox2);
+			this->Controls->Add(this->pictureBoxImgShadowMask);
+			this->Controls->Add(this->pictureBoxImgBGR);
 			this->Controls->Add(this->button1);
 			this->Controls->Add(this->labelRGB);
 			this->Controls->Add(this->labelBlue);
@@ -768,8 +762,8 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->Controls->Add(this->button6Close);
 			this->Controls->Add(this->button3exit);
 			this->Controls->Add(this->button2save);
-			this->Controls->Add(this->textBox2info);
-			this->Controls->Add(this->pictureBox1);
+			this->Controls->Add(this->textBoxImgInfo);
+			this->Controls->Add(this->pictureBoxImgBGRRes);
 			this->Controls->Add(this->button1open);
 			this->Controls->Add(this->textBox1open);
 			this->Name = L"Form1";
@@ -779,10 +773,9 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->ResizeEnd += gcnew System::EventHandler(this, &Form1::Form1_ResizeEnd);
 			this->Scroll += gcnew System::Windows::Forms::ScrollEventHandler(this, &Form1::Form1_Scroll);
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox3))->EndInit();
-			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox4))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGRRes))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGR))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgShadowMask))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -790,40 +783,39 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 #pragma endregion
 	
 
-			 //Окрыть bmp
-	private: bool OpenBmp(bool OpenDialog)
-			 {
-				if(OpenDialog){
+	private: bool OpenImage(bool OpenDialog)
+	{
+				if (OpenDialog){
 					OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
-					openFileDialog1->InitialDirectory = "D:\Mail.ru.Disk\Study\Обробка зображень\Lab2";
-					openFileDialog1->Filter = "bmp files|*.bmp";
+					openFileDialog1->InitialDirectory = "./";
+					openFileDialog1->Filter = "Image Files (*.jpg, *.jpeg, *.png, *.gif) | *.jpg; *.jpeg; *.png; *.gif|BMP Files|*.bmp|JPG Files|*.jpg; *.jpeg|PNG Files|*.png|GIF Files|*.gif";
 					openFileDialog1->FilterIndex = 1;
 					openFileDialog1->RestoreDirectory = true;
-					
-					System::Windows::Forms::DialogResult dialogRes= openFileDialog1->ShowDialog();
 
-					if ( dialogRes == System::Windows::Forms::DialogResult::Cancel )
+					System::Windows::Forms::DialogResult dialogRes = openFileDialog1->ShowDialog();
+
+					if (dialogRes == System::Windows::Forms::DialogResult::Cancel)
 					{
-						OPEN=OPEN;//OPEN=true;
+						OPEN = OPEN;//OPEN=true;
 						return false;
 					}
-					OPEN=false;
-					if ( dialogRes != System::Windows::Forms::DialogResult::OK )
+					OPEN = false;
+					if (dialogRes != System::Windows::Forms::DialogResult::OK)
 					{
 						//MessageBox::Show("Dialog error!");
 						return false;
 					}
-					if ( (myStream = openFileDialog1->OpenFile()) == nullptr )
+					if ((myStream = openFileDialog1->OpenFile()) == nullptr)
 					{
 						MessageBox::Show("Stream error!");
 						return false;
 					}
-				
+
 					//получение полного пути к файлу
 					myPath = openFileDialog1->FileName;
-					textBox1open->Text=myPath;
+					textBox1open->Text = myPath;
 					myStream->Close();
-					delete openFileDialog1 ;
+					delete openFileDialog1;
 				}
 
 				//Конвертация пути с System::String to char*
@@ -837,166 +829,48 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 				imgBGRRes = imgBGR.clone();
 				imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
 
-				CopyMatToArray(imgBGR,buffer);
-										
-				//Чтение файла
-				FILE* f = fopen(myPath_char,"rb");
-				if(!f){
-					MessageBox::Show("File read error!");
-					return false;
-				}
-				
-				fread(&hdBMP,sizeof(hdBMP),1,f);//чтение заголовка BITMAPFILEHEADER. размер-14 байт
-
-				//Проверка, что читаем bmp файл
-				if( hdBMP.bfType[0]!='B' || hdBMP.bfType[1]!='M' ){
-					MessageBox::Show("Required bmp format!");
-					fclose(f);
-					return false;
-				}
-
-				fread(&InfoHeader,sizeof(InfoHeader),1,f);//чтение заголовка BITMAPINFO. один из размеров-40 байт
-
-				//Палитра
-				size_palette = hdBMP.bfOffBits-( sizeof(hdBMP)+sizeof(InfoHeader) );
-				int size_paletteCOPY = size_palette;
-				delete palette;
-				palette = new UCHAR[size_palette]; 
-
-				fread(palette, size_palette, 1, f);//чтение палитры в массив
-
-				fseek(f,hdBMP.bfOffBits,SEEK_SET);//переход на позицию, с кот. нач пиксельные данные
-
-				size=InfoHeader.biSizeImage;//размер массива с пикселями
-				delete buffer;//удаляем старый массив, если открываем новый файл
-				delete bufferBackup;
-				buffer = new UCHAR[size];//одномерный массив с пикселями
-				bufferBackup = new UCHAR[size];//одномерный массив с пикселями(копия)
-
-				fread(buffer, size, 1, f);//чтение пикселей в массив
-				CopyArrayUCHAR(buffer, bufferBackup, size);//сохраняем копию массива с пикселями
-
-				fclose(f);
-				
-				OPEN=true;//флаг, что открыт файл
-		
-				//Вывод информации о изображении
-				textBox2info->Text=String::Format( "Размер файла в байтах: {0}\r\nШирина: {1}\r\nВысота: {2}\r\nКоличество бит на пиксель: {3}\r\nТип хранения(сжатия): {4}\r\nРазмер массива с пикселями: {5}\r\nСмещение, с которого начинается само изображение(растр): {6}\r\nКоэфициент сжатия: {7}",
-													hdBMP.bfSize ,InfoHeader.biWidth, InfoHeader.biHeight,InfoHeader.biBitCount,InfoHeader.biCompression,InfoHeader.biSizeImage,hdBMP.bfOffBits,compr_coef);
-			
-				//convertToHalftone();
-				//SaveBMP();
-
-				saveCopyBMP();
-
-				ShowBmp();//показать изображение если оно не сжато
+				OPEN = true;//флаг, что открыт файл
 
 				return true;
-			 }
-
-			 //Отобразить bmp
-	private: void ShowBmp()
-			 {
-//				 pictureBox4->Image = gcnew System::Drawing::Bitmap
-//					 (imgBGR.cols, imgBGR.rows, imgBGR.step,
-//					 System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgBGR.ptr());
-//				 pictureBox4->Refresh();
-
-				pictureBox1->Refresh();
-				pictureBox2->Refresh();
-				if(InfoHeader.biCompression==0){
-					//отображение изображения на экране
-					Bitmap^ bmpOrig = gcnew Bitmap(myPath);
-					Bitmap^ bmp = gcnew Bitmap(bmpOrig,pictureBox1->Width,pictureBox1->Height);
-					Graphics^ g = pictureBox1->CreateGraphics();
-					//pictureBox1->Width=bmpOrig->Width;
-					//pictureBox1->Height=bmpOrig->Height;
-					g->DrawImage(bmp, 1, 1);
-					delete bmpOrig;
-					delete bmp;
-					delete g;
-
-					ShowCopyBmp();
-				}
-				else{
-					//MessageBox::Show("");
-				}
-			 }
-
-	private: void ShowMaskBmp()
-	{
-//				 pictureBox1->Refresh();
-//				 pictureBox2->Refresh();
-				 pictureBox3->Refresh();
-				 if (InfoHeader.biCompression == 0){
-					 //отображение изображения на экране
-					 System::String^ string_pathCopyBMP = "maskBMP.bmp";
-					 Bitmap^ bmpOrig = gcnew Bitmap("maskBMP.bmp");
-					 /*
-					 System::String^ string_pathCopyBMP = "copyBMP.bmp";
-					 Bitmap^ bmpOrig = gcnew Bitmap(string_pathCopyBMP);
-					 */
-					 Bitmap^ bmp = gcnew Bitmap(bmpOrig, pictureBox3->Width, pictureBox3->Height);
-					 Graphics^ g = pictureBox3->CreateGraphics();
-					 //pictureBox1->Width=bmpOrig->Width;
-					 //pictureBox1->Height=bmpOrig->Height;
-					 g->DrawImage(bmp, 1, 1);
-					 delete bmpOrig;
-					 delete bmp;
-					 delete g;
-
-				 }
-				 else{
-					 //MessageBox::Show("");
-				 }
 	}
 
-	private: void ShowCopyBmp()
-			{				 
-				pictureBox2->Refresh();
-				if(InfoHeader.biCompression==0){
-					//отображение изображения на экране
-					System::String^ string_pathCopyBMP_ = "copyBMP.bmp";
-					Bitmap^ bmpOrig = gcnew Bitmap(string_pathCopyBMP_);
+	private: void ShowImgBGR()
+	{
+				pictureBoxImgBGR->Image = gcnew System::Drawing::Bitmap
+					(imgBGR.cols, imgBGR.rows, imgBGR.step,
+					System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgBGR.ptr());
+				pictureBoxImgBGR->Refresh();
+	}
 
-					Bitmap^ bmp = gcnew Bitmap(bmpOrig,pictureBox2->Width,pictureBox2->Height);
-					Graphics^ g = pictureBox2->CreateGraphics();
-					//pictureBox2->Width=bmpOrig->Width;
-					//pictureBox2->Height=bmpOrig->Height;
-					g->DrawImage(bmp, 1, 1);
-					delete bmpOrig;
-					delete bmp;
-					delete g;
-				}
-				else{
-					//MessageBox::Show("");
-				}
-			}
+	private: void ShowImgShadowMask()
+	{
+				 pictureBoxImgShadowMask->Image = gcnew System::Drawing::Bitmap
+					 (imgShadowMask.cols, imgShadowMask.rows, imgShadowMask.step,
+					 System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgShadowMask.ptr());
+				 pictureBoxImgShadowMask->Refresh();
+	}
 
-	private: bool SaveBMP()
-			 {
-				 FILE* f = fopen(myPath_char,"wb");
+	private: void ShowImgBGRRes()
+	{
+				 pictureBoxImgBGRRes->Image = gcnew System::Drawing::Bitmap
+					 (imgBGRRes.cols, imgBGRRes.rows, imgBGRRes.step,
+					 System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgBGRRes.ptr());
+				 pictureBoxImgBGRRes->Refresh();
+	}
 
-				 if(!f){
-					 MessageBox::Show("File open error!");
+	private: bool SaveImgBGRRes()
+	{
+				 try
+				 {
+					 cv::imwrite(myPath_char, imgBGRRes);
+				 }
+				 catch (...)
+				 {
 					 return false;
 				 }
 
-				 fwrite(&hdBMP,sizeof(hdBMP),1,f);
-				 fwrite(&InfoHeader,sizeof(InfoHeader),1,f);
-
-				 //если есть палитра
-				 if( InfoHeader.biBitCount<24 )
-				 {
-					 fwrite(palette,size_palette,1,f);
-				 }
-
-				 fseek(f,hdBMP.bfOffBits,SEEK_SET);//переход на позицию, с кот. нач пиксельные данные
-				 fwrite(buffer,size,1,f);
-				 fclose(f);
-
 				 return true;
-			 }
+	}
 
 	private: bool CopyArrayUCHAR(UCHAR* array1, UCHAR* array2, int size)
 			 {
@@ -1008,19 +882,6 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 				 return true;
 			 }
 
-			 //Преобразование в полутоновое изображение
-	private: void convertToHalftone()
-			 {
-				 float average;
-				 for(int i=0;i<size;i+=3)
-				 {
-					 average=( buffer[i] +  buffer[i+1] +  buffer[i+2] )/3;
-					 buffer[i] = average;//Blue
-					 buffer[i+1] = average;//Green
-					 buffer[i+2] = average;//Red
-				 }
-			 }
-
 	private: float myFabs(float x)
 			 {
 				 if(x < 0)
@@ -1029,65 +890,27 @@ private: System::Windows::Forms::PictureBox^  pictureBox4;
 					 return x;
 			 }
 
-	private: bool saveCopyBMP()
-			 {
-				 FILE* f = fopen(char_pathCopyBMP,"wb");
-
-				 if(!f){
-					 MessageBox::Show("File open error!");
-					 return false;
-				 }
-
-				 fwrite(&hdBMP,sizeof(hdBMP),1,f);
-				 fwrite(&InfoHeader,sizeof(InfoHeader),1,f);
-
-				 //если есть палитра
-				 if( InfoHeader.biBitCount<24 )
-				 {
-					 fwrite(palette,size_palette,1,f);
-				 }
-
-				 fseek(f,hdBMP.bfOffBits,SEEK_SET);//переход на позицию, с кот. нач пиксельные данные
-				 fwrite(bufferBackup,size,1,f);
-				 fclose(f);
-
-				 return true;
-			 }
-
-	private: bool saveMaskBMP()
-	{
-				 FILE* f = fopen("maskBMP.bmp", "wb");
-
-				 if (!f){
-					 MessageBox::Show("File open error!");
-					 return false;
-				 }
-
-				 fwrite(&hdBMP, sizeof(hdBMP), 1, f);
-				 fwrite(&InfoHeader, sizeof(InfoHeader), 1, f);
-
-				 //если есть палитра
-				 if (InfoHeader.biBitCount<24)
-				 {
-					 fwrite(palette, size_palette, 1, f);
-				 }
-
-				 fseek(f, hdBMP.bfOffBits, SEEK_SET);//переход на позицию, с кот. нач пиксельные данные
-				 fwrite(shadowMask, size, 1, f);
-				 fclose(f);
-
-				 return true;
-	}
 	//END
 
-
+private: void ShowImgBGRInfo()
+	{
+				 cv::Size imgSize = imgBGR.size();
+				 textBoxImgInfo->Text = System::String::Format("width: {0} \n height: {1} \n channels: ", imgSize.width, imgSize.height, imgBGR.channels());
+	}
+		 
 		 //Открыть
 private: System::Void button1open_Click(System::Object^  sender, System::EventArgs^  e) {
 
 				 button6Close_Click(sender,e);
 
-				 if( !OpenBmp(true) )
+				 //if( !OpenBmp(true) )
+				 if (!OpenImage(true))
 					 return;
+
+				 ShowImgBGR();
+				 ShowImgBGRRes();
+
+				 ShowImgBGRInfo();
 				
 				 button7colorCorrection->Enabled=true;
 				 buttonRestoreImage->Enabled=true;
@@ -1102,6 +925,7 @@ private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e)
 			 textBoxMSSColorRadius->Text = System::Convert::ToString(MeanShiftParams::COLOR_RADIUS);
 			 textBoxMSSMinRegionSize->Text = System::Convert::ToString(MeanShiftParams::MIN_REGION_SIZE);
 		 }
+
 private: System::Void panel1_Scroll(System::Object^  sender, System::Windows::Forms::ScrollEventArgs^  e) {			
 		 }
 
@@ -1114,7 +938,8 @@ private: System::Void button2save_Click(System::Object^  sender, System::EventAr
 				 return;
 			 }
 			 
-			 if(SaveBMP())
+			 //if(SaveBMP())
+			 if(SaveImgBGRRes())
 				MessageBox::Show("Success!");
 			 else
 				 MessageBox::Show("Fail!");
@@ -1129,7 +954,7 @@ private: System::Void button3exit_Click(System::Object^  sender, System::EventAr
 private: System::Void Form1_ResizeEnd(System::Object^  sender, System::EventArgs^  e) {
 			 if(OPEN)
 			 {
-				 ShowBmp();
+				 //ShowBmp();
 			 }
 		 }
 
@@ -1137,7 +962,7 @@ private: System::Void Form1_ResizeEnd(System::Object^  sender, System::EventArgs
 private: System::Void Form1_Scroll(System::Object^  sender, System::Windows::Forms::ScrollEventArgs^  e) {
 			 if(OPEN)
 			 {
-				 ShowBmp();
+				 //ShowBmp();
 			 }
 		 }
 
@@ -1145,27 +970,43 @@ private: System::Void Form1_Scroll(System::Object^  sender, System::Windows::For
 private: System::Void Form1_Activated(System::Object^  sender, System::EventArgs^  e) {
 			 if(OPEN)
 			 {
-				 ShowBmp();
+				 //ShowBmp();
 			 }
 		 }
 
 		 //Обновить при нажатии мишкой
-private: System::Void pictureBox1_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void pictureBoxImgBGRRes_Click(System::Object^  sender, System::EventArgs^  e) {
 			 if(OPEN)
 			 {
-				 ShowBmp();
+				 //ShowBmp();
 			 }
 		 }
 
+private: void ReleaseImage()
+{
+			 imgBGR.release();
+			 imgBGRRes.release();
+			 imgShadowMask.release();
+}
+		 
 		 //Закрыть
 private: System::Void button6Close_Click(System::Object^  sender, System::EventArgs^  e) {
-			pictureBox1->Refresh();
-			pictureBox2->Refresh();
+			 
+			 ReleaseImage();
+
+			 pictureBoxImgBGRRes->Image = nullptr;
+			 pictureBoxImgBGR->Image = nullptr;
+			 pictureBoxImgShadowMask->Image = nullptr;
+
+			 pictureBoxImgBGRRes->Refresh();
+			 pictureBoxImgBGR->Refresh();
+			 pictureBoxImgShadowMask->Refresh();
+
 			 button7colorCorrection->Enabled=false;
 			 buttonRestoreImage->Enabled=false;
 	
 			 textBox1open->Clear();
-			 textBox2info->Clear();
+			 textBoxImgInfo->Clear();
 			 OPEN=false;
 		 }
 
@@ -1192,10 +1033,10 @@ private: System::Void button7colorCorrection_Click(System::Object^  sender, Syst
 			 Blue = System::Convert::ToInt32(textBoxBlue->Text);
 			 RGB = System::Convert::ToInt32(textBoxRGB->Text);
 
-			 for (int i = 0; i < imgBGR.rows; i += 1) {
-				 for (int j = 0; j < imgBGR.cols; j += 1) {
+			 for (int i = 0; i < imgBGRRes.rows; i += 1) {
+				 for (int j = 0; j < imgBGRRes.cols; j += 1) {
 
-					 cv::Vec3b &pixel = imgBGR.at<cv::Vec3b>(i, j);
+					 cv::Vec3b &pixel = imgBGRRes.at<cv::Vec3b>(i, j);
 					 cv::Vec3b &shadowMaskPixel = imgShadowMask.at<cv::Vec3b>(i, j);
 
 					 if (shadowMaskPixel.val[0] == 255)
@@ -1214,19 +1055,13 @@ private: System::Void button7colorCorrection_Click(System::Object^  sender, Syst
 					 }
 				 }
 			 }
-
-			 CopyMatToArray(imgBGR,buffer);
-			
-			 SaveBMP();
-			 ShowBmp();
 		 }
 
 		 //Востановить массив пикселей, который был при откритии файла
 private: System::Void buttonRestoreImage_Click(System::Object^  sender, System::EventArgs^  e) {
 
-			 CopyArrayUCHAR(bufferBackup, buffer, size);
-			 SaveBMP();
-			 ShowBmp();
+			 imgBGRRes = imgBGR.clone();
+			 ShowImgBGRRes();
 		 }
 
 		 //Обнулить значения цветов
@@ -1237,226 +1072,6 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 			 textBoxBlue->Text="0";
 			 textBoxRGB->Text="0";
 		 }
-
-//Растяжение контрастности (“autolevels”) - Линейная коррекция
-private: void Autolevels()
-{
-		/////
-		//Растяжение контрастности (“autolevels”)
-		int Rmin = 255;
-		int Gmin = 255;
-		int Bmin = 255;
-		int Rmax = 0;
-		int Gmax = 0;
-		int Bmax = 0;
-		for (int i = 0; i < size; i += 3)
-		{
-
-			if (buffer[i] < Rmin)
-				Rmin = buffer[i];
-			if (buffer[i + 1] < Gmin)
-				Gmin = buffer[i + 1];
-			if (buffer[i + 2] < Bmin)
-				Bmin = buffer[i + 2];
-
-			if (buffer[i] > Rmax)
-				Rmax = buffer[i];
-			if (buffer[i + 1] > Gmax)
-				Gmax = buffer[i + 1];
-			if (buffer[i + 2] > Bmax)
-				Bmax = buffer[i + 2];
-		}
-		for (int i = 0; i < size; i += 3)
-		{
-
-			int R = buffer[i];
-			int G = buffer[i + 1];
-			int B = buffer[i + 2];
-
-			buffer[i] = (R - Rmin)*(255 / (Rmax - Rmin));
-			buffer[i + 1] = (G - Gmin)*(255 / (Gmax - Gmin));
-			buffer[i + 2] = (B - Bmin)*(255 / (Bmax - Bmin));
-		}
-}
-
-private: void RGBtoYCbCr()
-{
-			 //convert to YCbCr;
-			 for (int i = 0; i<size; i += 3)
-			 {
-				 int R = buffer[i];//Blue
-				 int G = buffer[i + 1];//Green
-				 int B = buffer[i + 2];//Red
-
-
-				 /*
-				 int Y = (int)(0.299   * R + 0.587   * G + 0.114   * B);
-				 int Cb = (int)(128 -0.16874 * R - 0.33126 * G + 0.50000 * B);
-				 int Cr = (int)(128 + 0.50000 * R - 0.41869 * G - 0.08131 * B);
-				 */
-
-
-				 int Y = 0.299*R + 0.587*G + 0.114*B;
-				 //int Cb =  - 0.168736*R - 0.331264*G + 0.5*B + 128;
-				 int Cb = -0.169*R - 0.331*G + 0.5*B + 128;
-				 //int Cr = +0.5*R - 0.418688*G - 0.081312*B + 128;
-				 int Cr = +0.5*R - 0.419*G - 0.081*B + 128;
-
-
-				 /*
-				 int Y = round(0.299    *R + 0.587  *G + 0.114  *B);
-				 int Cb = round(-0.1687   *R - 0.3313 *G + 0.5    *B) + 128;
-				 int Cr = round(0.5      *R - 0.4187 *G - 0.0813 *B) + 128;
-				 */
-
-
-				 if (Y>255) Y = 255;
-				 else if (Y<0) Y = 0;
-				 if (Cb>255) Cb = 255;
-				 else if (Cb<0) Cb = 0;
-				 if (Cr>255) Cr = 255;
-				 else if (Cr<0) Cr = 0;
-
-
-				 buffer[i] = Y;//Blue
-				 buffer[i + 1] = Cb;//Green
-				 buffer[i + 2] = Cr;//Red
-			 }
-}
-
-private: void YCbCrtoRGB()
-{
-		//Converting YCbCr to RGB 
-		for (int i = 0; i < size; i += 3)
-		{
-			int Y = buffer[i];
-			int Cb = buffer[i + 1];
-			int Cr = buffer[i + 2];
-
-
-			//int R = (int)((double)Y + 1.402 * (double)(Cr - 128));
-			//int G = (int)((double)Y - 0.34414 * (double)(Cb - 128) - 0.71414 * (double)(Cr - 128));
-			//int B = (int)((double)Y + 1.772 * (double)(Cb - 128));
-
-			///int R = Y + 1.402*(Cr - 128);
-			//int G = Y - 0.34414*(Cb - 128) - 0.71414*(Cr - 128);
-			//int B = Y + 1.772*(Cb - 128);
-
-			int R = Y + 1.4*(Cr - 128);
-			int G = Y - 0.343*(Cb - 128) - 0.711*(Cr - 128);
-			int B = Y + 1.765*(Cb - 128);
-
-
-			if (R > 255) R = 255;
-			else if (R<0) R = 0;
-			if (G>255) G = 255;
-			else if (G<0) G = 0;
-			if (B>255) B = 255;
-			else if (B < 0) B = 0;
-
-
-			buffer[i] = R;
-			buffer[i + 1] = G;
-			buffer[i + 2] = B;
-		}
-}
-
-private: double* RGBtoXYZ(UCHAR* bufferRGB)
-{
-			 double *bufferXYZ = new double[size];
-
-			 for (int i = 0; i < size; i += 3)
-			 {
-				 int R = bufferRGB[i];
-				 int G = bufferRGB[i + 1];
-				 int B = bufferRGB[i + 2];
-
-				 double var_R = (double)R / (double)255.0;
-				 double var_G = (double)G / (double)255.0;
-				 double var_B = (double)B / (double)255.0;
-
-				 if (var_R > 0.04045)
-					 //var_R = ((var_R + 0.055) / 1.055) ^ 2.4;
-					 var_R = pow((double)(((var_R + 0.055) / 1.055)), (double)2.4); 
-				 else
-					 var_R = var_R / 12.92;
-
-				 if (var_G > 0.04045)
-					 //var_G = ((var_G + 0.055) / 1.055) ^ 2.4;
-					 var_G = pow((double)(((var_G + 0.055) / 1.055)), (double)(2.4));
-				 else
-					 var_G = var_G / 12.92;
-
-				 if (var_B > 0.04045)
-					 //var_B = ((var_B + 0.055) / 1.055) ^ 2.4;
-					 var_B = pow((double)(((var_B + 0.055) / 1.055)), (double)(2.4));
-				 else
-					 var_B = var_B / 12.92;
-
-				 var_R = var_R * 100;
-				 var_G = var_G * 100;
-				 var_B = var_B * 100;
-
-				 //Observer. = 2°, Illuminant = D65
-				 double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
-				 double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
-				 double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
-
-				 bufferXYZ[i] = X;
-				 bufferXYZ[i + 1] = Y;
-				 bufferXYZ[i + 2] = Z;
-			 }
-
-			 return bufferXYZ;
-}
-
-private: double* XYZtoCIELAB(double* bufferXYZ)
-{
-			 double *bufferLAB = new double[size];
-
-			 for (int i = 0; i < size; i += 3)
-			 {
-				 int X = bufferXYZ[i];
-				 int Y = bufferXYZ[i + 1];
-				 int Z = bufferXYZ[i + 2];
-
-				 double ref_X = 95.047;
-				 double ref_Y = 100.000;
-				 double ref_Z = 108.883;
-
-				 double var_X = (double)X / (double)ref_X;          //ref_X =  95.047   Observer= 2°, Illuminant= D65
-				 double var_Y = (double)Y / (double)ref_Y;          //ref_Y = 100.000
-				 double var_Z = (double)Z / (double)ref_Z;          //ref_Z = 108.883
-
-				 if (var_X > 0.008856)
-					 //var_X = var_X ^ (1 / 3);
-					 var_X = pow((double)(var_X), (double)(1.0 / 3.0));
-				 else
-					 var_X = (7.787 * var_X) + (16.0 / 116.0);
-
-				 if (var_Y > 0.008856)
-					 //var_Y = var_Y ^ (1 / 3);
-					 var_Y = pow((double)(var_Y), (double)(1.0 / 3.0));
-				 else
-					 var_Y = (7.787 * var_Y) + (16.0 / 116.0);
-
-				 if (var_Z > 0.008856)
-					 //var_Z = var_Z ^ (1 / 3);
-					 var_Z = pow((double)(var_Z), (double)(1.0 / 3.0));
-				 else
-					 var_Z = (7.787 * var_Z) + (16.0 / 116.0);
-
-				 double CIE_L = (116 * var_Y) - 16;
-				 double CIE_a = 500 * (var_X - var_Y);
-				 double CIE_b = 200 * (var_Y - var_Z);
-
-				 bufferLAB[i] = CIE_L;
-				 bufferLAB[i + 1] = CIE_a;
-				 bufferLAB[i + 2] = CIE_b;
-			 }
-
-			 return bufferLAB;
-}
 
 /*private: void K_Means(){
 
@@ -2222,28 +1837,24 @@ private: double* XYZtoCIELAB(double* bufferXYZ)
 
 }*/
 
-private: UCHAR* SwapBGRtoRGB(UCHAR* bufferBGR)
-{
-			 UCHAR* bufferRGB = new UCHAR[size];
-
-			 for (int i = 0; i < size; i += 3)
-			 {
-				 int B = bufferBGR[i];
-				 int G = bufferBGR[i + 1];
-				 int R = bufferBGR[i + 2];
-
-				 bufferRGB[i] = R;
-				 bufferRGB[i + 1] = G;
-				 bufferRGB[i + 2] = B;
-
-			 }
-
-			 return bufferRGB;
-}
-
-private: System::Void pictureBox2_Click(System::Object^  sender, System::EventArgs^  e) {
-}
-		
+//private: UCHAR* SwapBGRtoRGB(UCHAR* bufferBGR)
+//{
+//			 UCHAR* bufferRGB = new UCHAR[size];
+//
+//			 for (int i = 0; i < size; i += 3)
+//			 {
+//				 int B = bufferBGR[i];
+//				 int G = bufferBGR[i + 1];
+//				 int R = bufferBGR[i + 2];
+//
+//				 bufferRGB[i] = R;
+//				 bufferRGB[i + 1] = G;
+//				 bufferRGB[i + 2] = B;
+//
+//			 }
+//
+//			 return bufferRGB;
+//}		
 
 private: System::Void buttonAdditive_Click(System::Object^  sender, System::EventArgs^  e) {
 
@@ -2332,10 +1943,7 @@ private: System::Void buttonAdditive_Click(System::Object^  sender, System::Even
 				 }
 			 }
 
-			 CopyMatToArray(imgBGRRes, buffer);
-
-			 SaveBMP();
-			 ShowBmp();
+			 ShowImgBGRRes();
 
 			 return;
 }
@@ -2427,10 +2035,7 @@ private: System::Void buttonBasicLightModel_Click(System::Object^  sender, Syste
 				 }
 			 }
 
-			 CopyMatToArray(imgBGRRes, buffer);
-
-			 SaveBMP();
-			 ShowBmp();
+			 ShowImgBGRRes();
 
 			 return;
 }
@@ -2522,23 +2127,22 @@ private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventAr
 
 			 cv::cvtColor(imgYcbCr,imgBGRRes,CV_YCrCb2BGR);
 
-			 CopyMatToArray(imgBGRRes, buffer);
-
-			 SaveBMP();
-			 ShowBmp();
+			 ShowImgBGRRes();
 
 			 return;
 }
 
-private: System::Void pictureBox3_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void pictureBoxImgShadowMask_Click(System::Object^  sender, System::EventArgs^  e) {
 			 if (OPEN)
 			 {
-				 ShowMaskBmp();
+				 //ShowShadowMaskBmp();
 			 }
 }
 
-
 private: System::Void buttonShadow0YCbCr_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 imgShadowMask.release();
+			 imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
 
 			 //convert to YCbCr;
 			 cv::Mat imgYcbcr;
@@ -2558,10 +2162,9 @@ private: System::Void buttonShadow0YCbCr_Click(System::Object^  sender, System::
 					 sum += Y;
 				 }
 			 }
-			 averageY = sum / (float)(size / 3.0);
+			 averageY = sum / (float)(imgYcbcr.cols*imgYcbcr.rows);
 
 			 //find shadow mask
-			 imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
 			 for (int i = 0; i < imgYcbcr.rows; i += 1) {
 				 for (int j = 0; j < imgYcbcr.cols; j += 1) {
 
@@ -2583,11 +2186,13 @@ private: System::Void buttonShadow0YCbCr_Click(System::Object^  sender, System::
 				 }
 			 }
 
-			 shadowMask = new UCHAR[size];
-			 CopyMatToArray(imgShadowMask, shadowMask);
+//			 shadowMask = new UCHAR[size];
+//			 CopyMatToArray(imgShadowMask, shadowMask);
+//
+//			 saveMaskBMP();
+//			 ShowShadowMaskBmp();
 
-			 saveMaskBMP();
-			 ShowMaskBmp();
+			 ShowImgShadowMask();
 }
 
 private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -2596,8 +2201,7 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			cv::Mat imgLABforDetectMat;
 			cv::cvtColor(imgBGR, imgLABforDetectMat, CV_BGR2Lab);
 
-			UCHAR *bufferCIELAB = new UCHAR[size];
-			CopyMatToArray(imgLABforDetectMat, bufferCIELAB);
+			cv::Mat imgBufferCIELAB = imgLABforDetectMat.clone();
 
 			imgShadowMask.release();
 			imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
@@ -2616,25 +2220,29 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			double CIE_A_max = 0;
 			double CIE_B_max = 0;
 
-			for (int i = 0; i < size; i += 3) //
-			{
-				double CIE_L = bufferCIELAB[i];
-				double CIE_A = bufferCIELAB[i + 1];
-				double CIE_B = bufferCIELAB[i + 2];
+			for (int i = 0; i < imgBufferCIELAB.rows; i += 1) {
+				for (int j = 0; j < imgBufferCIELAB.cols; j += 1) {
 
-				CIE_L_avg += CIE_L;
-				CIE_A_avg += CIE_A;
-				CIE_B_avg += CIE_B;
+					cv::Vec3b &pixel = imgBufferCIELAB.at<cv::Vec3b>(i, j);
 
-				count += 1;
+					double CIE_L = pixel.val[0];
+					double CIE_A = pixel.val[1];
+					double CIE_B = pixel.val[2];
 
-				CIE_L_min = CIE_L < CIE_L_min ? CIE_L : CIE_L_min;
-				CIE_A_min = CIE_A < CIE_A_min ? CIE_A : CIE_A_min;
-				CIE_B_min = CIE_B < CIE_B_min ? CIE_B : CIE_B_min;
+					CIE_L_avg += CIE_L;
+					CIE_A_avg += CIE_A;
+					CIE_B_avg += CIE_B;
 
-				CIE_L_max = CIE_L > CIE_L_max ? CIE_L : CIE_L_max;
-				CIE_A_max = CIE_A > CIE_A_max ? CIE_A : CIE_A_max;
-				CIE_B_max = CIE_B > CIE_B_max ? CIE_B : CIE_B_max;
+					count += 1;
+
+					CIE_L_min = CIE_L < CIE_L_min ? CIE_L : CIE_L_min;
+					CIE_A_min = CIE_A < CIE_A_min ? CIE_A : CIE_A_min;
+					CIE_B_min = CIE_B < CIE_B_min ? CIE_B : CIE_B_min;
+
+					CIE_L_max = CIE_L > CIE_L_max ? CIE_L : CIE_L_max;
+					CIE_A_max = CIE_A > CIE_A_max ? CIE_A : CIE_A_max;
+					CIE_B_max = CIE_B > CIE_B_max ? CIE_B : CIE_B_max;
+				}
 			}
 
 			CIE_L_avg /= count;
@@ -2643,13 +2251,16 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 
 			//standart deviation for L
 			double stdDevL = 0;
-			for (int i = 0; i < size; i += 3) //
-			{
-				double CIE_L = bufferCIELAB[i];
 
-				//CIE_L = (CIE_L * 100) / 255.0;
+			for (int i = 0; i < imgBufferCIELAB.rows; i += 1) {
+				for (int j = 0; j < imgBufferCIELAB.cols; j += 1) {
 
-				stdDevL += pow(CIE_L - CIE_L_avg, 2);
+					cv::Vec3b &pixel = imgBufferCIELAB.at<cv::Vec3b>(i, j);
+
+					double CIE_L = pixel.val[0];
+
+					stdDevL += pow(CIE_L - CIE_L_avg, 2);
+				}
 			}
 			stdDevL = stdDevL*(1.0 / ((double)count - 1.0));
 			stdDevL = sqrt(stdDevL);
@@ -2696,8 +2307,6 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 					}
 				}
 			}
-
-			delete bufferCIELAB;
 
 			 //cv::Mat shadowMaskMat = cv::Mat(InfoHeader.biHeight, InfoHeader.biWidth,CV_8UC3);
 			 cv::Mat shadowMaskClosingMat;
@@ -2840,16 +2449,19 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			 cv::imshow("ErosionFollowedByDilation", shadowMaskErosionFollowedByDilation);
 			 cv::imshow("DilationFollowedByErosion", shadowMaskDilationFollowedByErosion);
 
-			 shadowMask = new UCHAR[size];
-			 CopyMatToArray(shadowMaskErosionFollowedByDilation, shadowMask);
+//			 shadowMask = new UCHAR[size];
+//			 CopyMatToArray(shadowMaskErosionFollowedByDilation, shadowMask);
+//
+//			 saveMaskBMP();
+//			 ShowShadowMaskBmp();
 
-			 saveMaskBMP();
-			 ShowMaskBmp();
+			 imgShadowMask = shadowMaskErosionFollowedByDilation.clone();
+			 ShowImgShadowMask();
 }
 
 private: System::Void button11RemveLab_Click(System::Object^  sender, System::EventArgs^  e) {
 			
-			 cv::Mat imgBGRres;
+			 //cv::Mat imgBGRres;
 			 cv::Mat imgLAB;
 			 cv::Mat imgLAB_ORIGIN;
 			 cv::Mat imgKMeansRes;
@@ -2858,18 +2470,18 @@ private: System::Void button11RemveLab_Click(System::Object^  sender, System::Ev
 			 
 			 //Проверки на размер - если ширина не кратная 4, то дополняется мусором
 			 /////////////////////////////////////////////////////////////////////////
-			 int biWidth = InfoHeader.biWidth;
-			 int biHeight = InfoHeader.biHeight;
+			 //int biWidth = InfoHeader.biWidth;
+			 //int biHeight = InfoHeader.biHeight;
 
-			 int biWidth_add = biWidth % 4;
+			 //int biWidth_add = biWidth % 4;
 
-			 int cols = imgBGR.cols;
-			 int rows = imgBGR.rows;
-
-			 int sizeB = size;
-			 int sizeB2 = (biWidth * 3)*biHeight;
-			 int sizeB3 = (biWidth * 3 + biWidth % 4)*biHeight;
-			 int size2 = imgBGR.rows*imgBGR.cols*imgBGR.channels();
+//			 int cols = imgBGR.cols;
+//			 int rows = imgBGR.rows;
+//
+//			 //int sizeB = size;
+//			 int sizeB2 = (biWidth * 3)*biHeight;
+//			 int sizeB3 = (biWidth * 3 + biWidth % 4)*biHeight;
+//			 int size2 = imgBGR.rows*imgBGR.cols*imgBGR.channels();
 			 /////////////////////////////////////////////////////////////////////////////
 
 			 //Convert to LAB
@@ -2972,28 +2584,7 @@ private: System::Void button11RemveLab_Click(System::Object^  sender, System::Ev
 				 }
 			 }
 
-//			 cv::imshow("imgLAB", imgLAB);
-
 			 cv::cvtColor(imgLAB, imgBGRbeforeCluster, CV_Lab2BGR);
-
-//			 //Apply K_means
-//			 CopyMatToArray(imgLAB, buffer);
-//
-////			 imgKMeansRes = imgBGR.clone();
-////			 K_MeansLab(imgKMeansRes);
-////			 cv::imshow("imgKMeansRes", imgKMeansRes);
-//
-//			 cv::Mat imgKMeansResVisual = imgBGR.clone();
-//			 K_MeansLabByChrom(imgKMeansResVisual);
-//			 cv::imshow("imgKMeansResVisual", imgKMeansResVisual);
-//			 ///
-//
-//			 
-//			 CopyArrayToMat(buffer, imgLAB);
-
-//			 //Convert to BGR
-//			 cv::cvtColor(imgLAB, imgBGRres, CV_Lab2BGR);
-//			 CopyMatToArray(imgBGRres, buffer);
 
 			 //Mean Shift  takes BGR and do in LAB, writes res in first param
 			 cv::Mat imgMeanShiftVisual = imgBGR.clone();
@@ -3004,13 +2595,12 @@ private: System::Void button11RemveLab_Click(System::Object^  sender, System::Ev
 			 //cv::cvtColor(imgLAB, imgForMeanShiftForCluster, CV_Lab2BGR);
 			 ApplyMeanShiftAndCorrections(imgForMeanShiftForCluster, imgForMeanShiftForAlign, imgMeanShiftVisual);
 			 cv::imshow("imgMeanShiftVisual", imgMeanShiftVisual);
-			 CopyMatToArray(imgForMeanShiftForAlign, buffer); //write result to buffer
-			 imgBGRres = imgForMeanShiftForAlign.clone();
+			 imgBGRRes = imgForMeanShiftForAlign.clone();
 
 			 cv::imshow("imgBGR", imgBGR);
 			 //cv::imshow("imgLAB", imgLAB);
 			 cv::imshow("imgBGRRelight", imgBGRbeforeCluster);
-			 cv::imshow("imgBGRres", imgBGRres);
+			 cv::imshow("imgBGRRes", imgBGRRes);
 
 //			 //
 //			 //Process dark pixel on and near shadow edges
@@ -3066,17 +2656,16 @@ private: System::Void button11RemveLab_Click(System::Object^  sender, System::Ev
 //			 //CopyMatToArray(imgProcessEdgeDarkPixelsBGR, buffer);
 
 			 //Rlease memory
-			 imgBGR.release();
-			 delete imgBGR.data;
+//			 imgBGR.release();
+//			 delete imgBGR.data;
+//
+//			 imgLAB.release();
+//			 delete imgLAB.data;
+//
+//			 imgBGRres.release();
+//			 delete imgBGRres.data;
 
-			 imgLAB.release();
-			 delete imgLAB.data;
-
-			 imgBGRres.release();
-			 delete imgBGRres.data;
-
-			 SaveBMP();
-			 ShowBmp();
+			 ShowImgBGRRes();
 }
 
 private: void CopyMatToMat(cv::Mat source, cv::Mat dest){
@@ -3845,11 +3434,13 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
 
 			 cv::cvtColor(imgThresholdFixed, imgShadowMask, CV_GRAY2BGR);
 
-			 shadowMask = new UCHAR[size];
-			 CopyMatToArray(imgShadowMask, shadowMask);
+//			 shadowMask = new UCHAR[size];
+//			 CopyMatToArray(imgShadowMask, shadowMask);
+//
+//			 saveMaskBMP();
+//			 ShowShadowMaskBmp();
 
-			 saveMaskBMP();
-			 ShowMaskBmp();
+			 ShowImgShadowMask();
 }
 
 //This colors the segmentations
@@ -3875,24 +3466,20 @@ private: void floodFillPostprocess(cv::Mat& img, const cv::Scalar& colorDiff /*=
 
 private: System::Void buttonHandleEdges_Click(System::Object^  sender, System::EventArgs^  e) {
 
-			 cv::Mat imgBGRres = cv::Mat(InfoHeader.biHeight, InfoHeader.biWidth, CV_8UC3);
-			 CopyArrayToMat(buffer, imgBGRres);
-			 //cv::Mat shadowMaskMat = cv::Mat(InfoHeader.biHeight, InfoHeader.biWidth, CV_8UC3);
+			 imgBGRRes = imgBGR.clone();
 
 			 //Shadow edge detection
-			 cv::Mat imgShadowMask;
 			 cv::Mat imgShadowMaskGRAY;
 			 cv::Mat imgEdge;
 			 cv::Mat imgEdgeDilated;
 			 cv::Mat imgEdgeDilatedForInpaint;
-			 //cv::Mat imgEdgeInverted;
 			 cv::Mat imgEdgeGaussianWhole;
 			 cv::Mat imgEdgeGaussianEdgeOnly;
 			 cv::Mat imgMedianWhole;
 			 cv::Mat imgMedianEdgeOnly;
 
 			 cv::cvtColor(imgShadowMask, imgShadowMaskGRAY, CV_BGR2GRAY);
-
+			 
 			 cv::Canny(imgShadowMaskGRAY, imgEdge, 50, 150, 3);
 
 			 cv::Mat elementDil2 = getStructuringElement(cv::MORPH_RECT,
@@ -3902,20 +3489,20 @@ private: System::Void buttonHandleEdges_Click(System::Object^  sender, System::E
 			 cv::dilate(imgEdge, imgEdgeDilated, elementDil2);
 			 cv::dilate(imgEdge, imgEdgeDilatedForInpaint, elementDil3);
 
-			 imgEdgeGaussianEdgeOnly = imgBGRres.clone();
-			 cv::GaussianBlur(imgBGRres, imgEdgeGaussianWhole, cv::Size(3, 3), 0);
+			 imgEdgeGaussianEdgeOnly = imgBGRRes.clone();
+			 cv::GaussianBlur(imgBGRRes, imgEdgeGaussianWhole, cv::Size(3, 3), 0);
 			 imgEdgeGaussianWhole.copyTo(imgEdgeGaussianEdgeOnly, imgEdgeDilated);
 
-			 imgMedianEdgeOnly = imgBGRres.clone();
-			 cv::medianBlur(imgBGRres, imgMedianWhole, 3);
+			 imgMedianEdgeOnly = imgBGRRes.clone();
+			 cv::medianBlur(imgBGRRes, imgMedianWhole, 3);
 			 imgMedianWhole.copyTo(imgMedianEdgeOnly, imgEdgeDilated);
 			 ///
 
 			 //Inpaint edge artifacts
 			 cv::Mat imgBGRInpainted;
 			 //cv::inpaint(imgBGRres, imgEdgeDilatedForInpaint, imgBGRInpainted, 7, CV_INPAINT_TELEA);//CV_INPAINT_NS
-			 cv::inpaint(imgBGRres, imgEdgeDilatedForInpaint, imgBGRInpainted, 2, CV_INPAINT_TELEA);//CV_INPAINT_NS
-			 cv::imshow("imgBGRres", imgBGRres);
+			 cv::inpaint(imgBGRRes, imgEdgeDilatedForInpaint, imgBGRInpainted, 2, CV_INPAINT_TELEA);//CV_INPAINT_NS
+			 cv::imshow("imgBGRres", imgBGRRes);
 			 cv::imshow("imgBGRInpainted", imgBGRInpainted);
 
 			 cv::imshow("imgEdgeGaussianEdgeOnly", imgEdgeGaussianEdgeOnly);
@@ -3959,12 +3546,11 @@ private: System::Void buttonTestMEANSHIFT_Click(System::Object^  sender, System:
 			 cvShowImage("MeanShift", img);
 }
 
-
 private: System::Void buttonBasicLightModelLAB_Click(System::Object^  sender, System::EventArgs^  e) {
 
 			 //Add diff to L and correct A and B
 
-			 cv::Mat imgBGR = cv::imread(myPath_char);
+			 //cv::Mat imgBGR = cv::imread(myPath_char);
 			 cv::Mat imgLAB;
 			 cv::cvtColor(imgBGR, imgLAB, CV_BGR2Lab);
 
@@ -4050,17 +3636,12 @@ private: System::Void buttonBasicLightModelLAB_Click(System::Object^  sender, Sy
 				 }
 			 }
 
-			 cv::cvtColor(imgLAB, imgBGR, CV_Lab2BGR);
-			 CopyMatToArray(imgBGR, buffer);
+			 cv::cvtColor(imgLAB, imgBGRRes, CV_Lab2BGR);
 
-			 SaveBMP();
-			 ShowBmp();
+			 ShowImgBGRRes();
 }
 
 private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, System::EventArgs^  e) {
-
-			 cv::Mat imgBGR = cv::Mat(InfoHeader.biHeight, InfoHeader.biWidth, CV_8UC3);
-			 CopyArrayToMat(buffer, imgBGR);
 
 			 cv::Mat shadowMaskGRAY;
 			 cv::cvtColor(imgShadowMask, shadowMaskGRAY, CV_BGR2GRAY);
@@ -4614,7 +4195,7 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 			for (int i = 0; i < imgEdge.rows; i++) {
 				for (int j = 0; j < imgEdge.cols; j++) {
 
-					cv::Vec3b &pixel = imgBGR.at<cv::Vec3b>(i, j);
+					cv::Vec3b &pixel = imgBGRRes.at<cv::Vec3b>(i, j);
 					cv::Vec3b &shadow_mask_pixel = imgShadowMask.at<cv::Vec3b>(i, j);
 
 					if (shadow_mask_pixel.val[0] == 255){
@@ -4664,10 +4245,9 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 				}
 			}
 
-			 cv::imshow("const res", imgBGR);
+			cv::imshow("const res", imgBGRRes);
 }
-private: System::Void button5Decompress_Click(System::Object^  sender, System::EventArgs^  e) {
-}
+
 
 		 //Apply mean shift segentation params
 private: System::Void buttonMSSApply_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -4687,6 +4267,7 @@ private: System::Void buttonMSSApply_Click(System::Object^  sender, System::Even
 				 ShowMsgBox(System::Convert::ToString("Bad data was received. Check your input."));
 			 }
 }
+		 
 		 //Reset mean shift segentation params
 private: System::Void buttonMSSDefault_Click(System::Object^  sender, System::EventArgs^  e) {
 

@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ColorProcessing\ColorDifference.h" />
+    <ClInclude Include="ColorProcessing\ColorSpace.h" />
     <ClInclude Include="Debug\KMeansLAB.h" />
     <ClInclude Include="Form1.h">
       <FileType>CppForm</FileType>

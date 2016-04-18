@@ -107,6 +107,7 @@
     </ClInclude>
     <ClInclude Include="ArrayHelperr\ArrayHelperr.h" />
     <ClInclude Include="MeanShift\MeanShift.h" />
+    <ClInclude Include="OpenedImageData\OpenedImageData.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

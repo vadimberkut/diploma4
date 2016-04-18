@@ -59,6 +59,9 @@
     <ClInclude Include="ArrayHelperr\ArrayHelperr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OpenedImageData\OpenedImageData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">

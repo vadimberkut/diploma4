@@ -788,7 +788,7 @@ private: System::Windows::Forms::Label^  label10;
 				if (OpenDialog){
 					OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
 					openFileDialog1->InitialDirectory = "./";
-					openFileDialog1->Filter = "Image Files (*.jpg, *.jpeg, *.png, *.gif) | *.jpg; *.jpeg; *.png; *.gif|BMP Files|*.bmp|JPG Files|*.jpg; *.jpeg|PNG Files|*.png|GIF Files|*.gif";
+					openFileDialog1->Filter = "Image Files (*.bmp, *.jpg, *.jpeg, *.png, *.gif) | *.bmp; *.jpg; *.jpeg; *.png; *.gif|BMP Files|*.bmp|JPG Files|*.jpg; *.jpeg|PNG Files|*.png|GIF Files|*.gif";
 					openFileDialog1->FilterIndex = 1;
 					openFileDialog1->RestoreDirectory = true;
 
@@ -836,26 +836,47 @@ private: System::Windows::Forms::Label^  label10;
 
 	private: void ShowImgBGR()
 	{
-				pictureBoxImgBGR->Image = gcnew System::Drawing::Bitmap
-					(imgBGR.cols, imgBGR.rows, imgBGR.step,
-					System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgBGR.ptr());
-				pictureBoxImgBGR->Refresh();
+//				pictureBoxImgBGR->Image = gcnew System::Drawing::Bitmap
+//					(imgBGR.cols, imgBGR.rows, imgBGR.step,
+//					System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgBGR.ptr());
+//				pictureBoxImgBGR->Refresh();
+
+				 System::Drawing::Graphics^ graphics2 = pictureBoxImgBGR->CreateGraphics();
+				 System::IntPtr ptr2(imgBGR.ptr());
+				 System::Drawing::Bitmap^ b2 = gcnew System::Drawing::Bitmap(imgBGR.cols,
+					 imgBGR.rows, imgBGR.step, System::Drawing::Imaging::PixelFormat::Format24bppRgb, ptr2);
+				 System::Drawing::RectangleF rect2(0, 0, pictureBoxImgBGR->Width, pictureBoxImgBGR->Height);
+				 graphics2->DrawImage(b2, rect2);
 	}
 
 	private: void ShowImgShadowMask()
 	{
-				 pictureBoxImgShadowMask->Image = gcnew System::Drawing::Bitmap
-					 (imgShadowMask.cols, imgShadowMask.rows, imgShadowMask.step,
-					 System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgShadowMask.ptr());
-				 pictureBoxImgShadowMask->Refresh();
+//				 pictureBoxImgShadowMask->Image = gcnew System::Drawing::Bitmap
+//					 (imgShadowMask.cols, imgShadowMask.rows, imgShadowMask.step,
+//					 System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgShadowMask.ptr());
+//				 pictureBoxImgShadowMask->Refresh();
+
+				 System::Drawing::Graphics^ graphics2 = pictureBoxImgShadowMask->CreateGraphics();
+				 System::IntPtr ptr2(imgShadowMask.ptr());
+				 System::Drawing::Bitmap^ b2 = gcnew System::Drawing::Bitmap(imgShadowMask.cols,
+					 imgShadowMask.rows, imgShadowMask.step, System::Drawing::Imaging::PixelFormat::Format24bppRgb, ptr2);
+				 System::Drawing::RectangleF rect2(0, 0, pictureBoxImgShadowMask->Width, pictureBoxImgShadowMask->Height);
+				 graphics2->DrawImage(b2, rect2);
 	}
 
 	private: void ShowImgBGRRes()
 	{
-				 pictureBoxImgBGRRes->Image = gcnew System::Drawing::Bitmap
-					 (imgBGRRes.cols, imgBGRRes.rows, imgBGRRes.step,
-					 System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgBGRRes.ptr());
-				 pictureBoxImgBGRRes->Refresh();
+//				 pictureBoxImgBGRRes->Image = gcnew System::Drawing::Bitmap
+//					 (imgBGRRes.cols, imgBGRRes.rows, imgBGRRes.step,
+//					 System::Drawing::Imaging::PixelFormat::Format24bppRgb, (System::IntPtr) imgBGRRes.ptr());
+//				 pictureBoxImgBGRRes->Refresh(System::Drawing::Graphics^ graphics2 = pictureBoxImgShadowMask->CreateGraphics();
+
+				 System::Drawing::Graphics^ graphics2 = pictureBoxImgBGRRes->CreateGraphics();
+				 System::IntPtr ptr2(imgBGRRes.ptr());
+				 System::Drawing::Bitmap^ b2 = gcnew System::Drawing::Bitmap(imgBGRRes.cols,
+					 imgBGRRes.rows, imgBGRRes.step, System::Drawing::Imaging::PixelFormat::Format24bppRgb, ptr2);
+				 System::Drawing::RectangleF rect2(0, 0, pictureBoxImgBGRRes->Width, pictureBoxImgBGRRes->Height);
+				 graphics2->DrawImage(b2, rect2);
 	}
 
 	private: bool SaveImgBGRRes()
@@ -2899,6 +2920,9 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 			 }
 			 ////@@
 
+			 std::vector<int> hadled_shadow_regions_labels; //regions that have already aligned
+			 std::vector<int> unhadled_shadow_regions_labels; //regions that have not aligned
+
 			 //Loop through all labels (clusters)
 			 for (int iterations = 0; iterations < 1; iterations++){
 				 for (int r = 0; r < regionCount; r++) {
@@ -2914,6 +2938,10 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 					 double L_non_shadow_avg = 0;
 					 double A_non_shadow_avg = 0;
 					 double B_non_shadow_avg = 0;
+
+//					 if (std::find(hadled_shadow_regions_labels.begin(), hadled_shadow_regions_labels.end(), CURRENT_LABEL) != hadled_shadow_regions_labels.end()) { //if found
+//						 continue;
+//					 }
 
 
 					 //Take Shadow Regions
@@ -3126,8 +3154,15 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 //					 if (SHADOW_LABEL == -1 || NON_SHADOW_LABEL == -1)
 //						 MessageBox::Show("NO LABEL");
 
+					 //if no non shadow region found
 					 if (SHADOW_LABEL == -1 || NON_SHADOW_LABEL == -1)
+					 {
+						 unhadled_shadow_regions_labels.push_back(SHADOW_LABEL);
 						 continue;
+					 }
+
+					 //mark shadow region as handled
+					 hadled_shadow_regions_labels.push_back(SHADOW_LABEL);
 
 					 int SHADOW_LABEL_COPY = SHADOW_LABEL;
 					 int NON_SHADOW_LABEL_COPY = NON_SHADOW_LABEL;
@@ -3205,10 +3240,16 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 							 pixel2.val[2] = B2;
 						 }
 					 }
+				 }
 
-
+				 //if some regions was not aligned then repeat procedure
+				 if (unhadled_shadow_regions_labels.size() > 0)
+				 {
 					 int a = 0;
-
+				 }
+				 else
+				 {
+					 break;
 				 }
 
 				 imgSourceLAB = imgResLAB.clone();

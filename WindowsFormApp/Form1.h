@@ -166,6 +166,7 @@ private: System::Windows::Forms::Button^  buttonMSSDefault;
 private: System::Windows::Forms::Label^  label1;
 private: System::Windows::Forms::Label^  label9;
 private: System::Windows::Forms::Label^  label10;
+private: System::Windows::Forms::Button^  buttonDestroyAlllWindows;
 
 
 
@@ -229,6 +230,7 @@ private: System::Windows::Forms::Label^  label10;
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->label9 = (gcnew System::Windows::Forms::Label());
 			this->label10 = (gcnew System::Windows::Forms::Label());
+			this->buttonDestroyAlllWindows = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGRRes))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGR))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgShadowMask))->BeginInit();
@@ -711,12 +713,23 @@ private: System::Windows::Forms::Label^  label10;
 			this->label10->TabIndex = 104;
 			this->label10->Text = L"Result image";
 			// 
+			// buttonDestroyAlllWindows
+			// 
+			this->buttonDestroyAlllWindows->Location = System::Drawing::Point(504, 592);
+			this->buttonDestroyAlllWindows->Name = L"buttonDestroyAlllWindows";
+			this->buttonDestroyAlllWindows->Size = System::Drawing::Size(127, 25);
+			this->buttonDestroyAlllWindows->TabIndex = 105;
+			this->buttonDestroyAlllWindows->Text = L"Destroy alll windows";
+			this->buttonDestroyAlllWindows->UseVisualStyleBackColor = true;
+			this->buttonDestroyAlllWindows->Click += gcnew System::EventHandler(this, &Form1::buttonDestroyAlllWindows_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->ClientSize = System::Drawing::Size(1416, 662);
+			this->Controls->Add(this->buttonDestroyAlllWindows);
 			this->Controls->Add(this->label10);
 			this->Controls->Add(this->label9);
 			this->Controls->Add(this->label1);
@@ -2920,11 +2933,20 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 			 }
 			 ////@@
 
-			 std::vector<int> hadled_shadow_regions_labels; //regions that have already aligned
+			 //regions that have already aligned
+			 //std::vector<int> hadled_shadow_regions_labels; 
+			 bool *hadled_shadow_regions_labels = new bool[regionCount];
+			 bool *hadled_shadow_regions_labels_FOR_NEXT_ITER = new bool[regionCount];
+			 for (int i = 0; i < regionCount; i++)
+			 {
+				 hadled_shadow_regions_labels[i] = false;
+				 hadled_shadow_regions_labels_FOR_NEXT_ITER[i] = false;
+			 }
+
 			 std::vector<int> unhadled_shadow_regions_labels; //regions that have not aligned
 
 			 //Loop through all labels (clusters)
-			 for (int iterations = 0; iterations < 1; iterations++){
+			 for (int iterations = 0; iterations < 10; iterations++){
 				 for (int r = 0; r < regionCount; r++) {
 					 int CURRENT_LABEL = r;
 					 int SHADOW_LABEL = -1;
@@ -2942,6 +2964,11 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 //					 if (std::find(hadled_shadow_regions_labels.begin(), hadled_shadow_regions_labels.end(), CURRENT_LABEL) != hadled_shadow_regions_labels.end()) { //if found
 //						 continue;
 //					 }
+
+					 if (hadled_shadow_regions_labels[CURRENT_LABEL] == true)
+					 {
+						 continue;
+					 }
 
 
 					 //Take Shadow Regions
@@ -3003,12 +3030,35 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 										 continue;
 									 }
 
+									 //check handled shadow regions
+									 bool i_plus = false;
+									 bool i_minus = false;
+									 bool j_plus = false;
+									 bool j_minus = false;
+//									 if (std::find(hadled_shadow_regions_labels.begin(), hadled_shadow_regions_labels.end(), ilabels[i + dev][j]) != hadled_shadow_regions_labels.end()) { //if found
+//										 i_plus = true;
+//									 }
+//									 if (std::find(hadled_shadow_regions_labels.begin(), hadled_shadow_regions_labels.end(), ilabels[i - dev][j]) != hadled_shadow_regions_labels.end()) { //if found
+//										 i_minus = true;
+//									 }
+//									 if (std::find(hadled_shadow_regions_labels.begin(), hadled_shadow_regions_labels.end(), ilabels[i][j + dev]) != hadled_shadow_regions_labels.end()) { //if found
+//										 j_plus = true;
+//									 }
+//									 if (std::find(hadled_shadow_regions_labels.begin(), hadled_shadow_regions_labels.end(), ilabels[i][j - dev]) != hadled_shadow_regions_labels.end()) { //if found
+//										 j_minus = true;
+//									 }
+									 
+
 									 //Go 1px to 4 base direction - up,down,left,right
 									 if (i + dev < imgSourceLAB.rows)
 									 {
+										 if (hadled_shadow_regions_labels[ilabels[i + dev][j]] == true) { //if found
+											 i_plus = true;
+										 }
+
 										 cv::Vec3b &pixelDown = imgShadowMask.at<cv::Vec3b>(i + dev, j);
 										 //if non shadow
-										 if (pixelDown.val[0] == 0){
+										 if (pixelDown.val[0] == 0 || i_plus){
 											 //adjacent_labels.push_back(ilabels[i + 1][j]);
 											 int ilabel = ilabels[i + dev][j];
 											 if (std::find(adjacent_labels.begin(), adjacent_labels.end(), ilabel) == adjacent_labels.end()) {
@@ -3018,9 +3068,13 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 									 }
 									 if (i - dev >= 0)
 									 {
+										 if (hadled_shadow_regions_labels[ilabels[i - dev][j]] == true) { //if found
+											 i_minus = true;
+										 }
+
 										 cv::Vec3b &pixelUp = imgShadowMask.at<cv::Vec3b>(i - dev, j);
 										 //if non shadow
-										 if (pixelUp.val[0] == 0){
+										 if (pixelUp.val[0] == 0 || i_minus){
 											 //adjacent_labels.push_back(ilabels[i - 1][j]);
 											 int ilabel = ilabels[i - dev][j];
 											 if (std::find(adjacent_labels.begin(), adjacent_labels.end(), ilabel) == adjacent_labels.end()) {
@@ -3030,9 +3084,13 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 									 }
 									 if (j + dev < imgSourceLAB.cols)
 									 {
+										 if (hadled_shadow_regions_labels[ilabels[i][j + dev]] == true) { //if found
+											 j_plus = true;
+										 }
+
 										 cv::Vec3b &pixelRight = imgShadowMask.at<cv::Vec3b>(i, j + dev);
 										 //if non shadow
-										 if (pixelRight.val[0] == 0){
+										 if (pixelRight.val[0] == 0 || j_plus){
 											 //adjacent_labels.push_back(ilabels[i][j + 1]);
 											 int ilabel = ilabels[i][j + dev];
 											 if (std::find(adjacent_labels.begin(), adjacent_labels.end(), ilabel) == adjacent_labels.end()) {
@@ -3042,9 +3100,13 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 									 }
 									 if (j - dev >= 0)
 									 {
+										 if (hadled_shadow_regions_labels[ilabels[i][j - dev]] == true) { //if found
+											 j_minus = true;
+										 }
+
 										 cv::Vec3b &pixelLeft = imgShadowMask.at<cv::Vec3b>(i, j - dev);
 										 //if non shadow
-										 if (pixelLeft.val[0] == 0){
+										 if (pixelLeft.val[0] == 0 || j_minus){
 											 //adjacent_labels.push_back(ilabels[i][j - 1]);
 											 int ilabel = ilabels[i][j - dev];
 											 if (std::find(adjacent_labels.begin(), adjacent_labels.end(), ilabel) == adjacent_labels.end()) {
@@ -3122,7 +3184,6 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 
 //						 if (A_abs_diff > MAX_A_DIFF || B_abs_diff > MAX_B_DIFF)
 //							 continue;
-						 double *a = new double[3] {1,2,3};
 						 //double delta_e_metric = CIE76::GetMetric(cv::Vec3b(L_shadow_avg, A_shadow_avg, B_shadow_avg), cv::Vec3b(L_non_shadow_avg__, A_non_shadow_avg__, B_non_shadow_avg__));
 						 double delta_e_metric = CIE76::GetMetric(new double[2]{A_shadow_avg, B_shadow_avg}, new double[2]{ A_non_shadow_avg__, B_non_shadow_avg__},2);
 
@@ -3162,7 +3223,8 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 					 }
 
 					 //mark shadow region as handled
-					 hadled_shadow_regions_labels.push_back(SHADOW_LABEL);
+					 //hadled_shadow_regions_labels.push_back(SHADOW_LABEL);
+					 hadled_shadow_regions_labels_FOR_NEXT_ITER[SHADOW_LABEL] = true;
 
 					 int SHADOW_LABEL_COPY = SHADOW_LABEL;
 					 int NON_SHADOW_LABEL_COPY = NON_SHADOW_LABEL;
@@ -3202,10 +3264,27 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 							 double A = pixel.val[1];
 							 double B = pixel.val[2];
 
+
 							 L *= L_ratio;
 							 //L += L_diff_;
 							 A *= A_ratio;
 							 B *= B_ratio;
+
+//							 //If region colors too far from shadow region colors - only relight
+//							 int COLOR_METRIC_THRESHOLD = 20;
+//							 if (LAB_delta_e_metric < COLOR_METRIC_THRESHOLD)
+//							 {
+//								 L *= L_ratio;
+//								 A *= A_ratio;
+//								 B *= B_ratio;
+//							 }
+//							 else
+//							 {
+//								 L *= L_ratio;
+//								 //L += L_diff_;
+//							 }
+
+							
 
 							 L = (L > 255 ? 255 : (L < 0 ? 0 : L));
 							 A = (A > 255 ? 255 : (A < 0 ? 0 : A));
@@ -3216,30 +3295,42 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 							pixel.val[1] = A;
 							pixel.val[2] = B;
 
-							 if (SHADOW_LABEL == 11)
-							 {
-//								 pixel.val[0] = 0;
-//								 pixel.val[1] = 0;
-//								 pixel.val[2] = 255;
-							 }
-
 							 //Add diff image
 							 
 							 cv::Vec3b &pixel2 = imgResLABAddLDiff.at<cv::Vec3b>(i, j);
 							 double L2 = pixel2.val[0];
 							 double A2 = pixel2.val[1];
 							 double B2 = pixel2.val[2];
+
 							 L2 += L_diff_;
 							 A2 *= A_ratio;
 							 B2 *= B_ratio;
+
+//							 if (LAB_delta_e_metric < COLOR_METRIC_THRESHOLD)
+//							 {
+//								 A2 *= A_ratio;
+//								 B2 *= B_ratio;
+//							 }
+
 							 L2 = (L2 > 255 ? 255 : (L2 < 0 ? 0 : L2));
 							 A2 = (A2 > 255 ? 255 : (A2 < 0 ? 0 : A2));
 							 B2 = (B2 > 255 ? 255 : (B2 < 0 ? 0 : B2));
+
 							 pixel2.val[0] = L2;
 							 pixel2.val[1] = A2;
 							 pixel2.val[2] = B2;
 						 }
 					 }
+				 }
+
+//				 delete hadled_shadow_regions_labels;
+//				 hadled_shadow_regions_labels = hadled_shadow_regions_labels_FOR_NEXT_ITER;
+//				 hadled_shadow_regions_labels_FOR_NEXT_ITER = new bool[regionCount];
+				 for (int i = 0; i < regionCount; i++)
+				 {
+					 //hadled_shadow_regions_labels_FOR_NEXT_ITER[i] = false;
+
+					 hadled_shadow_regions_labels[i] = hadled_shadow_regions_labels[i] || hadled_shadow_regions_labels_FOR_NEXT_ITER[i];
 				 }
 
 				 //if some regions was not aligned then repeat procedure
@@ -3253,6 +3344,11 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 				 }
 
 				 imgSourceLAB = imgResLAB.clone();
+
+//				 cv::Mat imgIter;
+//				 cv::cvtColor(imgResLAB, imgIter, CV_Lab2BGR);
+//				 System::String ^str = "imgIter ";
+//				 cv::imshow(System::Convert:z(iterations), imgIter);
 			 }
 			 cv::cvtColor(imgResLAB, imgResBGR, CV_Lab2BGR);
 			 cv::cvtColor(imgResLABAddLDiff, imgResBGRAddDiff, CV_Lab2BGR);
@@ -3662,6 +3758,7 @@ private: System::Void buttonBasicLightModelLAB_Click(System::Object^  sender, Sy
 						 A *= ratio_A;
 						 B *= ratio_B;
 
+
 //						 L += diff_L;
 //						 A += diff_A;
 //						 B += diff_B;
@@ -3696,14 +3793,178 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 			 cv::dilate(imgEdge, imgEdgeD, elementD);
 
 			 cv::imshow("imgEdge", imgEdge);
-			 cv::imshow("imgEdgeD", imgEdgeD);
+			 //cv::imshow("imgEdgeD", imgEdgeD);
 
-			 imgEdge = imgEdgeD.clone();
+			 //imgEdge = imgEdgeD.clone();
+
+			 //determine shadow regions lookig at edges 
+			 cv::Mat imgEdgeHandled = cv::Mat(imgEdge.rows, imgEdge.cols, CV_8U, cvScalar(0.)); //fil with 0
+			 std::vector<std::vector<int*>> regionsEgesPixels = std::vector<std::vector<int*>>();
+			 //std::vector<int*> edgeHadledPixels = std::vector<int*>();
+			 int determinedShadowRegions = 0;
+			 //std::vector<int*> determinedShadowRegionsPixels = std::vector<int*>();
+			 int maxIters = 1000000;
+			 for(int i = 0; i < imgEdge.rows; i++) {
+				 for (int j = 0; j < imgEdge.cols; j++) {
+
+					 uchar &edgePixel = imgEdge.at<uchar>(i, j);
+					 
+					 //skip handled
+					 if (imgEdgeHandled.at<uchar>(i, j) == 255)
+					 {
+						 continue;
+					 }
+
+					 if (edgePixel == 255)
+					 {
+						 //go by edge pixels path and save indexes
+						 int i2 = i;
+						 int j2 = j;
+						 bool goNext = true;
+
+						 determinedShadowRegions += 1;
+
+						 std::vector<int*> currentRegionEgePixels = std::vector<int*>();
+
+						 for (int k = 0; goNext == true;k++)
+						 {
+							 goNext = false;
+
+							 uchar &p = imgEdgeHandled.at<uchar>(i2, j2);
+							 p = 255;
+
+							 currentRegionEgePixels.push_back(new int[2] {i2, j2});
+
+							 if (k > maxIters)
+							 {
+								 throw new std::exception("Max iterations limit");
+								 return;
+							 }
+
+							 //look at all possible direction to determine where to go next
+							 int disctance = 1;
+							 int maxDisctance = 2;
+							 for (;true;)
+							 {
+								 //First look up, down, left, right
+								 if (i2 + disctance < imgEdge.rows && imgEdge.at<uchar>(i2 + disctance, j2) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 i2 = i2 + disctance;
+									 //continue;
+								 }
+								 if (i2 - disctance >= 0 && imgEdge.at<uchar>(i2 - disctance, j2) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 i2 = i2 - disctance;
+									 //continue;
+								 }
+								 if (j2 + disctance < imgEdge.cols && imgEdge.at<uchar>(i2, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2, j2 + disctance) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 j2 = j2 + disctance;
+									 //continue;
+								 }
+								 if (j2 - disctance >= 0 && imgEdge.at<uchar>(i2, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2, j2 - disctance) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 j2 = j2 - disctance;
+									 //continue;
+								 }
+
+								 //then top-left, top-right, etc
+								 if ((i2 - disctance >= 0 && j2 - disctance >= 0) && imgEdge.at<uchar>(i2 - disctance, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2 - disctance) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 i2 = i2 - disctance;
+									 j2 = j2 - disctance;
+									 //continue;
+								 }
+								 if ((i2 - disctance >= 0 && j2 + disctance < imgEdge.cols) && imgEdge.at<uchar>(i2 - disctance, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2 + disctance) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 i2 = i2 - disctance;
+									 j2 = j2 + disctance;
+									 //continue;
+								 }
+								 if ((i2 + disctance < imgEdge.rows && j2 - disctance >= 0) && imgEdge.at<uchar>(i2 + disctance, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2 - disctance) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 i2 = i2 + disctance;
+									 j2 = j2 - disctance;
+									 //continue;
+								 }
+								 if ((i2 + disctance < imgEdge.rows && j2 + disctance < imgEdge.cols) && imgEdge.at<uchar>(i2 + disctance, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2 + disctance) != 255 && goNext == false)
+								 {
+									 goNext = true;
+									 i2 = i2 + disctance;
+									 j2 = j2 + disctance;
+									 //continue;
+								 }
+
+								 if (goNext)
+								 {
+									 break;
+								 }
+								 else
+								 {
+									 if (disctance < maxDisctance)
+									 {
+										 disctance += 1;
+									 }
+									 else
+									 {
+										 break;
+									 }
+								 }
+							 }
+							 
+						 }
+
+						 regionsEgesPixels.push_back(currentRegionEgePixels);
+					 }
+
+				 }
+			 }
+
+			 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			 cv::imshow("imgEdgeHandled", imgEdgeHandled);
+			 cv::Mat imgRegionsEgesPixels = cv::Mat(imgEdge.rows, imgEdge.cols, CV_8UC3, cvScalar(0.));
+			  
+			 cv::vector<int> color(determinedShadowRegions);
+			 CvRNG rng = cvRNG(cvGetTickCount());
+
+			 for (int k = 0; k < determinedShadowRegions; k++)
+			 {
+				 color[k] = cvRandInt(&rng);
+			 }
+
+			 for (int k = 0; k < determinedShadowRegions; k++)
+			 {
+				 std::vector<int*> currentRegionEgePixels = regionsEgesPixels[k];
+				 for (int i = 0; i < currentRegionEgePixels.size(); i++)
+				 {
+					 int *indexes = currentRegionEgePixels[i];
+
+					 cv::Vec3b &pixel = imgRegionsEgesPixels.at<cv::Vec3b>(indexes[0], indexes[1]);
+
+					 pixel.val[0] = (color[k]) & 255;
+					 pixel.val[1] = (color[k] >> 8) & 255;
+					 pixel.val[2] = (color[k] >> 16) & 255;
+				 }
+			 }
+			 
+			 cv::imshow("imgRegionsEgesPixels", imgRegionsEgesPixels);
+			 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			 //Find pixels adjacent to shadow border
 
 			 std::vector<int*> border_adjacent_shadow_pixels_indexes = std::vector<int*>();
 			 std::vector<int*> border_adjacent_non_shadow_pixels_indexes = std::vector<int*>();
 
-			 int distance = 1;
+			 int distance_shadow = 20;
+			 int distance_non_shadow = 10;
 
 			 for (int i = 0; i < imgEdge.rows; i++) {
 				 for (int j = 0; j < imgEdge.cols; j++) {
@@ -3712,34 +3973,60 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 					 cv::Vec3b &pixel = imgBGR.at<cv::Vec3b>(i, j);
 					 cv::Vec3b &shadow_mask_pixel = imgShadowMask.at<cv::Vec3b>(i, j);
 
-					 bool adjacent_to_border = false;
-
-					 if (i - distance >= 0 && imgEdge.at<uchar>(i - distance, j) == 255)
+					 //Loop through edge pixels
+					 if (imgEdge.rows && imgEdge.at<uchar>(i, j) != 255)
 					 {
-						 adjacent_to_border = true;
-					 }
-					 if (i + distance < imgEdge.rows && imgEdge.at<uchar>(i + distance, j) == 255)
-					 {
-						 adjacent_to_border = true;
+						 continue;
 					 }
 
-					 if (j - distance >= 0 && imgEdge.at<uchar>(i, j - distance) == 255)
-					 {
-						 adjacent_to_border = true;
-					 }
-					 if (j + distance < imgEdge.cols && imgEdge.at<uchar>(i, j + distance) == 255)
-					 {
-						 adjacent_to_border = true;
-					 }
+					 int distance = 20;
+//					 if (shadow_mask_pixel.val[0] == 255)
+//					 {
+//						 distance = distance_shadow;
+//					 }
+//					 else{
+//						 distance = distance_non_shadow;
+//					 }
 
-					 if (adjacent_to_border == true)
+					 if (i - distance >= 0)
 					 {
-						 if (shadow_mask_pixel.val[0] == 255)
+						 if (imgShadowMask.at<cv::Vec3b>(i - distance, j).val[0] == 255)
 						 {
-							 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i, j});
+							 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i - distance, j});
 						 }
 						 else{
-							 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i, j});
+							 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i - distance, j});
+						 }
+					 }
+					 if (i + distance < imgEdge.rows)
+					 {
+						 if (imgShadowMask.at<cv::Vec3b>(i + distance, j).val[0] == 255)
+						 {
+							 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i + distance, j});
+						 }
+						 else{
+							 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i + distance, j});
+						 }
+					 }
+
+					 if (j - distance >= 0)
+					 {
+						 if (imgShadowMask.at<cv::Vec3b>(i, j - distance).val[0] == 255)
+						 {
+							 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i, j - distance});
+						 }
+						 else{
+							 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i, j - distance});
+						 }
+					 }
+					 if (j + distance < imgEdge.cols)
+					 {
+						 if (imgShadowMask.at<cv::Vec3b>(i, j + distance).val[0] == 255)
+						 {
+							 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i, j + distance});
+						 }
+						 else{
+							 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i, j + distance});
 						 }
 					 }
 				 }
@@ -3767,159 +4054,6 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 			 //FINDING A CONSTANT
 			 //
 			 //
-
-//			 //1-st way diff constant
-//			 int prev_error_B = 999999;
-//			 int prev_error_G = 999999;
-//			 int prev_error_R = 999999;
-//
-//			 int c_res_B = 0;
-//			 int c_res_G = 0;
-//			 int c_res_R = 0;
-//
-//			 std::vector<int> c_B_min_values = std::vector<int>();
-//
-//			 for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
-//			 {
-//				 int *S1_indexes = border_adjacent_shadow_pixels_indexes[r-1];
-//				 int *P1_indexes = border_adjacent_non_shadow_pixels_indexes[r-1];
-//
-//				 int *S2_indexes = border_adjacent_shadow_pixels_indexes[r];
-//				 int *P2_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-//
-//				 int S1_index_0 = S1_indexes[0];
-//				 int S1_index_1 = S1_indexes[1];
-//
-//				 int P1_index_0 = P1_indexes[0];
-//				 int P1_index_1 = P1_indexes[1];
-//				 
-//				 int S2_index_0 = S2_indexes[0];
-//				 int S2_index_1 = S2_indexes[1];
-//
-//				 int P2_index_0 = P2_indexes[0];
-//				 int P2_index_1 = P2_indexes[1];
-//
-//				 cv::Vec3b &S1 = imgBGR.at<cv::Vec3b>(S1_indexes[0], S1_indexes[1]);
-//				 cv::Vec3b &P1 = imgBGR.at<cv::Vec3b>(P1_indexes[0], P1_indexes[1]);
-//
-//				 cv::Vec3b &S2 = imgBGR.at<cv::Vec3b>(S2_indexes[0], S2_indexes[1]);
-//				 cv::Vec3b &P2 = imgBGR.at<cv::Vec3b>(P2_indexes[0], P2_indexes[1]);
-//
-//				 int c_B = P1.val[0] - S1.val[0];
-//				 int c_G = P1.val[1] - S1.val[1];
-//				 int c_R = P1.val[2] - S1.val[2];
-//
-//				 //error = P2 − (S2 + c) = P2 − (S2 + P1 − S1)
-//				 int error_B = P2.val[0] - (S2.val[0] + c_B);
-//				 int error_G = P2.val[1] - (S2.val[1] + c_G);
-//				 int error_R = P2.val[2] - (S2.val[2] + c_R);
-//
-//				 //Rc > Gc > Bc
-//				 if ((c_R > c_G && c_G > c_B) == false)
-//				 {
-//					 continue;
-//				 }
-//
-//				 if (error_B < prev_error_B)
-//				 {
-//					 prev_error_B = error_B;
-//					 c_res_B = c_B;
-//
-//					 c_B_min_values.push_back(c_res_B);
-//				 }
-//
-//				 if (error_G < prev_error_G)
-//				 {
-//					 prev_error_G = error_G;
-//					 c_res_G = c_G;
-//				 }
-//
-//				 if (error_R < prev_error_R)
-//				 {
-//					 prev_error_R = error_R;
-//					 c_res_R = c_R;
-//				 }
-//
-//				 int a = 0;
-//			 }
-//
-//			 int a = 0;
-
-//			 //1-st way ratio constant
-//			 double prev_error_B = 999999;
-//			 double prev_error_G = 999999;
-//			 double prev_error_R = 999999;
-//
-//			 double c_res_B = 0;
-//			 double c_res_G = 0;
-//			 double c_res_R = 0;
-//
-//			 std::vector<double> c_B_min_values = std::vector<double>();
-//
-//			 for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
-//			 {
-//				 int *S1_indexes = border_adjacent_shadow_pixels_indexes[r - 1];
-//				 int *P1_indexes = border_adjacent_non_shadow_pixels_indexes[r - 1];
-//
-//				 int *S2_indexes = border_adjacent_shadow_pixels_indexes[r];
-//				 int *P2_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-//
-//				 int S1_index_0 = S1_indexes[0];
-//				 int S1_index_1 = S1_indexes[1];
-//
-//				 int P1_index_0 = P1_indexes[0];
-//				 int P1_index_1 = P1_indexes[1];
-//
-//				 int S2_index_0 = S2_indexes[0];
-//				 int S2_index_1 = S2_indexes[1];
-//
-//				 int P2_index_0 = P2_indexes[0];
-//				 int P2_index_1 = P2_indexes[1];
-//
-//				 cv::Vec3b &S1 = imgBGR.at<cv::Vec3b>(S1_indexes[0], S1_indexes[1]);
-//				 cv::Vec3b &P1 = imgBGR.at<cv::Vec3b>(P1_indexes[0], P1_indexes[1]);
-//
-//				 cv::Vec3b &S2 = imgBGR.at<cv::Vec3b>(S2_indexes[0], S2_indexes[1]);
-//				 cv::Vec3b &P2 = imgBGR.at<cv::Vec3b>(P2_indexes[0], P2_indexes[1]);
-//
-//				 double c_B = (double)P1.val[0] / (double)S1.val[0];
-//				 double c_G = (double)P1.val[1] / (double)S1.val[1];
-//				 double c_R = (double)P1.val[2] / (double)S1.val[2];
-//
-//				 //error = P2 − (S2 + c) = P2 − (S2 + P1 − S1)
-//				 double error_B = (double)P2.val[0] - ((double)S2.val[0] * c_B);
-//				 double error_G = (double)P2.val[1] - ((double)S2.val[1] * c_G);
-//				 double error_R = (double)P2.val[2] - ((double)S2.val[2] * c_R);
-//
-//				 //Rc > Gc > Bc
-////				 if ((c_R > c_G && c_G > c_B) == false)
-////				 {
-////					 continue;
-////				 }
-//
-//				 if (error_B < prev_error_B)
-//				 {
-//					 prev_error_B = error_B;
-//					 c_res_B = c_B;
-//
-//					 c_B_min_values.push_back(c_res_B);
-//				 }
-//
-//				 if (error_G < prev_error_G)
-//				 {
-//					 prev_error_G = error_G;
-//					 c_res_G = c_G;
-//				 }
-//
-//				 if (error_R < prev_error_R)
-//				 {
-//					 prev_error_R = error_R;
-//					 c_res_R = c_R;
-//				 }
-//
-//				 int a = 0;
-//			 }
-
 
 //			 //2-nd way diff
 //			 double min_a_B = 99999999999999;
@@ -4065,6 +4199,8 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 //			 c_res_G = abs(i_min_a_G);
 //			 c_res_R = abs(i_min_a_R);
 
+
+
 			//2-nd way Metod Deleniya popolam
 
 			double a_B = 0;
@@ -4083,9 +4219,7 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 			double r_G = 0;
 			double r_R = 0;
 
-			
-
-			double sigma = 0.01;
+			double sigma = 0.005;
 			int max_step = 100000;
 
 			//calsc f value; f = sum (Pi - Si*r)^2
@@ -4109,23 +4243,17 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 					f_a_B += pow(P_pixel.val[0] - S_pixel.val[0] * a_B, 2);
 
 					//r==b
-					f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] * b_B, 2);
-
-					//r==c
-					c_B = (a_B + b_B) / 2.0;
-
-					f_c_B += pow(P_pixel.val[0] - S_pixel.val[0] * c_B, 2);				
+					f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] * b_B, 2);			
 				}
 
-				if (f_c_B < f_a_B)
+				if (f_a_B < f_b_B)
 				{
-					a_B = c_B;
+					b_B = (a_B + b_B) / 2.0;
 				}
-				else if (f_c_B < f_b_B)
+				else
 				{
-					b_B = c_B;
+					a_B = (a_B + b_B) / 2.0;
 				}
-
 
 				if ((b_B - a_B)<=sigma || i >= max_step)
 				{
@@ -4155,20 +4283,15 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 					//r==b
 					f_b_G += pow(P_pixel.val[1] - S_pixel.val[1] * b_G, 2);
-
-					//r==c
-					c_G = (a_G + b_G) / 2.0;
-
-					f_c_G += pow(P_pixel.val[1] - S_pixel.val[1] * c_G, 2);
 				}
 
-				if (f_c_G < f_a_G)
+				if (f_a_G < f_b_G)
 				{
-					a_G = c_G;
+					b_G = (a_G + b_G) / 2.0;
 				}
-				else if (f_c_G < f_b_G)
+				else
 				{
-					b_G = c_G;
+					a_G = (a_G + b_G) / 2.0;
 				}
 
 				r_G = (a_G + b_G) / 2;
@@ -4201,20 +4324,15 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 					//r==b
 					f_b_R += pow(P_pixel.val[2] - S_pixel.val[2] * b_R, 2);
-
-					//r==c
-					c_R = (a_R + b_R) / 2.0;
-
-					f_c_R += pow(P_pixel.val[2] - S_pixel.val[2] * c_R, 2);
 				}
 
-				if (f_c_R < f_a_R)
+				if (f_a_R < f_b_R)
 				{
-					a_R = c_R;
+					b_R = (a_R + b_R) / 2.0;
 				}
-				else if (f_c_R < f_b_R)
+				else
 				{
-					b_R = c_R;
+					a_R = (a_R + b_R) / 2.0;
 				}
 
 				if ((b_R - a_R) <= sigma || i >= max_step)
@@ -4223,10 +4341,66 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 					break;
 				}
 			}
-			 
+
 			double c_res_B = r_B;
 			double c_res_G = r_G;
 			double c_res_R = r_R;
+
+//			/////Very slow - just find sequencelly
+//			c_B = 0;
+//			c_G = 0;
+//			c_R = 0;
+//
+//			double f_c_B_prev = 99999999999999;
+//			double f_c_G_prev = 99999999999999;
+//			double f_c_R_prev = 99999999999999;
+//
+//			for (double i = 0; i < 20; i += 0.001)
+//			{
+//				double f_c_B = 0;
+//				double f_c_G = 0;
+//				double f_c_R = 0;
+//
+//				for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
+//				{
+//					int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+//					int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+//
+//					cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+//					cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+//
+//					f_c_B += pow(P_pixel.val[0] - S_pixel.val[0] * i, 2);
+//					f_c_G += pow(P_pixel.val[1] - S_pixel.val[1] * i, 2);
+//					f_c_R += pow(P_pixel.val[2] - S_pixel.val[2] * i, 2);
+//				}
+//
+//				if (f_c_B < f_c_B_prev)
+//				{
+//					f_c_B_prev = f_c_B;
+//					c_B = i;
+//				}
+//				if (f_c_G < f_c_G_prev)
+//				{
+//					f_c_G_prev = f_c_G;
+//					c_G = i;
+//				}
+//				if (f_c_R < f_c_R_prev)
+//				{
+//					f_c_R_prev = f_c_R;
+//					c_R = i;
+//				}
+//
+//				if (i >= max_step)
+//				{
+//					break;
+//				}
+//			}
+//			double c_res_B = c_B;
+//			double c_res_G = c_G;
+//			double c_res_R = c_R;
+//			//////////
+			 
+			
 
 			 //
 			 //
@@ -4244,6 +4418,12 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 						double B = pixel.val[0];
 						double G = pixel.val[1];
 						double R = pixel.val[2];
+
+//						//wall
+//						B *= 1.7;
+//						G *= 2.04;
+//						R *= 2.59;
+
 
 //						B += c_res_B;
 //						G += c_res_G;
@@ -4332,6 +4512,10 @@ private: void ShowMsgBox(System::String ^msg)
 }
 
 
+		 //Destroy all windows
+private: System::Void buttonDestroyAlllWindows_Click(System::Object^  sender, System::EventArgs^  e) {
+			 cv::destroyAllWindows();
+}
 };
 
 

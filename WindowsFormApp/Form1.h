@@ -3779,14 +3779,32 @@ private: System::Void buttonBasicLightModelLAB_Click(System::Object^  sender, Sy
 			 ShowImgBGRRes();
 }
 
+private: cv::Scalar GenerateRandomColor()
+{
+			 //int n = clock(); //clock - Returns the processor time consumed by the program.
+			 int n = cvGetTickCount(); //
+			 cv::RNG rng(n);
+			 return cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+}
+//private: cv::Scalar GenerateRandomColor(int i)
+//{
+//			int size = sizeof(int);
+//			int n = clock(); //clock - Returns the processor time consumed by the program.
+//			cv::RNG rng(n);
+//			return cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+//}
+
 private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, System::EventArgs^  e) {
 
 			 cv::Mat shadowMaskGRAY;
 			 cv::cvtColor(imgShadowMask, shadowMaskGRAY, CV_BGR2GRAY);
 
 			 cv::Mat imgEdge;
+			 cv::Mat imgEdgeCopy;
 			 cv::Mat imgEdgeD;
-			 cv::Canny(shadowMaskGRAY, imgEdge, 50, 150, 3);
+
+			 int aperture_size = 5;// — размер для оператора Собеля
+			 cv::Canny(shadowMaskGRAY, imgEdge, 50, 150, aperture_size);
 
 			 cv::Mat elementD = getStructuringElement(cv::MORPH_RECT,
 				 cv::Size(3,3));
@@ -3794,172 +3812,204 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 			 cv::imshow("imgEdge", imgEdge);
 			 //cv::imshow("imgEdgeD", imgEdgeD);
-
 			 //imgEdge = imgEdgeD.clone();
 
-			 //determine shadow regions lookig at edges 
-			 cv::Mat imgEdgeHandled = cv::Mat(imgEdge.rows, imgEdge.cols, CV_8U, cvScalar(0.)); //fil with 0
-			 std::vector<std::vector<int*>> regionsEgesPixels = std::vector<std::vector<int*>>();
-			 //std::vector<int*> edgeHadledPixels = std::vector<int*>();
-			 int determinedShadowRegions = 0;
-			 //std::vector<int*> determinedShadowRegionsPixels = std::vector<int*>();
-			 int maxIters = 1000000;
-			 for(int i = 0; i < imgEdge.rows; i++) {
-				 for (int j = 0; j < imgEdge.cols; j++) {
+#pragma region FIND CONTOURS USING findContours
+			 //////FIND CONTOURS USING  cv::findContours
+			 // extract contours of the canny image:
+			 imgEdgeCopy = imgEdge.clone();
+			 std::vector<std::vector<cv::Point> > contours; //Detected contours. Each contour is stored as a vector of points
+			 std::vector<cv::Vec4i> hierarchy; //Optional output vector, containing information about the image topology. 
+			 cv::findContours(imgEdgeCopy, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
-					 uchar &edgePixel = imgEdge.at<uchar>(i, j);
-					 
-					 //skip handled
-					 if (imgEdgeHandled.at<uchar>(i, j) == 255)
-					 {
-						 continue;
-					 }
+			 // draw the contours to a copy of the input image:
+			 cv::Mat outputContour ;
+			 cv::cvtColor(imgEdge, outputContour, CV_GRAY2BGR);
 
-					 if (edgePixel == 255)
-					 {
-						 //go by edge pixels path and save indexes
-						 int i2 = i;
-						 int j2 = j;
-						 bool goNext = true;
-
-						 determinedShadowRegions += 1;
-
-						 std::vector<int*> currentRegionEgePixels = std::vector<int*>();
-
-						 for (int k = 0; goNext == true;k++)
-						 {
-							 goNext = false;
-
-							 uchar &p = imgEdgeHandled.at<uchar>(i2, j2);
-							 p = 255;
-
-							 currentRegionEgePixels.push_back(new int[2] {i2, j2});
-
-							 if (k > maxIters)
-							 {
-								 throw new std::exception("Max iterations limit");
-								 return;
-							 }
-
-							 //look at all possible direction to determine where to go next
-							 int disctance = 1;
-							 int maxDisctance = 2;
-							 for (;true;)
-							 {
-								 //First look up, down, left, right
-								 if (i2 + disctance < imgEdge.rows && imgEdge.at<uchar>(i2 + disctance, j2) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 i2 = i2 + disctance;
-									 //continue;
-								 }
-								 if (i2 - disctance >= 0 && imgEdge.at<uchar>(i2 - disctance, j2) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 i2 = i2 - disctance;
-									 //continue;
-								 }
-								 if (j2 + disctance < imgEdge.cols && imgEdge.at<uchar>(i2, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2, j2 + disctance) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 j2 = j2 + disctance;
-									 //continue;
-								 }
-								 if (j2 - disctance >= 0 && imgEdge.at<uchar>(i2, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2, j2 - disctance) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 j2 = j2 - disctance;
-									 //continue;
-								 }
-
-								 //then top-left, top-right, etc
-								 if ((i2 - disctance >= 0 && j2 - disctance >= 0) && imgEdge.at<uchar>(i2 - disctance, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2 - disctance) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 i2 = i2 - disctance;
-									 j2 = j2 - disctance;
-									 //continue;
-								 }
-								 if ((i2 - disctance >= 0 && j2 + disctance < imgEdge.cols) && imgEdge.at<uchar>(i2 - disctance, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2 + disctance) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 i2 = i2 - disctance;
-									 j2 = j2 + disctance;
-									 //continue;
-								 }
-								 if ((i2 + disctance < imgEdge.rows && j2 - disctance >= 0) && imgEdge.at<uchar>(i2 + disctance, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2 - disctance) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 i2 = i2 + disctance;
-									 j2 = j2 - disctance;
-									 //continue;
-								 }
-								 if ((i2 + disctance < imgEdge.rows && j2 + disctance < imgEdge.cols) && imgEdge.at<uchar>(i2 + disctance, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2 + disctance) != 255 && goNext == false)
-								 {
-									 goNext = true;
-									 i2 = i2 + disctance;
-									 j2 = j2 + disctance;
-									 //continue;
-								 }
-
-								 if (goNext)
-								 {
-									 break;
-								 }
-								 else
-								 {
-									 if (disctance < maxDisctance)
-									 {
-										 disctance += 1;
-									 }
-									 else
-									 {
-										 break;
-									 }
-								 }
-							 }
-							 
-						 }
-
-						 regionsEgesPixels.push_back(currentRegionEgePixels);
-					 }
-
-				 }
-			 }
-
-			 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			 cv::imshow("imgEdgeHandled", imgEdgeHandled);
-			 cv::Mat imgRegionsEgesPixels = cv::Mat(imgEdge.rows, imgEdge.cols, CV_8UC3, cvScalar(0.));
-			  
-			 cv::vector<int> color(determinedShadowRegions);
-			 CvRNG rng = cvRNG(cvGetTickCount());
-
-			 for (int k = 0; k < determinedShadowRegions; k++)
+			 int thickness = 1;
+			 int lineType = 8;
+			 int maxLevel = 0;
+			 for (int i = 0; i< contours.size(); i++)
 			 {
-				 color[k] = cvRandInt(&rng);
+				 cv::Scalar color = GenerateRandomColor();
+				 cv::drawContours(outputContour, contours, i, color, thickness, lineType, hierarchy, maxLevel);
 			 }
 
-			 for (int k = 0; k < determinedShadowRegions; k++)
-			 {
-				 std::vector<int*> currentRegionEgePixels = regionsEgesPixels[k];
-				 for (int i = 0; i < currentRegionEgePixels.size(); i++)
-				 {
-					 int *indexes = currentRegionEgePixels[i];
+			 cv::imshow("outputContour", outputContour);
+			 //
+#pragma endregion
 
-					 cv::Vec3b &pixel = imgRegionsEgesPixels.at<cv::Vec3b>(indexes[0], indexes[1]);
+#pragma region FIND CONTOURS (MY REALISTION) - NOT COMPLETED
 
-					 pixel.val[0] = (color[k]) & 255;
-					 pixel.val[1] = (color[k] >> 8) & 255;
-					 pixel.val[2] = (color[k] >> 16) & 255;
-				 }
-			 }
+//			 ///FIND CONTOURS (MY REALISTION) - NOT COMPLETED
+//			 //determine shadow regions lookig at edges 
+//			 cv::Mat imgEdgeHandled = cv::Mat(imgEdge.rows, imgEdge.cols, CV_8U, cvScalar(0.)); //fil with 0
+//			 std::vector<std::vector<int*>> regionsEgesPixels = std::vector<std::vector<int*>>();
+//			 //std::vector<int*> edgeHadledPixels = std::vector<int*>();
+//			 int determinedShadowRegions = 0;
+//			 //std::vector<int*> determinedShadowRegionsPixels = std::vector<int*>();
+//			 int maxIters = 1000000;
+//			 for(int i = 0; i < imgEdge.rows; i++) {
+//				 for (int j = 0; j < imgEdge.cols; j++) {
+//
+//					 uchar &edgePixel = imgEdge.at<uchar>(i, j);
+//					 
+//					 //skip handled
+//					 if (imgEdgeHandled.at<uchar>(i, j) == 255)
+//					 {
+//						 continue;
+//					 }
+//
+//					 if (edgePixel == 255)
+//					 {
+//						 //go by edge pixels path and save indexes
+//						 int i2 = i;
+//						 int j2 = j;
+//						 bool goNext = true;
+//
+//						 determinedShadowRegions += 1;
+//
+//						 std::vector<int*> currentRegionEgePixels = std::vector<int*>();
+//
+//						 for (int k = 0; goNext == true;k++)
+//						 {
+//							 goNext = false;
+//
+//							 uchar &p = imgEdgeHandled.at<uchar>(i2, j2);
+//							 p = 255;
+//
+//							 currentRegionEgePixels.push_back(new int[2] {i2, j2});
+//
+//							 if (k > maxIters)
+//							 {
+//								 throw new std::exception("Max iterations limit");
+//								 return;
+//							 }
+//
+//							 //look at all possible direction to determine where to go next
+//							 int disctance = 1;
+//							 int maxDisctance = 2;
+//							 for (;true;)
+//							 {
+//								 //First look up, down, left, right
+//								 if (i2 + disctance < imgEdge.rows && imgEdge.at<uchar>(i2 + disctance, j2) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 i2 = i2 + disctance;
+//									 //continue;
+//								 }
+//								 if (i2 - disctance >= 0 && imgEdge.at<uchar>(i2 - disctance, j2) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 i2 = i2 - disctance;
+//									 //continue;
+//								 }
+//								 if (j2 + disctance < imgEdge.cols && imgEdge.at<uchar>(i2, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2, j2 + disctance) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 j2 = j2 + disctance;
+//									 //continue;
+//								 }
+//								 if (j2 - disctance >= 0 && imgEdge.at<uchar>(i2, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2, j2 - disctance) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 j2 = j2 - disctance;
+//									 //continue;
+//								 }
+//
+//								 //then top-left, top-right, etc
+//								 if ((i2 - disctance >= 0 && j2 - disctance >= 0) && imgEdge.at<uchar>(i2 - disctance, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2 - disctance) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 i2 = i2 - disctance;
+//									 j2 = j2 - disctance;
+//									 //continue;
+//								 }
+//								 if ((i2 - disctance >= 0 && j2 + disctance < imgEdge.cols) && imgEdge.at<uchar>(i2 - disctance, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2 - disctance, j2 + disctance) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 i2 = i2 - disctance;
+//									 j2 = j2 + disctance;
+//									 //continue;
+//								 }
+//								 if ((i2 + disctance < imgEdge.rows && j2 - disctance >= 0) && imgEdge.at<uchar>(i2 + disctance, j2 - disctance) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2 - disctance) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 i2 = i2 + disctance;
+//									 j2 = j2 - disctance;
+//									 //continue;
+//								 }
+//								 if ((i2 + disctance < imgEdge.rows && j2 + disctance < imgEdge.cols) && imgEdge.at<uchar>(i2 + disctance, j2 + disctance) == 255 && imgEdgeHandled.at<uchar>(i2 + disctance, j2 + disctance) != 255 && goNext == false)
+//								 {
+//									 goNext = true;
+//									 i2 = i2 + disctance;
+//									 j2 = j2 + disctance;
+//									 //continue;
+//								 }
+//
+//								 if (goNext)
+//								 {
+//									 break;
+//								 }
+//								 else
+//								 {
+//									 if (disctance < maxDisctance)
+//									 {
+//										 disctance += 1;
+//									 }
+//									 else
+//									 {
+//										 break;
+//									 }
+//								 }
+//							 }
+//							 
+//						 }
+//
+//						 regionsEgesPixels.push_back(currentRegionEgePixels);
+//					 }
+//
+//				 }
+//			 }
+//
+//			 //Draw contours
+//			 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//			 cv::imshow("imgEdgeHandled", imgEdgeHandled);
+//			 cv::Mat imgRegionsEgesPixels = cv::Mat(imgEdge.rows, imgEdge.cols, CV_8UC3, cvScalar(0.));
+//			  
+//			 cv::vector<int> color(determinedShadowRegions);
+//			 CvRNG rng = cvRNG(cvGetTickCount());
+//
+//			 for (int k = 0; k < determinedShadowRegions; k++)
+//			 {
+//				 color[k] = cvRandInt(&rng);
+//			 }
+//
+//			 for (int k = 0; k < determinedShadowRegions; k++)
+//			 {
+//				 std::vector<int*> currentRegionEgePixels = regionsEgesPixels[k];
+//				 for (int i = 0; i < currentRegionEgePixels.size(); i++)
+//				 {
+//					 int *indexes = currentRegionEgePixels[i];
+//
+//					 cv::Vec3b &pixel = imgRegionsEgesPixels.at<cv::Vec3b>(indexes[0], indexes[1]);
+//
+//					 pixel.val[0] = (color[k]) & 255;
+//					 pixel.val[1] = (color[k] >> 8) & 255;
+//					 pixel.val[2] = (color[k] >> 16) & 255;
+//				 }
+//			 }
+//			 
+//			 cv::imshow("imgRegionsEgesPixels", imgRegionsEgesPixels);
+//			 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma endregion
+
 			 
-			 cv::imshow("imgRegionsEgesPixels", imgRegionsEgesPixels);
-			 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma region Find pixels adjacent to shadow border
 
-			 //Find pixels adjacent to shadow border
-
+			//Find pixels adjacent to shadow border
 			 std::vector<int*> border_adjacent_shadow_pixels_indexes = std::vector<int*>();
 			 std::vector<int*> border_adjacent_non_shadow_pixels_indexes = std::vector<int*>();
 
@@ -4048,7 +4098,9 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 					 border_adjacent_non_shadow_pixels_indexes.pop_back();
 				 }
 			 }
+#pragma endregion
 
+#pragma region FINDING A CONSTANT
 			 //
 			 //
 			 //FINDING A CONSTANT
@@ -4400,11 +4452,12 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 //			double c_res_R = c_R;
 //			//////////
 			 
-			
+#pragma endregion
 
+#pragma region APPLYING THE CONSTANT
 			 //
 			 //
-			 //APPLYING A CONSTANT
+			 //APPLYING THE CONSTANT
 			 //
 			 //
 			for (int i = 0; i < imgEdge.rows; i++) {
@@ -4465,6 +4518,8 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 					}
 				}
 			}
+
+#pragma endregion
 
 			cv::imshow("const res", imgBGRRes);
 }

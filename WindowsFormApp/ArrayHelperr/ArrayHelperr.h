@@ -32,3 +32,65 @@ UCHAR get_array_max(UCHAR* array, int size)
 
 				return max;
 }
+
+//UCHAR
+UCHAR** Create2DArray(int m, int n, UCHAR defaultVal)
+{
+	UCHAR** matrix = new  UCHAR* [m];
+
+	for (int i = 0; i < m; i++)
+	{
+		matrix[i] = new UCHAR[n];
+
+		for (int j = 0; j < n; j++)
+		{
+			matrix[i][j] = defaultVal;
+		}
+	}
+
+	return matrix;
+}
+UCHAR** CreateMatrix(int m, int n, UCHAR defaultVal)
+{
+	return Create2DArray(m, n, defaultVal);
+}
+
+//BOOL
+bool** Create2DArray(int m, int n, bool defaultVal)
+{
+	bool** matrix = new  bool*[m];
+
+	for (int i = 0; i < m; i++)
+	{
+		matrix[i] = new bool[n];
+
+		for (int j = 0; j < n; j++)
+		{
+			matrix[i][j] = defaultVal;
+		}
+	}
+
+	return matrix;
+}
+bool** CreateMatrix(int m, int n, bool defaultVal)
+{
+	return Create2DArray(m, n, defaultVal);
+}
+
+//FREE MEMORY
+void Delete2dArray(UCHAR** matrix, int m)
+{
+	for (int i = 0; i < m; i++)
+	{
+		delete[] matrix[i];
+	}
+	delete[] matrix;
+}
+void Delete2dArray(bool** matrix, int m)
+{
+	for (int i = 0; i < m; i++)
+	{
+		delete [] matrix[i];
+	}
+	delete [] matrix;
+}

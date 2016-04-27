@@ -3779,6 +3779,7 @@ private: System::Void buttonBasicLightModelLAB_Click(System::Object^  sender, Sy
 			 ShowImgBGRRes();
 }
 
+		 //GenerateRandomColor
 private: cv::Scalar GenerateRandomColor()
 {
 			 //int n = clock(); //clock - Returns the processor time consumed by the program.
@@ -3786,13 +3787,310 @@ private: cv::Scalar GenerateRandomColor()
 			 cv::RNG rng(n);
 			 return cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 }
-//private: cv::Scalar GenerateRandomColor(int i)
-//{
-//			int size = sizeof(int);
-//			int n = clock(); //clock - Returns the processor time consumed by the program.
-//			cv::RNG rng(n);
-//			return cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-//}
+
+		 //V1 Recursive - ERROR: StackOverflow
+/*private: void GoThroughAllAdjacentShadowPixelsRec(cv::Point startPixel, bool **passedThroughPixels) //startPixel (from top-left): x - col, y - row
+{
+			 
+			 int j2 = startPixel.x;
+			 int i2 = startPixel.y;
+
+			 //if pixel handled
+			 if (passedThroughPixels[i2][j2] == true)
+			 {
+				 return;
+			 }
+
+			 cv::Vec3b pixel = imgShadowMask.at<cv::Vec3b>(i2, j2);
+
+			 if (pixel.val[0] == 255)
+			 //if (shadowMask.at<cv::Vec3b>(i, j).val[0] == 255)
+			 {
+				 //mark as hadled
+				 passedThroughPixels[i2][j2] = true;
+
+				 //look for adjacent shadow pixels
+				 int disctance = 1;
+
+				 //First look up, down, left, right
+				 if (i2 + disctance < imgShadowMask.rows && imgShadowMask.at<cv::Vec3b>(i2 + disctance, j2).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2, i2 + disctance), passedThroughPixels);
+				 }
+				 if (i2 - disctance >= 0 && imgShadowMask.at<cv::Vec3b>(i2 - disctance, j2).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2, i2 - disctance), passedThroughPixels);
+				 }
+				 if (j2 + disctance < imgShadowMask.cols && imgShadowMask.at<cv::Vec3b>(i2, j2 + disctance).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 + disctance, i2), passedThroughPixels);
+				 }
+				 if (j2 - disctance >= 0 && imgShadowMask.at<cv::Vec3b>(i2, j2 - disctance).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 - disctance, i2), passedThroughPixels);
+				 }
+
+				 //then top-left, top-right, etc
+				 if ((i2 - disctance >= 0 && j2 - disctance >= 0) && imgShadowMask.at<cv::Vec3b>(i2 - disctance, j2 - disctance).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 - disctance, i2 - disctance), passedThroughPixels);
+				 }
+				 if ((i2 - disctance >= 0 && j2 + disctance < imgShadowMask.cols) && imgShadowMask.at<cv::Vec3b>(i2 - disctance, j2 + disctance).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 + disctance, i2 - disctance), passedThroughPixels);
+				 }
+				 if ((i2 + disctance < imgShadowMask.rows && j2 - disctance >= 0) && imgShadowMask.at<cv::Vec3b>(i2 + disctance, j2 - disctance).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 - disctance, i2 + disctance), passedThroughPixels);
+				 }
+				 if ((i2 + disctance < imgShadowMask.rows && j2 + disctance < imgShadowMask.cols) && imgShadowMask.at<cv::Vec3b>(i2 + disctance, j2 + disctance).val[0] == 255)
+				 {
+					 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 + disctance, i2 + disctance), passedThroughPixels);
+				 }
+			 }
+			 else
+			 {
+				 return;
+			 }
+}*/
+
+		 //V2 Recursive - Do not cover all pixels
+/*private: void GoThroughAllAdjacentShadowPixelsRec(cv::Point startPixel, bool **passedThroughPixels, int CURRENT_QUATER) //startPixel (from top-left): x - col, y - row
+{
+		//QUATER - in Cartesian (Декарт) plane, where pixel is center - O(0,0) point
+		//0 - All quaters
+		//(1 - 4) - (1 - 4) 
+		int WHOLE_PLANE = 0;
+		int FIRST_QUATER = 1;
+		int SECOND_QUATER = 2;
+		int THIRD_QUATER = 3;
+		int FOURH_QUATER = 4;
+
+		//int NEXT_QUATER;
+
+		int j2 = startPixel.x;
+		int i2 = startPixel.y;
+
+		//if pixel handled
+//		if (passedThroughPixels[i2][j2] == true)
+//		{
+//			return;
+//		}
+
+		cv::Vec3b pixel = imgShadowMask.at<cv::Vec3b>(i2, j2);
+
+		if (pixel.val[0] == 255)
+		{
+			//mark as hadled
+			passedThroughPixels[i2][j2] = true;
+
+			//look for adjacent shadow pixels
+			int disctance = 1;
+
+			//Go up, down, left, right
+
+			if (CURRENT_QUATER == FIRST_QUATER || CURRENT_QUATER == SECOND_QUATER || CURRENT_QUATER == WHOLE_PLANE)
+			{
+				for (int i3 = i2; i3 >= 0; i3--) //up
+				{
+					if (imgShadowMask.at<cv::Vec3b>(i3, j2).val[0] == 255)
+					{
+						passedThroughPixels[i3][j2] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+			if (CURRENT_QUATER == THIRD_QUATER || CURRENT_QUATER == FOURH_QUATER || CURRENT_QUATER == WHOLE_PLANE)
+			{
+				for (int i3 = i2; i3 < imgShadowMask.rows; i3++) //down
+				{
+					if (imgShadowMask.at<cv::Vec3b>(i3, j2).val[0] == 255)
+					{
+						passedThroughPixels[i3][j2] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+			if (CURRENT_QUATER == SECOND_QUATER || CURRENT_QUATER == THIRD_QUATER || CURRENT_QUATER == WHOLE_PLANE)
+			{
+				for (int j3 = j2; j3 >= 0; j3--) //left
+				{
+					if (imgShadowMask.at<cv::Vec3b>(i2, j3).val[0] == 255)
+					{
+						passedThroughPixels[i2][j3] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+			if (CURRENT_QUATER == FIRST_QUATER || CURRENT_QUATER == FOURH_QUATER || CURRENT_QUATER == WHOLE_PLANE)
+			{
+				for (int j3 = j2; j3 < imgShadowMask.cols; j3++) //rigth
+				{
+					if (imgShadowMask.at<cv::Vec3b>(i2, j3).val[0] == 255)
+					{
+						passedThroughPixels[i2][j3] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+
+			//go top-left, top-right, etc
+			if (CURRENT_QUATER == SECOND_QUATER || CURRENT_QUATER == WHOLE_PLANE) //top-left
+			{
+				if ((i2 - disctance >= 0 && j2 - disctance >= 0) && imgShadowMask.at<cv::Vec3b>(i2 - disctance, j2 - disctance).val[0] == 255)
+				{
+					GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 - disctance, i2 - disctance), passedThroughPixels, SECOND_QUATER);
+				}
+			}
+			if (CURRENT_QUATER == FIRST_QUATER || CURRENT_QUATER == WHOLE_PLANE) //top-right
+			{
+				if ((i2 - disctance >= 0 && j2 + disctance < imgShadowMask.cols) && imgShadowMask.at<cv::Vec3b>(i2 - disctance, j2 + disctance).val[0] == 255)
+				{
+					GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 + disctance, i2 - disctance), passedThroughPixels, FIRST_QUATER);
+				}
+			}
+			if (CURRENT_QUATER == THIRD_QUATER || CURRENT_QUATER == WHOLE_PLANE) //bottom-left
+			{
+				if ((i2 + disctance < imgShadowMask.rows && j2 - disctance >= 0) && imgShadowMask.at<cv::Vec3b>(i2 + disctance, j2 - disctance).val[0] == 255)
+				{
+					GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 - disctance, i2 + disctance), passedThroughPixels, THIRD_QUATER);
+				}
+			}
+			if (CURRENT_QUATER == FOURH_QUATER || CURRENT_QUATER == WHOLE_PLANE) //bottom-right
+			{
+				if ((i2 + disctance < imgShadowMask.rows && j2 + disctance < imgShadowMask.cols) && imgShadowMask.at<cv::Vec3b>(i2 + disctance, j2 + disctance).val[0] == 255)
+				{
+					GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 + disctance, i2 + disctance), passedThroughPixels, FOURH_QUATER);
+				}
+			}
+			
+		}
+		else
+		{
+			return;
+		}
+}*/
+
+		//V2 Recursive (Go along countour) - 
+private: void GoThroughAllAdjacentShadowPixelsRec(std::vector<cv::Point> currentContour, bool **passedThroughPixels)
+{
+			 cv::Mat imgShadowMaskCopy = imgShadowMask.clone();
+
+			 //mark countour pixels as shadow to avoid errors in shadow pixels search
+			 for (int k = 0; k < currentContour.size(); k++)
+			 {
+				 int j2 = currentContour[k].x;
+				 int i2 = currentContour[k].y;
+
+				 cv::Vec3b &pixel = imgShadowMaskCopy.at<cv::Vec3b>(i2, j2);
+				 pixel.val[0] = 255;
+				 pixel.val[1] = 255;
+				 pixel.val[2] = 255;
+			 }
+
+			 //main loop
+			 for (int k = 0; k < currentContour.size(); k++)
+			 {
+				 int j2 = currentContour[k].x;
+				 int i2 = currentContour[k].y;
+
+//				 //mark as hadled
+				 passedThroughPixels[i2][j2] = true;
+
+				 //look for adjacent shadow pixels
+				 int disctance = 1;
+
+				 //Go up, down, left, right
+
+				for (int i3 = i2; i3 >= 0; i3--) //up
+				{
+					if (imgShadowMaskCopy.at<cv::Vec3b>(i3, j2).val[0] == 255)
+					{
+						passedThroughPixels[i3][j2] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+				for (int i3 = i2; i3 < imgShadowMaskCopy.rows; i3++) //down
+				{
+					if (imgShadowMaskCopy.at<cv::Vec3b>(i3, j2).val[0] == 255)
+					{
+						passedThroughPixels[i3][j2] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+				for (int j3 = j2; j3 >= 0; j3--) //left
+				{
+					if (imgShadowMaskCopy.at<cv::Vec3b>(i2, j3).val[0] == 255)
+					{
+						passedThroughPixels[i2][j3] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+				 for (int j3 = j2; j3 < imgShadowMaskCopy.cols; j3++) //rigth
+				{
+					 if (imgShadowMaskCopy.at<cv::Vec3b>(i2, j3).val[0] == 255)
+					{
+						passedThroughPixels[i2][j3] = true;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+//					 //go top-left, top-right, etc
+//					 //if (CURRENT_QUATER == SECOND_QUATER || CURRENT_QUATER == WHOLE_PLANE) //top-left
+//					 //{
+//						 if ((i2 - disctance >= 0 && j2 - disctance >= 0) && imgShadowMask.at<cv::Vec3b>(i2 - disctance, j2 - disctance).val[0] == 255)
+//						 {
+//							 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 - disctance, i2 - disctance), passedThroughPixels, SECOND_QUATER);
+//						 }
+//						 //}
+//						 //if (CURRENT_QUATER == FIRST_QUATER || CURRENT_QUATER == WHOLE_PLANE) //top-right
+//						 //{
+//						 if ((i2 - disctance >= 0 && j2 + disctance < imgShadowMask.cols) && imgShadowMask.at<cv::Vec3b>(i2 - disctance, j2 + disctance).val[0] == 255)
+//						 {
+//							 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 + disctance, i2 - disctance), passedThroughPixels, FIRST_QUATER);
+//						 }
+//						 //}
+//						 //if (CURRENT_QUATER == THIRD_QUATER || CURRENT_QUATER == WHOLE_PLANE) //bottom-left
+//						 //{
+//						 if ((i2 + disctance < imgShadowMask.rows && j2 - disctance >= 0) && imgShadowMask.at<cv::Vec3b>(i2 + disctance, j2 - disctance).val[0] == 255)
+//						 {
+//							 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 - disctance, i2 + disctance), passedThroughPixels, THIRD_QUATER);
+//						 }
+//						 //}
+//						 //if (CURRENT_QUATER == FOURH_QUATER || CURRENT_QUATER == WHOLE_PLANE) //bottom-right
+//						 //{
+//						 if ((i2 + disctance < imgShadowMask.rows && j2 + disctance < imgShadowMask.cols) && imgShadowMask.at<cv::Vec3b>(i2 + disctance, j2 + disctance).val[0] == 255)
+//						 {
+//							 GoThroughAllAdjacentShadowPixelsRec(cv::Point(j2 + disctance, i2 + disctance), passedThroughPixels, FOURH_QUATER);
+//						 }
+//						 //}
+			 }
+
+}
 
 private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, System::EventArgs^  e) {
 
@@ -3816,11 +4114,16 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 #pragma region FIND CONTOURS USING findContours
 			 //////FIND CONTOURS USING  cv::findContours
+
 			 // extract contours of the canny image:
 			 imgEdgeCopy = imgEdge.clone();
 			 std::vector<std::vector<cv::Point> > contours; //Detected contours. Each contour is stored as a vector of points
 			 std::vector<cv::Vec4i> hierarchy; //Optional output vector, containing information about the image topology. 
-			 cv::findContours(imgEdgeCopy, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+			 //int mode = CV_RETR_EXTERNAL; //retrieves only the extreme outer contours.
+			 int mode = CV_RETR_TREE;//retrieves all of the contours and reconstructs a full hierarchy of nested contours
+			 //int method = CV_CHAIN_APPROX_SIMPLE; //compresses horizontal, vertical, and diagonal segments and leaves only their end points
+			 int method = CV_CHAIN_APPROX_NONE; //stores absolutely all the contour points
+			 cv::findContours(imgEdgeCopy, contours, hierarchy, mode, method, cv::Point(0, 0));
 
 			 // draw the contours to a copy of the input image:
 			 cv::Mat outputContour ;
@@ -4006,37 +4309,98 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 #pragma endregion
 
-			 
-#pragma region Find pixels adjacent to shadow border
+			int rows = imgBGR.rows;
+			int cols = imgBGR.cols;
+			bool **lightenedPixels = Create2DArray(rows, cols, false); //indicates pixels than already have lightened
 
-			//Find pixels adjacent to shadow border
-			 std::vector<int*> border_adjacent_shadow_pixels_indexes = std::vector<int*>();
-			 std::vector<int*> border_adjacent_non_shadow_pixels_indexes = std::vector<int*>();
+	         //Iterate through all countrous
+			 for (int contour_i = 0; contour_i < contours.size(); contour_i++)
+			 //for (int contour_i = 0; contour_i < 1; contour_i++)
+			 {
+				 std::vector<cv::Point> currentContour = contours[contour_i];
+				 int currentContourSize = currentContour.size();
 
-			 int distance_shadow = 20;
-			 int distance_non_shadow = 10;
+#pragma region Find pixels adjacent to shadow border (for specific contour)
+				 
+				 std::vector<int*> border_adjacent_shadow_pixels_indexes = std::vector<int*>();
+				 std::vector<int*> border_adjacent_non_shadow_pixels_indexes = std::vector<int*>();
 
-			 for (int i = 0; i < imgEdge.rows; i++) {
-				 for (int j = 0; j < imgEdge.cols; j++) {
+//				 int distance_shadow = 20;
+//				 int distance_non_shadow = 10;
+				 int distance = 20;
 
-					 //uchar &pixel = imgEdge.at<uchar>(i, j);
+//				 //Loop thorough image to find edge pixel and determine adjacent
+//				 for (int i = 0; i < imgEdge.rows; i++) {
+//					 for (int j = 0; j < imgEdge.cols; j++) {
+//
+//						 //uchar &pixel = imgEdge.at<uchar>(i, j);
+//						 cv::Vec3b &pixel = imgBGR.at<cv::Vec3b>(i, j);
+//						 cv::Vec3b &shadow_mask_pixel = imgShadowMask.at<cv::Vec3b>(i, j);
+//
+//						 //Loop through edge pixels
+//						 if (imgEdge.rows && imgEdge.at<uchar>(i, j) != 255)
+//						 {
+//							 continue;
+//						 }
+//
+//						 //					 if (shadow_mask_pixel.val[0] == 255)
+//						 //					 {
+//						 //						 distance = distance_shadow;
+//						 //					 }
+//						 //					 else{
+//						 //						 distance = distance_non_shadow;
+//						 //					 }
+//
+//						 if (i - distance >= 0)
+//						 {
+//							 if (imgShadowMask.at<cv::Vec3b>(i - distance, j).val[0] == 255)
+//							 {
+//								 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i - distance, j});
+//							 }
+//							 else{
+//								 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i - distance, j});
+//							 }
+//						 }
+//						 if (i + distance < imgEdge.rows)
+//						 {
+//							 if (imgShadowMask.at<cv::Vec3b>(i + distance, j).val[0] == 255)
+//							 {
+//								 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i + distance, j});
+//							 }
+//							 else{
+//								 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i + distance, j});
+//							 }
+//						 }
+//
+//						 if (j - distance >= 0)
+//						 {
+//							 if (imgShadowMask.at<cv::Vec3b>(i, j - distance).val[0] == 255)
+//							 {
+//								 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i, j - distance});
+//							 }
+//							 else{
+//								 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i, j - distance});
+//							 }
+//						 }
+//						 if (j + distance < imgEdge.cols)
+//						 {
+//							 if (imgShadowMask.at<cv::Vec3b>(i, j + distance).val[0] == 255)
+//							 {
+//								 border_adjacent_shadow_pixels_indexes.push_back(new int[2]{i, j + distance});
+//							 }
+//							 else{
+//								 border_adjacent_non_shadow_pixels_indexes.push_back(new int[2]{i, j + distance});
+//							 }
+//						 }
+//					 }
+//				 }
+
+				 //Loop thorough countour pixels  and determine adjacent
+				 for (int k = 0; k < currentContour.size(); k++)
+				 {
+					 int j = currentContour[k].x;
+					 int i = currentContour[k].y;
 					 cv::Vec3b &pixel = imgBGR.at<cv::Vec3b>(i, j);
-					 cv::Vec3b &shadow_mask_pixel = imgShadowMask.at<cv::Vec3b>(i, j);
-
-					 //Loop through edge pixels
-					 if (imgEdge.rows && imgEdge.at<uchar>(i, j) != 255)
-					 {
-						 continue;
-					 }
-
-					 int distance = 20;
-//					 if (shadow_mask_pixel.val[0] == 255)
-//					 {
-//						 distance = distance_shadow;
-//					 }
-//					 else{
-//						 distance = distance_non_shadow;
-//					 }
 
 					 if (i - distance >= 0)
 					 {
@@ -4080,448 +4444,487 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 						 }
 					 }
 				 }
-			 }
 
-			 if (border_adjacent_shadow_pixels_indexes.size() > border_adjacent_non_shadow_pixels_indexes.size())
-			 {
-				 int count = border_adjacent_shadow_pixels_indexes.size() - border_adjacent_non_shadow_pixels_indexes.size();
-				 for (int i = 0; i < count; i++)
+				 //int MIN_ADJACENT_NON_SHADOW_PIXELS = 10;
+
+				 if (border_adjacent_shadow_pixels_indexes.size() == 0 || border_adjacent_non_shadow_pixels_indexes.size() == 0)
+					 continue;
+
+				 if (border_adjacent_shadow_pixels_indexes.size() > border_adjacent_non_shadow_pixels_indexes.size())
 				 {
-					 border_adjacent_shadow_pixels_indexes.pop_back();
+					 int count = border_adjacent_shadow_pixels_indexes.size() - border_adjacent_non_shadow_pixels_indexes.size();
+					 for (int i = 0; i < count; i++)
+					 {
+						 border_adjacent_shadow_pixels_indexes.pop_back();
+					 }
 				 }
-			 }
-			 if (border_adjacent_shadow_pixels_indexes.size() < border_adjacent_non_shadow_pixels_indexes.size())
-			 {
-				 int count = border_adjacent_non_shadow_pixels_indexes.size() - border_adjacent_shadow_pixels_indexes.size();
-				 for (int i = 0; i < count; i++)
+				 if (border_adjacent_shadow_pixels_indexes.size() < border_adjacent_non_shadow_pixels_indexes.size())
 				 {
-					 border_adjacent_non_shadow_pixels_indexes.pop_back();
+					 int count = border_adjacent_non_shadow_pixels_indexes.size() - border_adjacent_shadow_pixels_indexes.size();
+					 for (int i = 0; i < count; i++)
+					 {
+						 border_adjacent_non_shadow_pixels_indexes.pop_back();
+					 }
 				 }
-			 }
 #pragma endregion
 
 #pragma region FINDING A CONSTANT
-			 //
-			 //
-			 //FINDING A CONSTANT
-			 //
-			 //
+				 //
+				 //
+				 //FINDING A CONSTANT
+				 //
+				 //
 
-//			 //2-nd way diff
-//			 double min_a_B = 99999999999999;
-//			 double min_a_G = 99999999999999;
-//			 double min_a_R = 99999999999999;
-//
-//			 int i_min_a_B = 9999999999999;
-//			 int i_min_a_G = 9999999999999;
-//			 int i_min_a_R = 9999999999999;
-//
-//			 for (int i = -255; i <= 255; i++)
-//			 {
-//				 double a_B = 0;
-//				 double a_G = 0;
-//				 double a_R = 0;
-//
-//				 for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
+				 //			 //2-nd way diff
+				 //			 double min_a_B = 99999999999999;
+				 //			 double min_a_G = 99999999999999;
+				 //			 double min_a_R = 99999999999999;
+				 //
+				 //			 int i_min_a_B = 9999999999999;
+				 //			 int i_min_a_G = 9999999999999;
+				 //			 int i_min_a_R = 9999999999999;
+				 //
+				 //			 for (int i = -255; i <= 255; i++)
+				 //			 {
+				 //				 double a_B = 0;
+				 //				 double a_G = 0;
+				 //				 double a_R = 0;
+				 //
+				 //				 for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
+				 //				 {
+				 //					 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+				 //					 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+				 //
+				 //					 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+				 //					 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+				 //
+				 //					 a_B += cv::pow(P_pixel.val[0] - S_pixel.val[0] + i,2);
+				 //					 a_G += cv::pow(P_pixel.val[1] - S_pixel.val[1] + i,2);
+				 //					 a_R += cv::pow(P_pixel.val[2] - S_pixel.val[2] + i,2);
+				 //				 }
+				 //
+				 //				 if (a_B < min_a_B)
+				 //				 {
+				 //					 min_a_B = a_B;
+				 //					 i_min_a_B = i;
+				 //				 }
+				 //				 if (a_G < min_a_G)
+				 //				 {
+				 //					 min_a_G = a_G;
+				 //					 i_min_a_G = i;
+				 //				 }
+				 //				 if (a_R < min_a_R)
+				 //				 {
+				 //					 min_a_R = a_R;
+				 //					 i_min_a_R = i;
+				 //				 }
+				 //			 }
+
+				 ////2-nd way MNK - NOT WORKING/ take average -> get grey pixels
+				 //			 double min_a_B = 99999999999999;
+				 //			 double min_a_G = 99999999999999;
+				 //			 double min_a_R = 99999999999999;
+				 //
+				 //			 int i_min_a_B = 9999999999999;
+				 //			 int i_min_a_G = 9999999999999;
+				 //			 int i_min_a_R = 9999999999999;
+				 //
+				 //
+				 //			 //take stat data P and S vectors
+				 //
+				 //			 //MNK x - S; y - P
+				 //
+				 //			 //sum xi
+				 //			 double sum_Si_B = 0;
+				 //			 double sum_Si_G = 0;
+				 //			 double sum_Si_R = 0;
+				 //
+				 //			 //sum xi^2
+				 //			 double sum_Si2_B = 0;
+				 //			 double sum_Si2_G = 0;
+				 //			 double sum_Si2_R = 0;
+				 //			 
+				 //			 //sum yi
+				 //			 double sum_Pi_B = 0;
+				 //			 double sum_Pi_G = 0;
+				 //			 double sum_Pi_R = 0;
+				 //
+				 //			 //sum xi*yi
+				 //			 double sum_SiPi_R = 0;
+				 //			 double sum_SiPi_G = 0;
+				 //			 double sum_SiPi_B = 0;
+				 //
+				 //			 //y = a*x + b; 
+				 //			 //P = a*S + b
+				 //			 double mnk_n = border_adjacent_shadow_pixels_indexes.size();
+				 //			 //double mnk_n = 100;
+				 //
+				 //			 double mnk_a_B = 0;
+				 //			 double mnk_a_G = 0;
+				 //			 double mnk_a_R = 0;
+				 //
+				 //			 double mnk_b_B = 0;
+				 //			 double mnk_b_G = 0;
+				 //			 double mnk_b_R = 0;
+				 //
+				 //			 //sum Si sum Pi sum Si^2
+				 //			 for (std::vector<int>::size_type r = 1; r != mnk_n; r++)
+				 //			 {
+				 //				 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+				 //				 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+				 //
+				 //				 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+				 //				 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+				 //
+				 //				 sum_Si_B += S_pixel.val[0];
+				 //				 sum_Si_G += S_pixel.val[1];
+				 //				 sum_Si_R += S_pixel.val[2];
+				 //
+				 //				 sum_Si2_B += pow(S_pixel.val[0], 2);
+				 //				 sum_Si2_G += pow(S_pixel.val[1], 2);
+				 //				 sum_Si2_R += pow(S_pixel.val[2], 2);
+				 //
+				 //				 sum_Pi_B += P_pixel.val[0];
+				 //				 sum_Pi_G += P_pixel.val[1];
+				 //				 sum_Pi_R += P_pixel.val[2];
+				 //			 }
+				 //
+				 //			 //sum Si*Pi
+				 //			 for (std::vector<int>::size_type r = 1; r != mnk_n; r++)
+				 //			 {
+				 //				 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+				 //				 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+				 //
+				 //				 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+				 //				 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+				 //
+				 //				 sum_SiPi_B += S_pixel.val[0] * P_pixel.val[0];
+				 //				 sum_SiPi_G += S_pixel.val[1] * P_pixel.val[1];
+				 //				 sum_SiPi_R += S_pixel.val[2] * P_pixel.val[2];
+				 //			 }
+				 //
+				 //			 mnk_a_B = (mnk_n*sum_SiPi_B - sum_Si_B*sum_Pi_B) / (mnk_n*sum_Si2_B - pow(sum_Si_B, 2));
+				 //			 mnk_a_G = (mnk_n*sum_SiPi_G - sum_Si_G*sum_Pi_G) / (mnk_n*sum_Si2_G - pow(sum_Si_G, 2));
+				 //			 mnk_a_R = (mnk_n*sum_SiPi_R - sum_Si_R*sum_Pi_R) / (mnk_n*sum_Si2_R - pow(sum_Si_R, 2));
+				 //
+				 //			 mnk_b_B = (sum_Pi_B - mnk_a_B*sum_Si_B) / mnk_n;
+				 //			 mnk_b_G = (sum_Pi_G - mnk_a_G*sum_Si_G) / mnk_n;
+				 //			 mnk_b_R = (sum_Pi_R - mnk_a_R*sum_Si_R) / mnk_n;
+				 //
+				 //			 double c_res_B = 0;
+				 //			 double c_res_G = 0;
+				 //			 double c_res_R = 0;
+
+				 //			 c_res_B = abs(i_min_a_B);
+				 //			 c_res_G = abs(i_min_a_G);
+				 //			 c_res_R = abs(i_min_a_R);
+
+
+
+				 //2-nd way Metod Deleniya popolam
+
+				 double a_B = 0;
+				 double a_G = 0;
+				 double a_R = 0;
+
+				 double b_B = 256;
+				 double b_G = 256;
+				 double b_R = 256;
+
+				 double c_B = 0;
+				 double c_G = 0;
+				 double c_R = 0;
+
+				 double sigma = 0.005; //accuracy
+				 int max_step = 100000; //max iterations
+
+				 //Rc > Gc > Bc
+
+				 //calsc f value; f = sum (Pi - Si*r)^2
+				 for (int i = 0; true; i++)
+				 {
+					 double f_a_B = 0;
+					 double f_b_B = 0;
+					 double f_c_B = 0;
+
+					 for (std::vector<int>::size_type r = 0; r != border_adjacent_shadow_pixels_indexes.size(); r++)
+					 {
+						 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+						 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+
+						 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+						 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+
+						 f_a_B += pow(P_pixel.val[0] - S_pixel.val[0] * a_B, 2);
+						 f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] * b_B, 2);
+					 }
+
+					 if (f_a_B < f_b_B)
+					 {
+						 b_B = (a_B + b_B) / 2.0;
+					 }
+					 else
+					 {
+						 a_B = (a_B + b_B) / 2.0;
+					 }
+
+					 if ((b_B - a_B) <= sigma || i >= max_step)
+					 {
+						 c_B = (a_B + b_B) / 2;
+						 break;
+					 }
+				 }
+
+				 for (int i = 0; true; i++)
+				 {
+					 double f_a_G = 0;
+					 double f_b_G = 0;
+					 double f_c_G = 0;
+
+					 for (std::vector<int>::size_type r = 0; r != border_adjacent_shadow_pixels_indexes.size(); r++)
+					 {
+						 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+						 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+
+						 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+						 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+
+						 f_a_G += pow(P_pixel.val[1] - S_pixel.val[1] * a_G, 2);
+						 f_b_G += pow(P_pixel.val[1] - S_pixel.val[1] * b_G, 2);
+					 }
+
+					 if (f_a_G < f_b_G)
+					 {
+						 b_G = (a_G + b_G) / 2.0;
+					 }
+					 else
+					 {
+						 a_G = (a_G + b_G) / 2.0;
+					 }
+
+					 if (((b_G - a_G) <= sigma || i >= max_step))
+					 {
+						 c_G = (a_G + b_G) / 2;
+						 break;
+					 }
+				 }
+
+				 for (int i = 0; true; i++)
+				 {
+					 double f_a_R = 0;
+					 double f_b_R = 0;
+					 double f_c_R = 0;
+
+					 for (std::vector<int>::size_type r = 0; r != border_adjacent_shadow_pixels_indexes.size(); r++)
+					 {
+						 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+						 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+
+						 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+						 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+
+						 f_a_R += pow(P_pixel.val[2] - S_pixel.val[2] * a_R, 2);
+						 f_b_R += pow(P_pixel.val[2] - S_pixel.val[2] * b_R, 2);
+					 }
+
+					 if (f_a_R < f_b_R)
+					 {
+						 b_R = (a_R + b_R) / 2.0;
+					 }
+					 else
+					 {
+						 a_R = (a_R + b_R) / 2.0;
+					 }
+
+					 if ((b_R - a_R) <= sigma || i >= max_step)
+					 {
+						 c_R = (a_R + b_R) / 2;
+						 break;
+					 }
+				 }
+
+				 double c_res_B = c_B;
+				 double c_res_G = c_G;
+				 double c_res_R = c_R;
+
+				 //			/////Very slow - just find sequencelly
+				 //			c_B = 0;
+				 //			c_G = 0;
+				 //			c_R = 0;
+				 //
+				 //			double f_c_B_prev = 99999999999999;
+				 //			double f_c_G_prev = 99999999999999;
+				 //			double f_c_R_prev = 99999999999999;
+				 //
+				 //			for (double i = 0; i < 20; i += 0.001)
+				 //			{
+				 //				double f_c_B = 0;
+				 //				double f_c_G = 0;
+				 //				double f_c_R = 0;
+				 //
+				 //				for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
+				 //				{
+				 //					int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
+				 //					int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
+				 //
+				 //					cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
+				 //					cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
+				 //
+				 //					f_c_B += pow(P_pixel.val[0] - S_pixel.val[0] * i, 2);
+				 //					f_c_G += pow(P_pixel.val[1] - S_pixel.val[1] * i, 2);
+				 //					f_c_R += pow(P_pixel.val[2] - S_pixel.val[2] * i, 2);
+				 //				}
+				 //
+				 //				if (f_c_B < f_c_B_prev)
+				 //				{
+				 //					f_c_B_prev = f_c_B;
+				 //					c_B = i;
+				 //				}
+				 //				if (f_c_G < f_c_G_prev)
+				 //				{
+				 //					f_c_G_prev = f_c_G;
+				 //					c_G = i;
+				 //				}
+				 //				if (f_c_R < f_c_R_prev)
+				 //				{
+				 //					f_c_R_prev = f_c_R;
+				 //					c_R = i;
+				 //				}
+				 //
+				 //				if (i >= max_step)
+				 //				{
+				 //					break;
+				 //				}
+				 //			}
+				 //			double c_res_B = c_B;
+				 //			double c_res_G = c_G;
+				 //			double c_res_R = c_R;
+				 //			//////////
+
+#pragma endregion
+
+#pragma region FIND SHADOW PIXELS FOR CURRENT COUNTOUR
+				 				 
+				 bool **passedThroughPixels = Create2DArray(rows, cols, false); //indicates pixelsForRelight
+
+//				 //Take any shadow countour pixel as init value;
+//				 cv::Point startPixel = currentContour[0];
+//				 for (int k = 0; k < currentContour.size(); k++)
 //				 {
-//					 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-//					 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-//
-//					 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-//					 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-//
-//					 a_B += cv::pow(P_pixel.val[0] - S_pixel.val[0] + i,2);
-//					 a_G += cv::pow(P_pixel.val[1] - S_pixel.val[1] + i,2);
-//					 a_R += cv::pow(P_pixel.val[2] - S_pixel.val[2] + i,2);
+//					 int j = currentContour[k].x;
+//					 int i = currentContour[k].y;
+//					 if (imgShadowMask.at<cv::Vec3b>(i,j).val[0] == 255)
+//					 {
+//						 startPixel = currentContour[k];
+//						 break;
+//					 }
 //				 }
-//
-//				 if (a_B < min_a_B)
+
+				 int pixelsHandled = 0;
+				 
+				 //GoThroughAllAdjacentShadowPixelsRec(startPixel, passedThroughPixels);//V1
+
+				 //int QUATER = 0; //0 - means whole Cartesian plane (see method description)
+				 //GoThroughAllAdjacentShadowPixelsRec(startPixel, passedThroughPixels, QUATER);//V2
+
+				 GoThroughAllAdjacentShadowPixelsRec(currentContour, passedThroughPixels);//V3
+
+				 //visualize
+				 cv::Mat visualRes = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3, cv::Scalar(0,0,0));
+
+				 for (int i = 0; i < visualRes.rows; i++) { //draw all adjacent shadow pixels
+					 for (int j = 0; j < visualRes.cols; j++) {
+
+						 if (passedThroughPixels[i][j] == true)
+						 {
+							 cv::Vec3b &pixel = visualRes.at<cv::Vec3b>(i, j);
+							 pixel.val[2] = 200;
+						 }	 
+					 }
+				 }
+
+//				 for (int k = 0; k < currentContour.size(); k++) //draw countour pixels only
 //				 {
-//					 min_a_B = a_B;
-//					 i_min_a_B = i;
+//					 int j = currentContour[k].x;
+//					 int i = currentContour[k].y;
+//					 cv::Vec3b &pixel = visualRes.at<cv::Vec3b>(i, j);
+//					 pixel.val[2] = 200;
 //				 }
-//				 if (a_G < min_a_G)
-//				 {
-//					 min_a_G = a_G;
-//					 i_min_a_G = i;
-//				 }
-//				 if (a_R < min_a_R)
-//				 {
-//					 min_a_R = a_R;
-//					 i_min_a_R = i;
-//				 }
-//			 }
 
-			 ////2-nd way MNK - NOT WORKING/ take average -> get grey pixels
-//			 double min_a_B = 99999999999999;
-//			 double min_a_G = 99999999999999;
-//			 double min_a_R = 99999999999999;
-//
-//			 int i_min_a_B = 9999999999999;
-//			 int i_min_a_G = 9999999999999;
-//			 int i_min_a_R = 9999999999999;
-//
-//
-//			 //take stat data P and S vectors
-//
-//			 //MNK x - S; y - P
-//
-//			 //sum xi
-//			 double sum_Si_B = 0;
-//			 double sum_Si_G = 0;
-//			 double sum_Si_R = 0;
-//
-//			 //sum xi^2
-//			 double sum_Si2_B = 0;
-//			 double sum_Si2_G = 0;
-//			 double sum_Si2_R = 0;
-//			 
-//			 //sum yi
-//			 double sum_Pi_B = 0;
-//			 double sum_Pi_G = 0;
-//			 double sum_Pi_R = 0;
-//
-//			 //sum xi*yi
-//			 double sum_SiPi_R = 0;
-//			 double sum_SiPi_G = 0;
-//			 double sum_SiPi_B = 0;
-//
-//			 //y = a*x + b; 
-//			 //P = a*S + b
-//			 double mnk_n = border_adjacent_shadow_pixels_indexes.size();
-//			 //double mnk_n = 100;
-//
-//			 double mnk_a_B = 0;
-//			 double mnk_a_G = 0;
-//			 double mnk_a_R = 0;
-//
-//			 double mnk_b_B = 0;
-//			 double mnk_b_G = 0;
-//			 double mnk_b_R = 0;
-//
-//			 //sum Si sum Pi sum Si^2
-//			 for (std::vector<int>::size_type r = 1; r != mnk_n; r++)
-//			 {
-//				 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-//				 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-//
-//				 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-//				 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-//
-//				 sum_Si_B += S_pixel.val[0];
-//				 sum_Si_G += S_pixel.val[1];
-//				 sum_Si_R += S_pixel.val[2];
-//
-//				 sum_Si2_B += pow(S_pixel.val[0], 2);
-//				 sum_Si2_G += pow(S_pixel.val[1], 2);
-//				 sum_Si2_R += pow(S_pixel.val[2], 2);
-//
-//				 sum_Pi_B += P_pixel.val[0];
-//				 sum_Pi_G += P_pixel.val[1];
-//				 sum_Pi_R += P_pixel.val[2];
-//			 }
-//
-//			 //sum Si*Pi
-//			 for (std::vector<int>::size_type r = 1; r != mnk_n; r++)
-//			 {
-//				 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-//				 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-//
-//				 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-//				 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-//
-//				 sum_SiPi_B += S_pixel.val[0] * P_pixel.val[0];
-//				 sum_SiPi_G += S_pixel.val[1] * P_pixel.val[1];
-//				 sum_SiPi_R += S_pixel.val[2] * P_pixel.val[2];
-//			 }
-//
-//			 mnk_a_B = (mnk_n*sum_SiPi_B - sum_Si_B*sum_Pi_B) / (mnk_n*sum_Si2_B - pow(sum_Si_B, 2));
-//			 mnk_a_G = (mnk_n*sum_SiPi_G - sum_Si_G*sum_Pi_G) / (mnk_n*sum_Si2_G - pow(sum_Si_G, 2));
-//			 mnk_a_R = (mnk_n*sum_SiPi_R - sum_Si_R*sum_Pi_R) / (mnk_n*sum_Si2_R - pow(sum_Si_R, 2));
-//
-//			 mnk_b_B = (sum_Pi_B - mnk_a_B*sum_Si_B) / mnk_n;
-//			 mnk_b_G = (sum_Pi_G - mnk_a_G*sum_Si_G) / mnk_n;
-//			 mnk_b_R = (sum_Pi_R - mnk_a_R*sum_Si_R) / mnk_n;
-//
-//			 double c_res_B = 0;
-//			 double c_res_G = 0;
-//			 double c_res_R = 0;
-
-//			 c_res_B = abs(i_min_a_B);
-//			 c_res_G = abs(i_min_a_G);
-//			 c_res_R = abs(i_min_a_R);
-
-
-
-			//2-nd way Metod Deleniya popolam
-
-			double a_B = 0;
-			double a_G = 0;
-			double a_R = 0;
-
-			double b_B = 256;
-			double b_G = 256;
-			double b_R = 256;
-			
-			double c_B = 0;
-			double c_G = 0;
-			double c_R = 0;
-
-			double r_B = 0;
-			double r_G = 0;
-			double r_R = 0;
-
-			double sigma = 0.005;
-			int max_step = 100000;
-
-			//calsc f value; f = sum (Pi - Si*r)^2
-			for (int i = 0; true; i++)
-			{
-				double f_a_B = 0;
-
-				double f_b_B = 0;
-				
-				double f_c_B = 0;
-
-				for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
-				{
-					int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-					int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-
-					cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-					cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-
-					//r==a
-					f_a_B += pow(P_pixel.val[0] - S_pixel.val[0] * a_B, 2);
-
-					//r==b
-					f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] * b_B, 2);			
-				}
-
-				if (f_a_B < f_b_B)
-				{
-					b_B = (a_B + b_B) / 2.0;
-				}
-				else
-				{
-					a_B = (a_B + b_B) / 2.0;
-				}
-
-				if ((b_B - a_B)<=sigma || i >= max_step)
-				{
-					r_B = (a_B + b_B) / 2;
-					break;
-				}
-			}
-
-			for (int i = 0; true; i++)
-			{
-				double f_a_G = 0;
-
-				double f_b_G = 0;
-
-				double f_c_G = 0;
-
-				for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
-				{
-					int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-					int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-
-					cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-					cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-
-					//r==a
-					f_a_G += pow(P_pixel.val[1] - S_pixel.val[1] * a_G, 2);
-
-					//r==b
-					f_b_G += pow(P_pixel.val[1] - S_pixel.val[1] * b_G, 2);
-				}
-
-				if (f_a_G < f_b_G)
-				{
-					b_G = (a_G + b_G) / 2.0;
-				}
-				else
-				{
-					a_G = (a_G + b_G) / 2.0;
-				}
-
-				r_G = (a_G + b_G) / 2;
-
-				if (((b_G - a_G) <= sigma || i >= max_step))
-				{
-					
-					break;
-				}
-			}
-
-			for (int i = 0; true; i++)
-			{
-				double f_a_R = 0;
-
-				double f_b_R = 0;
-
-				double f_c_R = 0;
-
-				for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
-				{
-					int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-					int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-
-					cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-					cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-
-					//r==a
-					f_a_R += pow(P_pixel.val[2] - S_pixel.val[2] * a_R, 2);
-
-					//r==b
-					f_b_R += pow(P_pixel.val[2] - S_pixel.val[2] * b_R, 2);
-				}
-
-				if (f_a_R < f_b_R)
-				{
-					b_R = (a_R + b_R) / 2.0;
-				}
-				else
-				{
-					a_R = (a_R + b_R) / 2.0;
-				}
-
-				if ((b_R - a_R) <= sigma || i >= max_step)
-				{
-					r_R = (a_R + b_R) / 2;
-					break;
-				}
-			}
-
-			double c_res_B = r_B;
-			double c_res_G = r_G;
-			double c_res_R = r_R;
-
-//			/////Very slow - just find sequencelly
-//			c_B = 0;
-//			c_G = 0;
-//			c_R = 0;
-//
-//			double f_c_B_prev = 99999999999999;
-//			double f_c_G_prev = 99999999999999;
-//			double f_c_R_prev = 99999999999999;
-//
-//			for (double i = 0; i < 20; i += 0.001)
-//			{
-//				double f_c_B = 0;
-//				double f_c_G = 0;
-//				double f_c_R = 0;
-//
-//				for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
-//				{
-//					int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-//					int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-//
-//					cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-//					cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-//
-//					f_c_B += pow(P_pixel.val[0] - S_pixel.val[0] * i, 2);
-//					f_c_G += pow(P_pixel.val[1] - S_pixel.val[1] * i, 2);
-//					f_c_R += pow(P_pixel.val[2] - S_pixel.val[2] * i, 2);
-//				}
-//
-//				if (f_c_B < f_c_B_prev)
-//				{
-//					f_c_B_prev = f_c_B;
-//					c_B = i;
-//				}
-//				if (f_c_G < f_c_G_prev)
-//				{
-//					f_c_G_prev = f_c_G;
-//					c_G = i;
-//				}
-//				if (f_c_R < f_c_R_prev)
-//				{
-//					f_c_R_prev = f_c_R;
-//					c_R = i;
-//				}
-//
-//				if (i >= max_step)
-//				{
-//					break;
-//				}
-//			}
-//			double c_res_B = c_B;
-//			double c_res_G = c_G;
-//			double c_res_R = c_R;
-//			//////////
-			 
+				char integer_string[32];
+				int integer = contour_i;
+				sprintf(integer_string, "%d", integer);
+				char other_string[64] = "visualRes"; // make sure you allocate enough space to append the other string
+				strcat(other_string, integer_string); // other_string now contains "Integer: 1234"
+				cv::imshow(other_string, visualRes);
 #pragma endregion
 
 #pragma region APPLYING THE CONSTANT
-			 //
-			 //
-			 //APPLYING THE CONSTANT
-			 //
-			 //
-			for (int i = 0; i < imgEdge.rows; i++) {
-				for (int j = 0; j < imgEdge.cols; j++) {
+				 //
+				 //
+				 //APPLYING THE CONSTANT
+				 //
+				 //
 
-					cv::Vec3b &pixel = imgBGRRes.at<cv::Vec3b>(i, j);
-					cv::Vec3b &shadow_mask_pixel = imgShadowMask.at<cv::Vec3b>(i, j);
+				 //Apply to all pixels adajcent to border and all pixels adjacent to that pixels etc
+				 for (int i = 0; i < imgEdge.rows; i++) {
+					 for (int j = 0; j < imgEdge.cols; j++) {
 
-					if (shadow_mask_pixel.val[0] == 255){
+						 //relight only pixels for cuurent countour
+						 if (passedThroughPixels[i][j] != true)
+						 {
+							 continue;
+						 }
 
-						double B = pixel.val[0];
-						double G = pixel.val[1];
-						double R = pixel.val[2];
+						 //do not relight pixels that already lightened
+						 if (lightenedPixels[i][j] == true)
+						 {
+							 continue;
+						 }
 
-//						//wall
-//						B *= 1.7;
-//						G *= 2.04;
-//						R *= 2.59;
+						 //mark pixels as lightened to avoid double relight
+						 lightenedPixels[i][j] = true;
 
+						 cv::Vec3b &pixel = imgBGRRes.at<cv::Vec3b>(i, j);
+						 cv::Vec3b &shadow_mask_pixel = imgShadowMask.at<cv::Vec3b>(i, j);
 
-//						B += c_res_B;
-//						G += c_res_G;
-//						R += c_res_R;
+						 if (shadow_mask_pixel.val[0] == 255){
 
-						B *= c_res_B;
-						G *= c_res_G;
-						R *= c_res_R;
+							 double B = pixel.val[0];
+							 double G = pixel.val[1];
+							 double R = pixel.val[2];
 
-//						B = B*mnk_a_B + mnk_b_B;
-//						G = G*mnk_a_G + mnk_b_G;
-//						R = R*mnk_a_R + mnk_b_R;
+							 B *= c_res_B;
+							 G *= c_res_G;
+							 R *= c_res_R;
 
-//						B *= 2.7;
-//						G *= 3.3;
-//						R *= 4;
+							 //						B = B*mnk_a_B + mnk_b_B;
+							 //						G = G*mnk_a_G + mnk_b_G;
+							 //						R = R*mnk_a_R + mnk_b_R;
 
-//						//wall
-//						B *= 1.705;
-//						G *= 2.04;
-//						R *= 2.59;
+							 //						//wall
+							 //						B *= 1.705;
+							 //						G *= 2.04;
+							 //						R *= 2.59;
 
-//						B += 67;
-//						G += 93;
-//						R += 121;
+							 B = B > 255 ? 255 : (B < 0 ? 0 : B);
+							 G = G > 255 ? 255 : (G < 0 ? 0 : G);
+							 R = R > 255 ? 255 : (R < 0 ? 0 : R);
 
-//						//man on alley
-//						B *= 1.409;
-//						G *= 1.46;
-//						R *= 1.62;
-
-						B = B > 255 ? 255 : (B < 0 ? 0 : B);
-						G = G > 255 ? 255 : (G < 0 ? 0 : G);
-						R = R > 255 ? 255 : (R < 0 ? 0 : R);
-
-						pixel.val[0] = B;
-						pixel.val[1] = G;
-						pixel.val[2] = R;
-					}
-				}
-			}
+							 pixel.val[0] = B;
+							 pixel.val[1] = G;
+							 pixel.val[2] = R;
+						 }
+					 }
+				 }
 
 #pragma endregion
 
+				 //Free memory
+				 Delete2dArray(passedThroughPixels, rows);
+			 }
 			cv::imshow("const res", imgBGRRes);
+			ShowImgBGRRes();
 }
 
 

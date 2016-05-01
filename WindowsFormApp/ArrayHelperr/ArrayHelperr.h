@@ -94,3 +94,15 @@ void Delete2dArray(bool** matrix, int m)
 	}
 	delete [] matrix;
 }
+
+//RESET ARRAy
+void Reset2dArray(bool** matrix, int m, int n, bool val)
+{
+	for (int i = 0; i < m; i++)
+	{
+		for (int j = 0; j < m; j++)
+		{
+			matrix[i][j] = val;
+		}
+	}
+}

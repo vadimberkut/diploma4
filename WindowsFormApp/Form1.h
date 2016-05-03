@@ -48,6 +48,7 @@ namespace WindowsFormApp {
 	
 	cv::Mat imgBGR;
 	cv::Mat imgBGRRes;
+	cv::Mat imgBGRResOriginal;
 	cv::Mat imgShadowMask;
 
 	//CONSTANTS
@@ -229,6 +230,13 @@ private: System::Windows::Forms::Label^  label22;
 
 private: System::Windows::Forms::TextBox^  textBoxEdgesProcMedianFilterDilationKernelSize;
 private: System::Windows::Forms::Label^  label23;
+private: System::Windows::Forms::TextBox^  textBoxShadowDetectionMedianFilterKernelSize;
+private: System::Windows::Forms::Label^  label21;
+private: System::Windows::Forms::Button^  buttonShadowDetectionApplyMedianFilter;
+private: System::Windows::Forms::Label^  label24;
+private: System::Windows::Forms::CheckBox^  checkBoxDisplayOptionalWindows;
+private: System::Windows::Forms::CheckBox^  checkBoxEdgesProcComposeResults;
+private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 
 
 
@@ -319,6 +327,13 @@ private: System::Windows::Forms::Label^  label23;
 			this->label15 = (gcnew System::Windows::Forms::Label());
 			this->buttonEdgesProcessingDefault = (gcnew System::Windows::Forms::Button());
 			this->label14 = (gcnew System::Windows::Forms::Label());
+			this->textBoxShadowDetectionMedianFilterKernelSize = (gcnew System::Windows::Forms::TextBox());
+			this->label21 = (gcnew System::Windows::Forms::Label());
+			this->buttonShadowDetectionApplyMedianFilter = (gcnew System::Windows::Forms::Button());
+			this->label24 = (gcnew System::Windows::Forms::Label());
+			this->checkBoxDisplayOptionalWindows = (gcnew System::Windows::Forms::CheckBox());
+			this->buttonEdgesProcSaveToResultImage = (gcnew System::Windows::Forms::Button());
+			this->checkBoxEdgesProcComposeResults = (gcnew System::Windows::Forms::CheckBox());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGRRes))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGR))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgShadowMask))->BeginInit();
@@ -393,7 +408,7 @@ private: System::Windows::Forms::Label^  label23;
 			// button7colorCorrection
 			// 
 			this->button7colorCorrection->Enabled = false;
-			this->button7colorCorrection->Location = System::Drawing::Point(331, 484);
+			this->button7colorCorrection->Location = System::Drawing::Point(321, 461);
 			this->button7colorCorrection->Name = L"button7colorCorrection";
 			this->button7colorCorrection->Size = System::Drawing::Size(98, 22);
 			this->button7colorCorrection->TabIndex = 16;
@@ -403,7 +418,7 @@ private: System::Windows::Forms::Label^  label23;
 			// 
 			// textBoxRed
 			// 
-			this->textBoxRed->Location = System::Drawing::Point(233, 458);
+			this->textBoxRed->Location = System::Drawing::Point(223, 435);
 			this->textBoxRed->Multiline = true;
 			this->textBoxRed->Name = L"textBoxRed";
 			this->textBoxRed->Size = System::Drawing::Size(44, 20);
@@ -412,7 +427,7 @@ private: System::Windows::Forms::Label^  label23;
 			// 
 			// textBoxGreen
 			// 
-			this->textBoxGreen->Location = System::Drawing::Point(282, 458);
+			this->textBoxGreen->Location = System::Drawing::Point(272, 435);
 			this->textBoxGreen->Multiline = true;
 			this->textBoxGreen->Name = L"textBoxGreen";
 			this->textBoxGreen->Size = System::Drawing::Size(44, 20);
@@ -421,7 +436,7 @@ private: System::Windows::Forms::Label^  label23;
 			// 
 			// textBoxBlue
 			// 
-			this->textBoxBlue->Location = System::Drawing::Point(331, 458);
+			this->textBoxBlue->Location = System::Drawing::Point(321, 435);
 			this->textBoxBlue->Multiline = true;
 			this->textBoxBlue->Name = L"textBoxBlue";
 			this->textBoxBlue->Size = System::Drawing::Size(44, 20);
@@ -430,7 +445,7 @@ private: System::Windows::Forms::Label^  label23;
 			// 
 			// textBoxRGB
 			// 
-			this->textBoxRGB->Location = System::Drawing::Point(380, 458);
+			this->textBoxRGB->Location = System::Drawing::Point(370, 435);
 			this->textBoxRGB->Multiline = true;
 			this->textBoxRGB->Name = L"textBoxRGB";
 			this->textBoxRGB->Size = System::Drawing::Size(49, 20);
@@ -451,7 +466,7 @@ private: System::Windows::Forms::Label^  label23;
 			// labelRed
 			// 
 			this->labelRed->AutoSize = true;
-			this->labelRed->Location = System::Drawing::Point(230, 442);
+			this->labelRed->Location = System::Drawing::Point(220, 419);
 			this->labelRed->Name = L"labelRed";
 			this->labelRed->Size = System::Drawing::Size(27, 13);
 			this->labelRed->TabIndex = 22;
@@ -460,7 +475,7 @@ private: System::Windows::Forms::Label^  label23;
 			// labelGreen
 			// 
 			this->labelGreen->AutoSize = true;
-			this->labelGreen->Location = System::Drawing::Point(279, 442);
+			this->labelGreen->Location = System::Drawing::Point(269, 419);
 			this->labelGreen->Name = L"labelGreen";
 			this->labelGreen->Size = System::Drawing::Size(36, 13);
 			this->labelGreen->TabIndex = 23;
@@ -469,7 +484,7 @@ private: System::Windows::Forms::Label^  label23;
 			// labelBlue
 			// 
 			this->labelBlue->AutoSize = true;
-			this->labelBlue->Location = System::Drawing::Point(331, 442);
+			this->labelBlue->Location = System::Drawing::Point(321, 419);
 			this->labelBlue->Name = L"labelBlue";
 			this->labelBlue->Size = System::Drawing::Size(28, 13);
 			this->labelBlue->TabIndex = 24;
@@ -478,7 +493,7 @@ private: System::Windows::Forms::Label^  label23;
 			// labelRGB
 			// 
 			this->labelRGB->AutoSize = true;
-			this->labelRGB->Location = System::Drawing::Point(377, 442);
+			this->labelRGB->Location = System::Drawing::Point(367, 419);
 			this->labelRGB->Name = L"labelRGB";
 			this->labelRGB->Size = System::Drawing::Size(30, 13);
 			this->labelRGB->TabIndex = 25;
@@ -486,7 +501,7 @@ private: System::Windows::Forms::Label^  label23;
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(233, 484);
+			this->button1->Location = System::Drawing::Point(223, 461);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(95, 22);
 			this->button1->TabIndex = 26;
@@ -884,6 +899,8 @@ private: System::Windows::Forms::Label^  label23;
 			// panel4
 			// 
 			this->panel4->BackColor = System::Drawing::SystemColors::ControlLight;
+			this->panel4->Controls->Add(this->checkBoxEdgesProcComposeResults);
+			this->panel4->Controls->Add(this->buttonEdgesProcSaveToResultImage);
 			this->panel4->Controls->Add(this->textBoxEdgesProcMedianFilterDilationKernelSize);
 			this->panel4->Controls->Add(this->label23);
 			this->panel4->Controls->Add(this->textBoxEdgesProcGaussianFilterDilationKernelSize);
@@ -1081,14 +1098,84 @@ private: System::Windows::Forms::Label^  label23;
 			this->label14->TabIndex = 112;
 			this->label14->Text = L"Edges processing";
 			// 
+			// textBoxShadowDetectionMedianFilterKernelSize
+			// 
+			this->textBoxShadowDetectionMedianFilterKernelSize->Location = System::Drawing::Point(238, 560);
+			this->textBoxShadowDetectionMedianFilterKernelSize->Multiline = true;
+			this->textBoxShadowDetectionMedianFilterKernelSize->Name = L"textBoxShadowDetectionMedianFilterKernelSize";
+			this->textBoxShadowDetectionMedianFilterKernelSize->Size = System::Drawing::Size(64, 20);
+			this->textBoxShadowDetectionMedianFilterKernelSize->TabIndex = 123;
+			this->textBoxShadowDetectionMedianFilterKernelSize->Text = L"0";
+			// 
+			// label21
+			// 
+			this->label21->AutoSize = true;
+			this->label21->Location = System::Drawing::Point(235, 544);
+			this->label21->Name = L"label21";
+			this->label21->Size = System::Drawing::Size(61, 13);
+			this->label21->TabIndex = 124;
+			this->label21->Text = L"Kernel size:";
+			// 
+			// buttonShadowDetectionApplyMedianFilter
+			// 
+			this->buttonShadowDetectionApplyMedianFilter->Location = System::Drawing::Point(306, 555);
+			this->buttonShadowDetectionApplyMedianFilter->Name = L"buttonShadowDetectionApplyMedianFilter";
+			this->buttonShadowDetectionApplyMedianFilter->Size = System::Drawing::Size(152, 25);
+			this->buttonShadowDetectionApplyMedianFilter->TabIndex = 122;
+			this->buttonShadowDetectionApplyMedianFilter->Text = L"Apply Median filter";
+			this->buttonShadowDetectionApplyMedianFilter->UseVisualStyleBackColor = true;
+			// 
+			// label24
+			// 
+			this->label24->AutoSize = true;
+			this->label24->Location = System::Drawing::Point(222, 496);
+			this->label24->Name = L"label24";
+			this->label24->Size = System::Drawing::Size(90, 13);
+			this->label24->TabIndex = 125;
+			this->label24->Text = L"Additional params";
+			// 
+			// checkBoxDisplayOptionalWindows
+			// 
+			this->checkBoxDisplayOptionalWindows->AutoSize = true;
+			this->checkBoxDisplayOptionalWindows->Location = System::Drawing::Point(238, 512);
+			this->checkBoxDisplayOptionalWindows->Name = L"checkBoxDisplayOptionalWindows";
+			this->checkBoxDisplayOptionalWindows->Size = System::Drawing::Size(144, 17);
+			this->checkBoxDisplayOptionalWindows->TabIndex = 126;
+			this->checkBoxDisplayOptionalWindows->Text = L"Display optional windows";
+			this->checkBoxDisplayOptionalWindows->UseVisualStyleBackColor = true;
+			// 
+			// buttonEdgesProcSaveToResultImage
+			// 
+			this->buttonEdgesProcSaveToResultImage->Location = System::Drawing::Point(125, 188);
+			this->buttonEdgesProcSaveToResultImage->Name = L"buttonEdgesProcSaveToResultImage";
+			this->buttonEdgesProcSaveToResultImage->Size = System::Drawing::Size(143, 25);
+			this->buttonEdgesProcSaveToResultImage->TabIndex = 122;
+			this->buttonEdgesProcSaveToResultImage->Text = L"SaveToResultImage";
+			this->buttonEdgesProcSaveToResultImage->UseVisualStyleBackColor = true;
+			// 
+			// checkBoxEdgesProcComposeResults
+			// 
+			this->checkBoxEdgesProcComposeResults->AutoSize = true;
+			this->checkBoxEdgesProcComposeResults->Location = System::Drawing::Point(241, 3);
+			this->checkBoxEdgesProcComposeResults->Name = L"checkBoxEdgesProcComposeResults";
+			this->checkBoxEdgesProcComposeResults->Size = System::Drawing::Size(103, 17);
+			this->checkBoxEdgesProcComposeResults->TabIndex = 127;
+			this->checkBoxEdgesProcComposeResults->Text = L"Compose results";
+			this->checkBoxEdgesProcComposeResults->UseVisualStyleBackColor = true;
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->ClientSize = System::Drawing::Size(1416, 662);
+			this->Controls->Add(this->checkBoxDisplayOptionalWindows);
+			this->Controls->Add(this->label24);
+			this->Controls->Add(this->textBoxShadowDetectionMedianFilterKernelSize);
 			this->Controls->Add(this->label14);
+			this->Controls->Add(this->label21);
 			this->Controls->Add(this->panel4);
+			this->Controls->Add(this->buttonShadowDetectionApplyMedianFilter);
 			this->Controls->Add(this->panel3);
 			this->Controls->Add(this->panel2);
 			this->Controls->Add(this->panel1);
@@ -1187,8 +1274,16 @@ private: System::Windows::Forms::Label^  label23;
 				//Read file
 				//OpenedImageData::Open(myPath);
 				imgBGR = cv::imread(myPath_char);
-				//imgBGRRes = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
+				
+				//Program use bitmaps that require width be a multiple of four: width%4 == 0 
+				if (imgBGR.cols % 4 != 0)
+				{
+					MessageBox::Show("The image width have to be a multiple of four (due to using bitmaps)");
+					return false;
+				}
+
 				imgBGRRes = imgBGR.clone();
+				imgBGRResOriginal = imgBGR.clone();
 				imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
 
 				OPEN = true;//флаг, что открыт файл
@@ -2323,6 +2418,8 @@ private: System::Void buttonAdditive_Click(System::Object^  sender, System::Even
 				 }
 			 }
 
+			 imgBGRResOriginal = imgBGRRes.clone();
+
 			 ShowImgBGRRes();
 
 			 return;
@@ -2414,6 +2511,8 @@ private: System::Void buttonBasicLightModel_Click(System::Object^  sender, Syste
 					 }
 				 }
 			 }
+
+			 imgBGRResOriginal = imgBGRRes.clone();
 
 			 ShowImgBGRRes();
 
@@ -2507,6 +2606,8 @@ private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventAr
 
 			 cv::cvtColor(imgYcbCr,imgBGRRes,CV_YCrCb2BGR);
 
+			 imgBGRResOriginal = imgBGRRes.clone();
+
 			 ShowImgBGRRes();
 
 			 return;
@@ -2565,12 +2666,6 @@ private: System::Void buttonShadow0YCbCr_Click(System::Object^  sender, System::
 					 }
 				 }
 			 }
-
-//			 shadowMask = new UCHAR[size];
-//			 CopyMatToArray(imgShadowMask, shadowMask);
-//
-//			 saveMaskBMP();
-//			 ShowShadowMaskBmp();
 
 			 ShowImgShadowMask();
 }
@@ -2728,7 +2823,7 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			 cv::Mat const structure_elem33 = cv::getStructuringElement(
 				 cv::MORPH_RECT, cv::Size(5, 5));
 			 cv::Mat const structure_elem44 = cv::getStructuringElement(
-				 cv::MORPH_RECT, cv::Size(5, 5));
+				 cv::MORPH_RECT, cv::Size(3, 3));
 			 cv::morphologyEx(tmp, shadowMaskClosingOpeningMat,
 				 cv::MORPH_CLOSE, structure_elem33);
 			 cv::morphologyEx(imgShadowMask, tmp,
@@ -2743,58 +2838,54 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			 cv::erode(imgShadowMask, tmp, elementEr);
 			 cv::dilate(tmp, shadowMaskErosionFollowedByDilation, elementDil);
 
+			 //Median Filter
+			 cv::Mat imgMedianFilter;
+			 int kernelSize = 7;
+			 cv::medianBlur(imgShadowMask, imgMedianFilter, kernelSize);
+			 
+
 			 // Apply Dilation Followed By Erosion
 			 cv::Mat elementDil2 = getStructuringElement(cv::MORPH_RECT,
-				 cv::Size(3, 3));
+				 cv::Size(5, 5));
 			 cv::Mat elementEr2 = getStructuringElement(cv::MORPH_RECT,
 				 cv::Size(7, 7));
 			 cv::dilate(imgShadowMask, tmp, elementDil2);
+			 //cv::dilate(imgMedianFilter, tmp, elementDil2);
 			 cv::erode(tmp, shadowMaskDilationFollowedByErosion, elementEr2);
+
+//			 //Cleaning
+//			 cv::Mat imgCleaning;
+//			 int ddepth = CV_8UC3; // -1 same as src
+//			 int kernelSize = 3;
+//			 cv::Mat filter2DKernel = cv::Mat::ones(kernelSize, kernelSize, CV_32F) / (float)(kernelSize*kernelSize);
+//			 cv::filter2D(imgShadowMask, imgCleaning, ddepth, filter2DKernel);
+//			 cv::imshow("imgCleaning", imgCleaning);
+
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("imgMedianFilter", imgMedianFilter);
+				 cv::imshow("imgShadowMask", imgShadowMask);
+				 cv::imshow("shadowMaskClosingMat", shadowMaskClosingMat);
+				 cv::imshow("shadowMaskOpeningMat", shadowMaskOpeningMat);
+				 cv::imshow("shadowMaskOpeningClosingMat", shadowMaskOpeningClosingMat);
+				 cv::imshow("shadowMaskClosingOpeningMat", shadowMaskClosingOpeningMat);
+				 cv::imshow("ErosionFollowedByDilation", shadowMaskErosionFollowedByDilation);
+				 cv::imshow("DilationFollowedByErosion", shadowMaskDilationFollowedByErosion);
+			 }
+			 
 			 
 
-
-			 cv::imshow("imgShadowMask", imgShadowMask);
-			 cv::imshow("shadowMaskClosingMat", shadowMaskClosingMat);
-			 cv::imshow("shadowMaskOpeningMat", shadowMaskOpeningMat);
-			 cv::imshow("shadowMaskOpeningClosingMat", shadowMaskOpeningClosingMat);
-			 cv::imshow("shadowMaskClosingOpeningMat", shadowMaskClosingOpeningMat);
-			 cv::imshow("ErosionFollowedByDilation", shadowMaskErosionFollowedByDilation);
-			 cv::imshow("DilationFollowedByErosion", shadowMaskDilationFollowedByErosion);
-
-//			 shadowMask = new UCHAR[size];
-//			 CopyMatToArray(shadowMaskErosionFollowedByDilation, shadowMask);
-//
-//			 saveMaskBMP();
-//			 ShowShadowMaskBmp();
-
-			 imgShadowMask = shadowMaskErosionFollowedByDilation.clone();
+			 //imgShadowMask = shadowMaskErosionFollowedByDilation.clone();
+			 imgShadowMask = imgMedianFilter.clone();
 			 ShowImgShadowMask();
 }
 
 private: System::Void button11RemveLab_Click(System::Object^  sender, System::EventArgs^  e) {
 			
-			 //cv::Mat imgBGRres;
 			 cv::Mat imgLAB;
 			 cv::Mat imgLAB_ORIGIN;
 			 cv::Mat imgKMeansRes;
 			 cv::Mat imgBGRbeforeCluster;
-			 //cv::Mat shadowMaskMat = cv::Mat(InfoHeader.biHeight, InfoHeader.biWidth,CV_8UC3);
-			 
-			 //Проверки на размер - если ширина не кратная 4, то дополняется мусором
-			 /////////////////////////////////////////////////////////////////////////
-			 //int biWidth = InfoHeader.biWidth;
-			 //int biHeight = InfoHeader.biHeight;
-
-			 //int biWidth_add = biWidth % 4;
-
-//			 int cols = imgBGR.cols;
-//			 int rows = imgBGR.rows;
-//
-//			 //int sizeB = size;
-//			 int sizeB2 = (biWidth * 3)*biHeight;
-//			 int sizeB3 = (biWidth * 3 + biWidth % 4)*biHeight;
-//			 int size2 = imgBGR.rows*imgBGR.cols*imgBGR.channels();
-			 /////////////////////////////////////////////////////////////////////////////
 
 			 //Convert to LAB
 			 cv::cvtColor(imgBGR, imgLAB, CV_BGR2Lab);
@@ -2900,82 +2991,25 @@ private: System::Void button11RemveLab_Click(System::Object^  sender, System::Ev
 
 			 //Mean Shift  takes BGR and do in LAB, writes res in first param
 			 cv::Mat imgMeanShiftVisual = imgBGR.clone();
-			 cv::Mat imgForMeanShiftForCluster;
-			 cv::Mat imgForMeanShiftForAlign;
-			 cv::cvtColor(imgLAB, imgForMeanShiftForAlign, CV_Lab2BGR);
-			 cv::cvtColor(imgLAB_ORIGIN, imgForMeanShiftForCluster, CV_Lab2BGR);
-			 //cv::cvtColor(imgLAB, imgForMeanShiftForCluster, CV_Lab2BGR);
-			 ApplyMeanShiftAndCorrections(imgForMeanShiftForCluster, imgForMeanShiftForAlign, imgMeanShiftVisual);
-			 cv::imshow("imgMeanShiftVisual", imgMeanShiftVisual);
-			 imgBGRRes = imgForMeanShiftForAlign.clone();
+			 cv::Mat imgForMeanShiftCluster;
+			 cv::Mat imgForMeanShiftAlign;
+			 cv::cvtColor(imgLAB, imgForMeanShiftAlign, CV_Lab2BGR);
+			 cv::cvtColor(imgLAB_ORIGIN, imgForMeanShiftCluster, CV_Lab2BGR);
+			 ApplyMeanShiftAndCorrections(imgForMeanShiftCluster, imgForMeanShiftAlign, imgMeanShiftVisual);
+			 
+			 imgBGRRes = imgForMeanShiftAlign.clone();
+			
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("imgMeanShiftVisual", imgMeanShiftVisual);
 
-			 cv::imshow("imgBGR", imgBGR);
-			 //cv::imshow("imgLAB", imgLAB);
-			 cv::imshow("imgBGRRelight", imgBGRbeforeCluster);
-			 cv::imshow("imgBGRRes", imgBGRRes);
+				 //cv::imshow("imgBGR", imgBGR);
+				 //cv::imshow("imgLAB", imgLAB);
+				 cv::imshow("imgBGRRelight", imgBGRbeforeCluster);
+				 cv::imshow("imgBGRRes", imgBGRRes);
+			 }
 
-//			 //
-//			 //Process dark pixel on and near shadow edges
-//			 //
-//			 cv::Mat imgShadowMask = imgBGRres.clone();
-//			 cv::Mat imgShadowMaskGRAY;
-//			 cv::Mat imgEdge;
-//			 cv::Mat imgEdgeDilated;
-//			 CopyArrayToMat(shadowMask, imgShadowMask);
-//			 cv::cvtColor(imgShadowMask, imgShadowMaskGRAY, CV_BGR2GRAY);
-//
-//			 cv::Canny(imgShadowMaskGRAY, imgEdge, 50, 150, 3);
-//
-//			 cv::Mat elementDil = getStructuringElement(cv::MORPH_RECT,
-//				 cv::Size(5, 5));
-//			 cv::dilate(imgEdge, imgEdgeDilated, elementDil);
-//
-//			 cv::Mat imgProcessEdgeDarkPixelsBGR = imgBGRres.clone();
-//			 cv::Mat imgProcessEdgeDarkPixelsLAB = imgBGRres.clone();
-//			 //cv::Mat imgLABres;
-//			 cv::cvtColor(imgBGRres, imgProcessEdgeDarkPixelsLAB, CV_BGR2Lab);
-//			 int DISTANCE = 10;
-//			 for (int i = 0; i < imgProcessEdgeDarkPixelsLAB.rows; i++) {
-//				 for (int j = 0; j < imgProcessEdgeDarkPixelsLAB.cols; j++) {
-//
-//					 UCHAR &shadowEdgePixel = imgEdgeDilated.at<UCHAR>(i, j);
-//					 cv::Vec3b &pixel = imgProcessEdgeDarkPixelsLAB.at<cv::Vec3b>(i, j);
-//					 int L = pixel.val[0];
-//					 int A = pixel.val[1];
-//					 int B = pixel.val[2];
-//					 if (shadowEdgePixel == 255)
-//					 {
-//						 if (L < CIE_L_avg_non_shadow)
-//						 {
-//							 //L = CIE_L_avg_non_shadow - L;
-//							 L = L + 40;
-//							 A = CIE_A_avg_non_shadow - A;
-//							 B = CIE_B_avg_non_shadow - B;
-//
-//							 L = (L > 255 ? 255 : (L < 0 ? 0 : L));
-//							 A = (A > 255 ? 255 : (A < 0 ? 0 : A));
-//							 B = (B > 255 ? 255 : (B < 0 ? 0 : B));
-//						 }
-//
-//						 pixel.val[0] = L;
-////						 pixel.val[1] = A;
-////						 pixel.val[2] = B;
-//					 }
-//				 }
-//			 }
-//			 cv::cvtColor(imgProcessEdgeDarkPixelsLAB, imgProcessEdgeDarkPixelsBGR, CV_Lab2BGR);
-//			 cv::imshow("imgProcessEdgeDarkPixels", imgProcessEdgeDarkPixelsBGR);
-//			 //CopyMatToArray(imgProcessEdgeDarkPixelsBGR, buffer);
-
-			 //Rlease memory
-//			 imgBGR.release();
-//			 delete imgBGR.data;
-//
-//			 imgLAB.release();
-//			 delete imgLAB.data;
-//
-//			 imgBGRres.release();
-//			 delete imgBGRres.data;
+			 imgBGRResOriginal = imgBGRRes.clone();
 
 			 ShowImgBGRRes();
 }
@@ -3144,7 +3178,11 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 					 pixel.val[2] = (color2[cl] >> 16) & 255;
 				 }
 			 }
-			 cv::imshow("imgSegmentationResOld", imgSegmentationResOld);
+			 
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("imgSegmentationResOld", imgSegmentationResOld);
+			 }
 
 			 //separate such regions on two (old label - non shadow, new label - shadow region)
 			 for (std::vector<int>::size_type r = 0; r != regions_to_separate.size(); r++)
@@ -3546,9 +3584,9 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 							 double B = pixel.val[2];
 
 
-							 L *= L_ratio;
+							 //L *= L_ratio;
 							 //L = ((L*L_ratio) + (L + L_diff_))/2.0;
-							 //L += L_diff_;
+							 L += L_diff_;
 							 A *= A_ratio;
 							 B *= B_ratio;
 
@@ -3566,12 +3604,9 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 //								 //L += L_diff_;
 //							 }
 
-							
-
 							 L = (L > 255 ? 255 : (L < 0 ? 0 : L));
 							 A = (A > 255 ? 255 : (A < 0 ? 0 : A));
-							 B = (B > 255 ? 255 : (B < 0 ? 0 : B));
-							
+							 B = (B > 255 ? 255 : (B < 0 ? 0 : B));				
 
 							pixel.val[0] = L;
 							pixel.val[1] = A;
@@ -3601,24 +3636,6 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 							 pixel2.val[0] = L2;
 							 pixel2.val[1] = A2;
 							 pixel2.val[2] = B2;
-
-							 //imgResLABOnlyChroma
-							 cv::Vec3b &pixel3 = imgResLABOnlyChroma.at<cv::Vec3b>(i, j);
-							 double L3 = pixel3.val[0];
-							 double A3 = pixel3.val[1];
-							 double B3 = pixel3.val[2];
-							 
-							 //L3 += L_diff_;
-							 A3 *= A_ratio;
-							 B3 *= B_ratio;
-
-							 L3 = (L3 > 255 ? 255 : (L3 < 0 ? 0 : L3));
-							 A3 = (A3 > 255 ? 255 : (A3 < 0 ? 0 : A3));
-							 B3 = (B3 > 255 ? 255 : (B3 < 0 ? 0 : B3));
-
-							 pixel3.val[0] = L3;
-							 pixel3.val[1] = A3;
-							 pixel3.val[2] = B3;
 						 }
 					 }
 				 }
@@ -3634,11 +3651,7 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 				 }
 
 				 //if some regions was not aligned then repeat procedure
-				 if (unhadled_shadow_regions_labels.size() > 0)
-				 {
-					 int a = 0;
-				 }
-				 else
+				 if (unhadled_shadow_regions_labels.size() == 0)
 				 {
 					 break;
 				 }
@@ -3650,58 +3663,58 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 //				 System::String ^str = "imgIter ";
 //				 cv::imshow(System::Convert:z(iterations), imgIter);
 			 }
-			 cv::Mat imgResBGROnlyChroma;
 			 cv::cvtColor(imgResLAB, imgResBGR, CV_Lab2BGR);
 			 cv::cvtColor(imgResLABAddLDiff, imgResBGRAddDiff, CV_Lab2BGR);
-			 cv::cvtColor(imgResLABOnlyChroma, imgResBGROnlyChroma, CV_Lab2BGR);
-			 cv::imshow("!! imgResBGR", imgResBGR);
-			 cv::imshow("!! imgResBGRAddDiff", imgResBGRAddDiff);
-			 cv::imshow("!! imgResBGROnlyChroma", imgResBGROnlyChroma);
+			 
+
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("!! imgResBGRAddDiff", imgResBGRAddDiff);
+			 }
 
 			 cv::cvtColor(imgResLAB, imgResBGR, CV_Lab2BGR);
-			 //cv::cvtColor(imgResLABAddLDiff, imgResBGR, CV_Lab2BGR);
 			 imgForAlign = imgResBGR.clone();
 
-//			 // Draw random color
-//			 cv::Mat imgRes(img);
-//			 cv::Mat imgResBGR = imgRes.clone();
-//			 for (int i = 0; i < imgResBGR.rows; i++) {
-//				 for (int j = 0; j < imgResBGR.cols; j++) {
-//
-//
-//					 cv::Vec3b &pixel = imgResBGR.at<cv::Vec3b>(i, j);
-//
-//					 int cl = ilabels[i][j];
-//
-//					 pixel.val[0] = (color[cl]) & 255;
-//					 pixel.val[1] = (color[cl] >> 8) & 255;
-//					 pixel.val[2] = (color[cl] >> 16) & 255;
-//				 }
-//			 }
-//
-//			 cv::imshow("TEST", imgResBGR);
-
 			 // Draw random color
-
+			 cv::Mat imgRes(img);
 			 cv::vector<int> color(regionCount);
 			 CvRNG rng = cvRNG(cvGetTickCount());
 			 for (int i = 0; i<regionCount; i++)
 				 color[i] = cvRandInt(&rng);
 
-			 for (int i = 0; i<img->height; i++)
-				 for (int j = 0; j<img->width; j++)
-				 {
+			 for (int i = 0; i < imgRes.rows; i++) {
+				 for (int j = 0; j < imgRes.cols; j++) {
+
+
+					 cv::Vec3b &pixel = imgRes.at<cv::Vec3b>(i, j);
+
 					 int cl = ilabels[i][j];
-					 ((uchar *)(img->imageData + i*img->widthStep))[j*img->nChannels + 0] = (color[cl]) & 255;
-					 ((uchar *)(img->imageData + i*img->widthStep))[j*img->nChannels + 1] = (color[cl] >> 8) & 255;
-					 ((uchar *)(img->imageData + i*img->widthStep))[j*img->nChannels + 2] = (color[cl] >> 16) & 255;
+
+					 pixel.val[0] = (color[cl]) & 255;
+					 pixel.val[1] = (color[cl] >> 8) & 255;
+					 pixel.val[2] = (color[cl] >> 16) & 255;
 				 }
+			 }
+			 imgResVisual = imgRes.clone();
 
-
-				 cv::Mat resultVisual(img);
-				 imgResVisual = resultVisual.clone();
-//			 cvNamedWindow("MeanShift2", CV_WINDOW_AUTOSIZE);
-//			 cvShowImage("MeanShift2", img);
+			 // Draw random color
+//			 cv::vector<int> color(regionCount);
+//			 CvRNG rng = cvRNG(cvGetTickCount());
+//			 for (int i = 0; i<regionCount; i++)
+//				 color[i] = cvRandInt(&rng);
+//
+//			 for (int i = 0; i < img->height; i++){
+//				 for (int j = 0; j < img->width; j++)
+//				 {
+//					 int cl = ilabels[i][j];
+//					 ((uchar *)(img->imageData + i*img->widthStep))[j*img->nChannels + 0] = (color[cl]) & 255;
+//					 ((uchar *)(img->imageData + i*img->widthStep))[j*img->nChannels + 1] = (color[cl] >> 8) & 255;
+//					 ((uchar *)(img->imageData + i*img->widthStep))[j*img->nChannels + 2] = (color[cl] >> 16) & 255;
+//				 }
+//			 }
+			 //
+//			cv::Mat resultVisual(img);
+//			imgResVisual = resultVisual.clone();
 }
 
 //mean Shift - returns regionCount and labels
@@ -3862,16 +3875,21 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
 //
 //			 imgThresholdFixed = imgThresholdFixedErode1.clone();
 //
-//			 cv::imshow("imgThresholdFixedDil1", imgThresholdFixedDil1);
-//			 cv::imshow("imgThresholdFixedDil2", imgThresholdFixedDil2);
-//			 cv::imshow("imgThresholdFixedErode1", imgThresholdFixedErode1);
+//			 
 
-//			 cv::imshow("1 imgBGR", imgBGR);
-//			 cv::imshow("2 imgGaussian", imgGaussian);
-//			 cv::imshow("3 imgMeanShift", imgMeanShift);
-//			 cv::imshow("4 imgMeanShiftRes", imgMeanShiftRes);
-			 cv::imshow("5 imgMeanShiftGrayscal", imgMeanShiftGrayscal);
-			 cv::imshow("6 imgThresholdFixed", imgThresholdFixed);
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 //cv::imshow("imgThresholdFixedDil1", imgThresholdFixedDil1);
+				 //			 cv::imshow("imgThresholdFixedDil2", imgThresholdFixedDil2);
+				 //			 cv::imshow("imgThresholdFixedErode1", imgThresholdFixedErode1);
+
+				 //			 cv::imshow("1 imgBGR", imgBGR);
+				 //			 cv::imshow("2 imgGaussian", imgGaussian);
+				 //			 cv::imshow("3 imgMeanShift", imgMeanShift);
+				 //			 cv::imshow("4 imgMeanShiftRes", imgMeanShiftRes);
+				 cv::imshow("5 imgMeanShiftGrayscal", imgMeanShiftGrayscal);
+				 //cv::imshow("6 imgThresholdFixed", imgThresholdFixed);
+			 }
 
 			 cv::cvtColor(imgThresholdFixed, imgShadowMask, CV_GRAY2BGR);
 
@@ -4109,6 +4127,8 @@ private: System::Void buttonBasicLightModelLAB_Click(System::Object^  sender, Sy
 
 			 cv::cvtColor(imgLAB, imgBGRRes, CV_Lab2BGR);
 
+			 imgBGRResOriginal = imgBGRRes.clone();
+
 			 ShowImgBGRRes();
 }
 
@@ -4265,9 +4285,10 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 				 cv::Size(3,3));
 			 cv::dilate(imgEdge, imgEdgeD, elementD);
 
-			 cv::imshow("imgEdge", imgEdge);
-			 //cv::imshow("imgEdgeD", imgEdgeD);
-			 //imgEdge = imgEdgeD.clone();
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("imgEdge", imgEdge);
+			 }
 
 #pragma region FIND CONTOURS USING findContours
 			 //////FIND CONTOURS USING  cv::findContours
@@ -4294,7 +4315,11 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 				 cv::Scalar color = GenerateRandomColor();
 				 cv::drawContours(outputContour, contours, i, color, thickness, lineType, hierarchy, maxLevel);
 			 }
-			 cv::imshow("outputContour", outputContour);
+			 
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("outputContour", outputContour);
+			 }
 			 //
 
 			 //Sort countours by size descending
@@ -4905,60 +4930,6 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 				 double c_res_G = c_G;
 				 double c_res_R = c_R;
 
-				 //			/////Very slow - just find sequencelly
-				 //			c_B = 0;
-				 //			c_G = 0;
-				 //			c_R = 0;
-				 //
-				 //			double f_c_B_prev = 99999999999999;
-				 //			double f_c_G_prev = 99999999999999;
-				 //			double f_c_R_prev = 99999999999999;
-				 //
-				 //			for (double i = 0; i < 20; i += 0.001)
-				 //			{
-				 //				double f_c_B = 0;
-				 //				double f_c_G = 0;
-				 //				double f_c_R = 0;
-				 //
-				 //				for (std::vector<int>::size_type r = 1; r != border_adjacent_shadow_pixels_indexes.size(); r++)
-				 //				{
-				 //					int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-				 //					int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-				 //
-				 //					cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-				 //					cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-				 //
-				 //					f_c_B += pow(P_pixel.val[0] - S_pixel.val[0] * i, 2);
-				 //					f_c_G += pow(P_pixel.val[1] - S_pixel.val[1] * i, 2);
-				 //					f_c_R += pow(P_pixel.val[2] - S_pixel.val[2] * i, 2);
-				 //				}
-				 //
-				 //				if (f_c_B < f_c_B_prev)
-				 //				{
-				 //					f_c_B_prev = f_c_B;
-				 //					c_B = i;
-				 //				}
-				 //				if (f_c_G < f_c_G_prev)
-				 //				{
-				 //					f_c_G_prev = f_c_G;
-				 //					c_G = i;
-				 //				}
-				 //				if (f_c_R < f_c_R_prev)
-				 //				{
-				 //					f_c_R_prev = f_c_R;
-				 //					c_R = i;
-				 //				}
-				 //
-				 //				if (i >= max_step)
-				 //				{
-				 //					break;
-				 //				}
-				 //			}
-				 //			double c_res_B = c_B;
-				 //			double c_res_G = c_G;
-				 //			double c_res_R = c_R;
-				 //			//////////
-
 #pragma endregion
 
 #pragma region FIND SHADOW PIXELS FOR CURRENT COUNTOUR
@@ -4970,34 +4941,39 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 				 GoThroughAllAdjacentShadowPixelsRec(currentContour, passedThroughPixels);//V3
 
-				 //visualize
-				 cv::Mat visualRes = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3, cv::Scalar(0,0,0));
 
-				 for (int i = 0; i < visualRes.rows; i++) { //draw all adjacent shadow pixels
-					 for (int j = 0; j < visualRes.cols; j++) {
+				 if (checkBoxDisplayOptionalWindows->Checked == true)
+				 {
+					 //visualize
+					 cv::Mat visualRes = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3, cv::Scalar(0, 0, 0));
 
-						 if (passedThroughPixels[i][j] == true)
-						 {
-							 cv::Vec3b &pixel = visualRes.at<cv::Vec3b>(i, j);
-							 pixel.val[2] = 200;
-						 }	 
+					 for (int i = 0; i < visualRes.rows; i++) { //draw all adjacent shadow pixels
+						 for (int j = 0; j < visualRes.cols; j++) {
+
+							 if (passedThroughPixels[i][j] == true)
+							 {
+								 cv::Vec3b &pixel = visualRes.at<cv::Vec3b>(i, j);
+								 pixel.val[2] = 200;
+							 }
+						 }
 					 }
+
+					 //				 for (int k = 0; k < currentContour.size(); k++) //draw countour pixels only
+					 //				 {
+					 //					 int j = currentContour[k].x;
+					 //					 int i = currentContour[k].y;
+					 //					 cv::Vec3b &pixel = visualRes.at<cv::Vec3b>(i, j);
+					 //					 pixel.val[2] = 200;
+					 //				 }
+
+					 char integer_string[32];
+					 int integer = contour_i;
+					 sprintf(integer_string, "%d", integer);
+					 char other_string[64] = "visualRes"; // make sure you allocate enough space to append the other string
+					 strcat(other_string, integer_string); // other_string now contains "Integer: 1234"
+					 cv::imshow(other_string, visualRes);
 				 }
-
-//				 for (int k = 0; k < currentContour.size(); k++) //draw countour pixels only
-//				 {
-//					 int j = currentContour[k].x;
-//					 int i = currentContour[k].y;
-//					 cv::Vec3b &pixel = visualRes.at<cv::Vec3b>(i, j);
-//					 pixel.val[2] = 200;
-//				 }
-
-				char integer_string[32];
-				int integer = contour_i;
-				sprintf(integer_string, "%d", integer);
-				char other_string[64] = "visualRes"; // make sure you allocate enough space to append the other string
-				strcat(other_string, integer_string); // other_string now contains "Integer: 1234"
-				cv::imshow(other_string, visualRes);
+				 
 #pragma endregion
 
 #pragma region Find near shadow edge pixels (relight separatelly from shadow core pixels)
@@ -5133,8 +5109,15 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 				 Delete2dArray(passedThroughPixels, rows);
 				 Delete2dArray(countour_adjacent_shadow_pixels_indexes, rows);
 			 }
-			cv::imshow("const res", imgBGRRes);
-			ShowImgBGRRes();
+			
+//			 if (checkBoxDisplayOptionalWindows->Checked == true)
+//			 {
+//				 cv::imshow("const res", imgBGRRes);
+//			 }
+
+			 imgBGRResOriginal = imgBGRRes.clone();
+
+			 ShowImgBGRRes();
 
 			
 }
@@ -5210,7 +5193,20 @@ private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::
 			 cv::Mat imgShadowMaskGRAY;
 			 cv::Mat imgEdge;
 			 cv::Mat imgEdgeDilatedForInpaint;
+			 //cv::Mat imgBGRResSource = imgBGRResOriginal.clone();
+			 cv::Mat imgBGRResSource;
 			 cv::Mat imgBGRInpainted;
+
+			 if (checkBoxEdgesProcComposeResults->Checked == false)
+			 {
+				 //apply transformation to original imgBGRres image
+				 imgBGRResSource = imgBGRResOriginal.clone();
+			 }
+			 else
+			 {
+				 //apply transformation to image otained from previous transformations
+				 imgBGRResSource = imgBGRRes.clone();
+			 }
 
 			 cv::cvtColor(imgShadowMask, imgShadowMaskGRAY, CV_BGR2GRAY);
 
@@ -5227,9 +5223,16 @@ private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::
 			 cv::dilate(imgEdge, imgEdgeDilatedForInpaint, elementDilationForInpaint);
 
 			 //Inpaint edge artifacts
-			 cv::inpaint(imgBGRRes, imgEdgeDilatedForInpaint, imgBGRInpainted, inpaintRadius, CV_INPAINT_TELEA);//CV_INPAINT_NS
+			 cv::inpaint(imgBGRResSource, imgEdgeDilatedForInpaint, imgBGRInpainted, inpaintRadius, CV_INPAINT_TELEA);//CV_INPAINT_NS
 
-			 cv::imshow("imgBGRInpainted", imgBGRInpainted);
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("imgBGRInpainted", imgBGRInpainted);
+			 }
+
+			 
+			 imgBGRRes = imgBGRInpainted.clone();
+			 ShowImgBGRRes();
 }
 		 //Smooth Using Gaussian Filter
 private: System::Void buttonSmoothUsingGaussianFilter_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -5239,8 +5242,23 @@ private: System::Void buttonSmoothUsingGaussianFilter_Click(System::Object^  sen
 			 cv::Mat imgEdge;
 			 cv::Mat imgEdgeDilated;
 			 cv::Mat imgEdgeGaussianWhole;
+			 //cv::Mat imgBGRResSource = imgBGRResOriginal.clone();
+			 cv::Mat imgBGRResSource;
+			 
+			 
+			 if (checkBoxEdgesProcComposeResults->Checked == false)
+			 {
+				 //apply transformation to original imgBGRres image
+				 imgBGRResSource = imgBGRResOriginal.clone();
+			 }
+			 else
+			 {
+				 //apply transformation to image otained from previous transformations
+				 imgBGRResSource = imgBGRRes.clone();
+			 }
+
 			 //cv::Mat imgEdgeGaussianEdgeOnly = cv::Mat(imgBGRRes.rows, imgBGRRes.cols, CV_8UC3);
-			 cv::Mat imgEdgeGaussianEdgeOnly = imgBGRRes.clone();
+			 cv::Mat imgEdgeGaussianEdgeOnly = imgBGRResSource.clone();
 
 			 cv::cvtColor(imgShadowMask, imgShadowMaskGRAY, CV_BGR2GRAY);
 
@@ -5256,11 +5274,18 @@ private: System::Void buttonSmoothUsingGaussianFilter_Click(System::Object^  sen
 				 cv::Size(diationKernelSize, diationKernelSize));
 			 cv::dilate(imgEdge, imgEdgeDilated, elementDilation);
 
-			 cv::GaussianBlur(imgBGRRes, imgEdgeGaussianWhole, cv::Size(kernelSize, kernelSize), 0);
+			 cv::GaussianBlur(imgBGRResSource, imgEdgeGaussianWhole, cv::Size(kernelSize, kernelSize), 0);
 			 imgEdgeGaussianWhole.copyTo(imgEdgeGaussianEdgeOnly, imgEdgeDilated);
 
-			 cv::imshow("imgEdgeGaussianWhole", imgEdgeGaussianWhole);
-			 cv::imshow("imgEdgeGaussianEdgeOnly", imgEdgeGaussianEdgeOnly);
+			 
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("imgEdgeGaussianWhole", imgEdgeGaussianWhole);
+				 cv::imshow("imgEdgeGaussianEdgeOnly", imgEdgeGaussianEdgeOnly);
+			 }
+
+			 imgBGRRes = imgEdgeGaussianEdgeOnly.clone();
+			 ShowImgBGRRes();
 }
 
 		 //Smooth Using Median Filter
@@ -5269,7 +5294,22 @@ private: System::Void buttonSmoothUsingMedianFilter_Click(System::Object^  sende
 			 cv::Mat imgShadowMaskGRAY;
 			 cv::Mat imgEdge;
 			 cv::Mat imgEdgeDilated;
-			 cv::Mat imgMedianEdgeOnly = imgBGRRes.clone();
+			 //cv::Mat imgBGRResSource = imgBGRResOriginal.clone();
+			 cv::Mat imgBGRResSource;
+			 
+
+			 if (checkBoxEdgesProcComposeResults->Checked == false)
+			 {
+				 //apply transformation to original imgBGRres image
+				 imgBGRResSource = imgBGRResOriginal.clone();
+			 }
+			 else
+			 {
+				 //apply transformation to image otained from previous transformations
+				 imgBGRResSource = imgBGRRes.clone();
+			 }
+
+			 cv::Mat imgMedianEdgeOnly = imgBGRResSource.clone();
 			 cv::Mat imgMedianWhole;
 
 			 cv::cvtColor(imgShadowMask, imgShadowMaskGRAY, CV_BGR2GRAY);
@@ -5286,11 +5326,17 @@ private: System::Void buttonSmoothUsingMedianFilter_Click(System::Object^  sende
 				 cv::Size(diationKernelSize, diationKernelSize));
 			 cv::dilate(imgEdge, imgEdgeDilated, elementDilation);
 
-			 cv::medianBlur(imgBGRRes, imgMedianWhole, kernelSize);
+			 cv::medianBlur(imgBGRResSource, imgMedianWhole, kernelSize);
 			 imgMedianWhole.copyTo(imgMedianEdgeOnly, imgEdgeDilated);
 
-			 cv::imshow("imgMedianWhole", imgMedianWhole);
-			 cv::imshow("imgMedianEdgeOnly", imgMedianEdgeOnly);
+			 if (checkBoxDisplayOptionalWindows->Checked == true)
+			 {
+				 cv::imshow("imgMedianWhole", imgMedianWhole);
+				 cv::imshow("imgMedianEdgeOnly", imgMedianEdgeOnly);
+			 }
+
+			 imgBGRRes = imgMedianEdgeOnly.clone();
+			 ShowImgBGRRes();
 }
 
 };

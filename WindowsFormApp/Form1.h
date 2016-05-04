@@ -2633,6 +2633,7 @@ private: System::Void buttonShadow0YCbCr_Click(System::Object^  sender, System::
 			 //Computing the average at Y channel 
 			 float averageY = 1;
 			 float sum = 0;
+			 int count = 0;
 			 
 			 for (int i = 0; i < imgYcbcr.rows; i += 1) {
 				 for (int j = 0; j < imgYcbcr.cols; j += 1) {
@@ -2641,9 +2642,30 @@ private: System::Void buttonShadow0YCbCr_Click(System::Object^  sender, System::
 
 					 int Y = pixel.val[0];
 					 sum += Y;
+					 count += 1;
 				 }
 			 }
 			 averageY = sum / (float)(imgYcbcr.cols*imgYcbcr.rows);
+
+//			 ///////////////
+//
+//			 //standart deviation for Y
+//			 double stdDevY = 0;
+//
+//			 for (int i = 0; i < imgYcbcr.rows; i += 1) {
+//				 for (int j = 0; j < imgYcbcr.cols; j += 1) {
+//
+//					 cv::Vec3b &pixel = imgYcbcr.at<cv::Vec3b>(i, j);
+//
+//					 double Y = pixel.val[0];
+//
+//					 stdDevY += pow(Y - averageY, 2);
+//				 }
+//			 }
+//			 stdDevY = stdDevY*(1.0 / ((double)count - 1.0));
+//			 stdDevY = sqrt(stdDevY);
+//
+//			 /////////////////////
 
 			 //find shadow mask
 			 for (int i = 0; i < imgYcbcr.rows; i += 1) {

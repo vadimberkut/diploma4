@@ -17,14 +17,13 @@
 
 
 #include "MeanShift\MeanShift.h"
-
 #include "ColorProcessing\ColorDifference.h"
-
 #include "ArrayHelperr\ArrayHelperr.h"
-
 #include "OpenedImageData\OpenedImageData.h"
-
 #include "Helper\Helper.h"
+#include "FogRemoval\FogRemoval.h"
+
+#include <msclr\marshal_cppstd.h> //for System::String to std::string
 
 #pragma once
 
@@ -121,7 +120,7 @@ namespace WindowsFormApp {
 
 		/*my variables*/
 		Stream^ myStream;
-		String^ myPath;
+		System::String^ myPath;
 
 
 
@@ -160,7 +159,7 @@ private: System::Windows::Forms::Button^  button11RemveLab;
 
 private: System::Windows::Forms::Button^  button1Shadow4Math;
 private: System::Windows::Forms::Button^  buttonShadow0YCbCr;
-private: System::Windows::Forms::Button^  buttonHandleEdges;
+
 private: System::Windows::Forms::Button^  buttonTestMEANSHIFT;
 
 private: System::Windows::Forms::Button^  buttonBasicLightModelLAB;
@@ -171,7 +170,8 @@ private: System::Windows::Forms::TextBox^  textBoxShadowDetectionThreshold;
 private: System::Windows::Forms::Label^  label5;
 private: System::Windows::Forms::Label^  label6;
 private: System::Windows::Forms::Label^  label7;
-private: System::Windows::Forms::Button^  buttonRemoveUsingConstant;
+	private: System::Windows::Forms::Button^  buttonRemoveFogUsingDarkChannelPprior;
+
 
 
 
@@ -237,6 +237,8 @@ private: System::Windows::Forms::Label^  label24;
 private: System::Windows::Forms::CheckBox^  checkBoxDisplayOptionalWindows;
 private: System::Windows::Forms::CheckBox^  checkBoxEdgesProcComposeResults;
 private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
+private: System::Windows::Forms::Button^  button2;
+private: System::Windows::Forms::SaveFileDialog^  saveFileDialog1;
 
 
 
@@ -278,7 +280,6 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->button11RemveLab = (gcnew System::Windows::Forms::Button());
 			this->button1Shadow4Math = (gcnew System::Windows::Forms::Button());
 			this->buttonShadow0YCbCr = (gcnew System::Windows::Forms::Button());
-			this->buttonHandleEdges = (gcnew System::Windows::Forms::Button());
 			this->buttonTestMEANSHIFT = (gcnew System::Windows::Forms::Button());
 			this->buttonBasicLightModelLAB = (gcnew System::Windows::Forms::Button());
 			this->textBoxGrayAvg = (gcnew System::Windows::Forms::TextBox());
@@ -287,7 +288,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->label5 = (gcnew System::Windows::Forms::Label());
 			this->label6 = (gcnew System::Windows::Forms::Label());
 			this->label7 = (gcnew System::Windows::Forms::Label());
-			this->buttonRemoveUsingConstant = (gcnew System::Windows::Forms::Button());
+			this->buttonRemoveFogUsingDarkChannelPprior = (gcnew System::Windows::Forms::Button());
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->textBoxMSSColorRadius = (gcnew System::Windows::Forms::TextBox());
@@ -308,6 +309,8 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->panel3 = (gcnew System::Windows::Forms::Panel());
 			this->label13 = (gcnew System::Windows::Forms::Label());
 			this->panel4 = (gcnew System::Windows::Forms::Panel());
+			this->checkBoxEdgesProcComposeResults = (gcnew System::Windows::Forms::CheckBox());
+			this->buttonEdgesProcSaveToResultImage = (gcnew System::Windows::Forms::Button());
 			this->textBoxEdgesProcMedianFilterDilationKernelSize = (gcnew System::Windows::Forms::TextBox());
 			this->label23 = (gcnew System::Windows::Forms::Label());
 			this->textBoxEdgesProcGaussianFilterDilationKernelSize = (gcnew System::Windows::Forms::TextBox());
@@ -332,8 +335,8 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->buttonShadowDetectionApplyMedianFilter = (gcnew System::Windows::Forms::Button());
 			this->label24 = (gcnew System::Windows::Forms::Label());
 			this->checkBoxDisplayOptionalWindows = (gcnew System::Windows::Forms::CheckBox());
-			this->buttonEdgesProcSaveToResultImage = (gcnew System::Windows::Forms::Button());
-			this->checkBoxEdgesProcComposeResults = (gcnew System::Windows::Forms::CheckBox());
+			this->button2 = (gcnew System::Windows::Forms::Button());
+			this->saveFileDialog1 = (gcnew System::Windows::Forms::SaveFileDialog());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGRRes))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGR))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgShadowMask))->BeginInit();
@@ -408,7 +411,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// button7colorCorrection
 			// 
 			this->button7colorCorrection->Enabled = false;
-			this->button7colorCorrection->Location = System::Drawing::Point(321, 461);
+			this->button7colorCorrection->Location = System::Drawing::Point(306, 451);
 			this->button7colorCorrection->Name = L"button7colorCorrection";
 			this->button7colorCorrection->Size = System::Drawing::Size(98, 22);
 			this->button7colorCorrection->TabIndex = 16;
@@ -418,7 +421,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			// textBoxRed
 			// 
-			this->textBoxRed->Location = System::Drawing::Point(223, 435);
+			this->textBoxRed->Location = System::Drawing::Point(208, 429);
 			this->textBoxRed->Multiline = true;
 			this->textBoxRed->Name = L"textBoxRed";
 			this->textBoxRed->Size = System::Drawing::Size(44, 20);
@@ -427,7 +430,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			// textBoxGreen
 			// 
-			this->textBoxGreen->Location = System::Drawing::Point(272, 435);
+			this->textBoxGreen->Location = System::Drawing::Point(257, 429);
 			this->textBoxGreen->Multiline = true;
 			this->textBoxGreen->Name = L"textBoxGreen";
 			this->textBoxGreen->Size = System::Drawing::Size(44, 20);
@@ -436,7 +439,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			// textBoxBlue
 			// 
-			this->textBoxBlue->Location = System::Drawing::Point(321, 435);
+			this->textBoxBlue->Location = System::Drawing::Point(306, 429);
 			this->textBoxBlue->Multiline = true;
 			this->textBoxBlue->Name = L"textBoxBlue";
 			this->textBoxBlue->Size = System::Drawing::Size(44, 20);
@@ -445,7 +448,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			// textBoxRGB
 			// 
-			this->textBoxRGB->Location = System::Drawing::Point(370, 435);
+			this->textBoxRGB->Location = System::Drawing::Point(355, 429);
 			this->textBoxRGB->Multiline = true;
 			this->textBoxRGB->Name = L"textBoxRGB";
 			this->textBoxRGB->Size = System::Drawing::Size(49, 20);
@@ -466,7 +469,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// labelRed
 			// 
 			this->labelRed->AutoSize = true;
-			this->labelRed->Location = System::Drawing::Point(220, 419);
+			this->labelRed->Location = System::Drawing::Point(205, 413);
 			this->labelRed->Name = L"labelRed";
 			this->labelRed->Size = System::Drawing::Size(27, 13);
 			this->labelRed->TabIndex = 22;
@@ -475,7 +478,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// labelGreen
 			// 
 			this->labelGreen->AutoSize = true;
-			this->labelGreen->Location = System::Drawing::Point(269, 419);
+			this->labelGreen->Location = System::Drawing::Point(254, 413);
 			this->labelGreen->Name = L"labelGreen";
 			this->labelGreen->Size = System::Drawing::Size(36, 13);
 			this->labelGreen->TabIndex = 23;
@@ -484,7 +487,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// labelBlue
 			// 
 			this->labelBlue->AutoSize = true;
-			this->labelBlue->Location = System::Drawing::Point(321, 419);
+			this->labelBlue->Location = System::Drawing::Point(306, 413);
 			this->labelBlue->Name = L"labelBlue";
 			this->labelBlue->Size = System::Drawing::Size(28, 13);
 			this->labelBlue->TabIndex = 24;
@@ -493,7 +496,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// labelRGB
 			// 
 			this->labelRGB->AutoSize = true;
-			this->labelRGB->Location = System::Drawing::Point(367, 419);
+			this->labelRGB->Location = System::Drawing::Point(352, 413);
 			this->labelRGB->Name = L"labelRGB";
 			this->labelRGB->Size = System::Drawing::Size(30, 13);
 			this->labelRGB->TabIndex = 25;
@@ -501,7 +504,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(223, 461);
+			this->button1->Location = System::Drawing::Point(208, 451);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(95, 22);
 			this->button1->TabIndex = 26;
@@ -596,16 +599,6 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->buttonShadow0YCbCr->UseVisualStyleBackColor = true;
 			this->buttonShadow0YCbCr->Click += gcnew System::EventHandler(this, &Form1::buttonShadow0YCbCr_Click);
 			// 
-			// buttonHandleEdges
-			// 
-			this->buttonHandleEdges->Location = System::Drawing::Point(1297, 409);
-			this->buttonHandleEdges->Name = L"buttonHandleEdges";
-			this->buttonHandleEdges->Size = System::Drawing::Size(109, 25);
-			this->buttonHandleEdges->TabIndex = 75;
-			this->buttonHandleEdges->Text = L"Edges Correction";
-			this->buttonHandleEdges->UseVisualStyleBackColor = true;
-			this->buttonHandleEdges->Click += gcnew System::EventHandler(this, &Form1::buttonHandleEdges_Click);
-			// 
 			// buttonTestMEANSHIFT
 			// 
 			this->buttonTestMEANSHIFT->Location = System::Drawing::Point(887, 555);
@@ -682,15 +675,15 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->label7->TabIndex = 85;
 			this->label7->Text = L"Stddev:";
 			// 
-			// buttonRemoveUsingConstant
+			// buttonRemoveFogUsingDarkChannelPprior
 			// 
-			this->buttonRemoveUsingConstant->Location = System::Drawing::Point(12, 158);
-			this->buttonRemoveUsingConstant->Name = L"buttonRemoveUsingConstant";
-			this->buttonRemoveUsingConstant->Size = System::Drawing::Size(163, 25);
-			this->buttonRemoveUsingConstant->TabIndex = 86;
-			this->buttonRemoveUsingConstant->Text = L"Remove Using Constant";
-			this->buttonRemoveUsingConstant->UseVisualStyleBackColor = true;
-			this->buttonRemoveUsingConstant->Click += gcnew System::EventHandler(this, &Form1::buttonRemoveUsingConstant_Click);
+			this->buttonRemoveFogUsingDarkChannelPprior->Location = System::Drawing::Point(12, 158);
+			this->buttonRemoveFogUsingDarkChannelPprior->Name = L"buttonRemoveFogUsingDarkChannelPprior";
+			this->buttonRemoveFogUsingDarkChannelPprior->Size = System::Drawing::Size(163, 25);
+			this->buttonRemoveFogUsingDarkChannelPprior->TabIndex = 86;
+			this->buttonRemoveFogUsingDarkChannelPprior->Text = L"Remove Using Constant";
+			this->buttonRemoveFogUsingDarkChannelPprior->UseVisualStyleBackColor = true;
+			this->buttonRemoveFogUsingDarkChannelPprior->Click += gcnew System::EventHandler(this, &Form1::buttonRemoveUsingConstant_Click);
 			// 
 			// label2
 			// 
@@ -863,7 +856,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->panel2->Controls->Add(this->buttonYCbCr);
 			this->panel2->Controls->Add(this->button11RemveLab);
 			this->panel2->Controls->Add(this->buttonBasicLightModelLAB);
-			this->panel2->Controls->Add(this->buttonRemoveUsingConstant);
+			this->panel2->Controls->Add(this->buttonRemoveFogUsingDarkChannelPprior);
 			this->panel2->Location = System::Drawing::Point(678, 442);
 			this->panel2->Name = L"panel2";
 			this->panel2->Size = System::Drawing::Size(185, 195);
@@ -918,10 +911,29 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->panel4->Controls->Add(this->label16);
 			this->panel4->Controls->Add(this->textBoxEdgesProcDilationKernelSize);
 			this->panel4->Controls->Add(this->label15);
-			this->panel4->Location = System::Drawing::Point(1054, 440);
+			this->panel4->Location = System::Drawing::Point(1054, 442);
 			this->panel4->Name = L"panel4";
-			this->panel4->Size = System::Drawing::Size(350, 213);
+			this->panel4->Size = System::Drawing::Size(303, 213);
 			this->panel4->TabIndex = 111;
+			// 
+			// checkBoxEdgesProcComposeResults
+			// 
+			this->checkBoxEdgesProcComposeResults->AutoSize = true;
+			this->checkBoxEdgesProcComposeResults->Location = System::Drawing::Point(193, 3);
+			this->checkBoxEdgesProcComposeResults->Name = L"checkBoxEdgesProcComposeResults";
+			this->checkBoxEdgesProcComposeResults->Size = System::Drawing::Size(103, 17);
+			this->checkBoxEdgesProcComposeResults->TabIndex = 127;
+			this->checkBoxEdgesProcComposeResults->Text = L"Compose results";
+			this->checkBoxEdgesProcComposeResults->UseVisualStyleBackColor = true;
+			// 
+			// buttonEdgesProcSaveToResultImage
+			// 
+			this->buttonEdgesProcSaveToResultImage->Location = System::Drawing::Point(151, 172);
+			this->buttonEdgesProcSaveToResultImage->Name = L"buttonEdgesProcSaveToResultImage";
+			this->buttonEdgesProcSaveToResultImage->Size = System::Drawing::Size(143, 25);
+			this->buttonEdgesProcSaveToResultImage->TabIndex = 122;
+			this->buttonEdgesProcSaveToResultImage->Text = L"SaveToResultImage";
+			this->buttonEdgesProcSaveToResultImage->UseVisualStyleBackColor = true;
 			// 
 			// textBoxEdgesProcMedianFilterDilationKernelSize
 			// 
@@ -1008,9 +1020,9 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			this->buttonSmoothUsingMedianFilter->Location = System::Drawing::Point(193, 134);
 			this->buttonSmoothUsingMedianFilter->Name = L"buttonSmoothUsingMedianFilter";
-			this->buttonSmoothUsingMedianFilter->Size = System::Drawing::Size(152, 25);
+			this->buttonSmoothUsingMedianFilter->Size = System::Drawing::Size(102, 25);
 			this->buttonSmoothUsingMedianFilter->TabIndex = 109;
-			this->buttonSmoothUsingMedianFilter->Text = L"Smooth using Median filter";
+			this->buttonSmoothUsingMedianFilter->Text = L"Median filter";
 			this->buttonSmoothUsingMedianFilter->UseVisualStyleBackColor = true;
 			this->buttonSmoothUsingMedianFilter->Click += gcnew System::EventHandler(this, &Form1::buttonSmoothUsingMedianFilter_Click);
 			// 
@@ -1018,9 +1030,9 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			this->buttonSmoothUsingGaussianFilter->Location = System::Drawing::Point(193, 95);
 			this->buttonSmoothUsingGaussianFilter->Name = L"buttonSmoothUsingGaussianFilter";
-			this->buttonSmoothUsingGaussianFilter->Size = System::Drawing::Size(152, 25);
+			this->buttonSmoothUsingGaussianFilter->Size = System::Drawing::Size(102, 25);
 			this->buttonSmoothUsingGaussianFilter->TabIndex = 108;
-			this->buttonSmoothUsingGaussianFilter->Text = L"Smooth using Gaussian filter";
+			this->buttonSmoothUsingGaussianFilter->Text = L"Gaussian filter";
 			this->buttonSmoothUsingGaussianFilter->UseVisualStyleBackColor = true;
 			this->buttonSmoothUsingGaussianFilter->Click += gcnew System::EventHandler(this, &Form1::buttonSmoothUsingGaussianFilter_Click);
 			// 
@@ -1028,7 +1040,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			this->buttonInpaintEdges->Location = System::Drawing::Point(201, 31);
 			this->buttonInpaintEdges->Name = L"buttonInpaintEdges";
-			this->buttonInpaintEdges->Size = System::Drawing::Size(143, 25);
+			this->buttonInpaintEdges->Size = System::Drawing::Size(93, 25);
 			this->buttonInpaintEdges->TabIndex = 107;
 			this->buttonInpaintEdges->Text = L"Inpaint";
 			this->buttonInpaintEdges->UseVisualStyleBackColor = true;
@@ -1100,7 +1112,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			// textBoxShadowDetectionMedianFilterKernelSize
 			// 
-			this->textBoxShadowDetectionMedianFilterKernelSize->Location = System::Drawing::Point(238, 560);
+			this->textBoxShadowDetectionMedianFilterKernelSize->Location = System::Drawing::Point(211, 499);
 			this->textBoxShadowDetectionMedianFilterKernelSize->Multiline = true;
 			this->textBoxShadowDetectionMedianFilterKernelSize->Name = L"textBoxShadowDetectionMedianFilterKernelSize";
 			this->textBoxShadowDetectionMedianFilterKernelSize->Size = System::Drawing::Size(64, 20);
@@ -1110,7 +1122,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// label21
 			// 
 			this->label21->AutoSize = true;
-			this->label21->Location = System::Drawing::Point(235, 544);
+			this->label21->Location = System::Drawing::Point(208, 483);
 			this->label21->Name = L"label21";
 			this->label21->Size = System::Drawing::Size(61, 13);
 			this->label21->TabIndex = 124;
@@ -1118,7 +1130,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// 
 			// buttonShadowDetectionApplyMedianFilter
 			// 
-			this->buttonShadowDetectionApplyMedianFilter->Location = System::Drawing::Point(306, 555);
+			this->buttonShadowDetectionApplyMedianFilter->Location = System::Drawing::Point(279, 494);
 			this->buttonShadowDetectionApplyMedianFilter->Name = L"buttonShadowDetectionApplyMedianFilter";
 			this->buttonShadowDetectionApplyMedianFilter->Size = System::Drawing::Size(152, 25);
 			this->buttonShadowDetectionApplyMedianFilter->TabIndex = 122;
@@ -1128,7 +1140,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// label24
 			// 
 			this->label24->AutoSize = true;
-			this->label24->Location = System::Drawing::Point(222, 496);
+			this->label24->Location = System::Drawing::Point(19, 416);
 			this->label24->Name = L"label24";
 			this->label24->Size = System::Drawing::Size(90, 13);
 			this->label24->TabIndex = 125;
@@ -1137,31 +1149,22 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			// checkBoxDisplayOptionalWindows
 			// 
 			this->checkBoxDisplayOptionalWindows->AutoSize = true;
-			this->checkBoxDisplayOptionalWindows->Location = System::Drawing::Point(238, 512);
+			this->checkBoxDisplayOptionalWindows->Location = System::Drawing::Point(35, 432);
 			this->checkBoxDisplayOptionalWindows->Name = L"checkBoxDisplayOptionalWindows";
 			this->checkBoxDisplayOptionalWindows->Size = System::Drawing::Size(144, 17);
 			this->checkBoxDisplayOptionalWindows->TabIndex = 126;
 			this->checkBoxDisplayOptionalWindows->Text = L"Display optional windows";
 			this->checkBoxDisplayOptionalWindows->UseVisualStyleBackColor = true;
 			// 
-			// buttonEdgesProcSaveToResultImage
+			// button2
 			// 
-			this->buttonEdgesProcSaveToResultImage->Location = System::Drawing::Point(125, 188);
-			this->buttonEdgesProcSaveToResultImage->Name = L"buttonEdgesProcSaveToResultImage";
-			this->buttonEdgesProcSaveToResultImage->Size = System::Drawing::Size(143, 25);
-			this->buttonEdgesProcSaveToResultImage->TabIndex = 122;
-			this->buttonEdgesProcSaveToResultImage->Text = L"SaveToResultImage";
-			this->buttonEdgesProcSaveToResultImage->UseVisualStyleBackColor = true;
-			// 
-			// checkBoxEdgesProcComposeResults
-			// 
-			this->checkBoxEdgesProcComposeResults->AutoSize = true;
-			this->checkBoxEdgesProcComposeResults->Location = System::Drawing::Point(241, 3);
-			this->checkBoxEdgesProcComposeResults->Name = L"checkBoxEdgesProcComposeResults";
-			this->checkBoxEdgesProcComposeResults->Size = System::Drawing::Size(103, 17);
-			this->checkBoxEdgesProcComposeResults->TabIndex = 127;
-			this->checkBoxEdgesProcComposeResults->Text = L"Compose results";
-			this->checkBoxEdgesProcComposeResults->UseVisualStyleBackColor = true;
+			this->button2->Location = System::Drawing::Point(219, 546);
+			this->button2->Name = L"button2";
+			this->button2->Size = System::Drawing::Size(196, 25);
+			this->button2->TabIndex = 87;
+			this->button2->Text = L"Remove fog using dark channel prior";
+			this->button2->UseVisualStyleBackColor = true;
+			this->button2->Click += gcnew System::EventHandler(this, &Form1::button2_Click);
 			// 
 			// Form1
 			// 
@@ -1169,6 +1172,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->ClientSize = System::Drawing::Size(1416, 662);
+			this->Controls->Add(this->button2);
 			this->Controls->Add(this->checkBoxDisplayOptionalWindows);
 			this->Controls->Add(this->label24);
 			this->Controls->Add(this->textBoxShadowDetectionMedianFilterKernelSize);
@@ -1184,7 +1188,6 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 			this->Controls->Add(this->button1);
 			this->Controls->Add(this->buttonDestroyAlllWindows);
 			this->Controls->Add(this->label4);
-			this->Controls->Add(this->buttonHandleEdges);
 			this->Controls->Add(this->label10);
 			this->Controls->Add(this->buttonEdgesProcessingDefault);
 			this->Controls->Add(this->label9);
@@ -1237,7 +1240,7 @@ private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
 				if (OpenDialog){
 					OpenFileDialog^ openFileDialog1 = gcnew OpenFileDialog;
 					openFileDialog1->InitialDirectory = "./";
-					openFileDialog1->Filter = "Image Files (*.bmp, *.jpg, *.jpeg, *.png, *.gif) | *.bmp; *.jpg; *.jpeg; *.png; *.gif|BMP Files|*.bmp|JPG Files|*.jpg; *.jpeg|PNG Files|*.png|GIF Files|*.gif";
+					openFileDialog1->Filter = "Image Files (*.bmp, *.jpg, *.jpeg, *.png) | *.bmp; *.jpg; *.jpeg; *.png; *.gif|BMP Files|*.bmp|JPG Files|*.jpg; *.jpeg|PNG Files|*.png";
 					openFileDialog1->FilterIndex = 1;
 					openFileDialog1->RestoreDirectory = true;
 
@@ -1406,17 +1409,58 @@ private: System::Void panel1_Scroll(System::Object^  sender, System::Windows::Fo
 		 //Сохранить
 private: System::Void button2save_Click(System::Object^  sender, System::EventArgs^  e) {
 		
-			 //проверка на открытый файл
-			 if(!OPEN){
-				 MessageBox::Show("No file to save!");
-				 return;
+//			 //проверка на открытый файл
+//			 if(!OPEN){
+//				 MessageBox::Show("No file to save!");
+//				 return;
+//			 }
+//			 
+//			 //if(SaveBMP())
+//			 if(SaveImgBGRRes())
+//				MessageBox::Show("Success!");
+//			 else
+//				 MessageBox::Show("Fail!");
+
+			 // Displays a SaveFileDialog so the user can save the Image
+			 // assigned to Button2.
+			 SaveFileDialog ^ saveFileDialog1 = gcnew SaveFileDialog();
+			 //saveFileDialog1->Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+			 saveFileDialog1->Filter = "BMP Image|*.bmp|JPG Image|*.jpg; *.jpeg|PNG Image|*.png";
+			 saveFileDialog1->Title = "Save an Image File";
+			 saveFileDialog1->ShowDialog();
+			 // If the file name is not an empty string, open it for saving.
+			 if (saveFileDialog1->FileName != "")
+			 {
+				 // Saves the Image through OpenCV
+				 System::String^ fileNameStr = saveFileDialog1->FileName;
+				 std::string fileName = msclr::interop::marshal_as<std::string>(fileNameStr);
+
+				 cv::imwrite(fileName, imgBGRRes);
+
+//				 // Saves the Image through a FileStream created by
+//				 // the OpenFile method.
+//				 System::IO::FileStream ^ fs =	safe_cast<System::IO::FileStream^>(saveFileDialog1->OpenFile());
+//				 // Saves the Image in the appropriate ImageFormat based on
+//				 // the file type selected in the dialog box.
+//				 // Note that the FilterIndex property is one based.
+//				 switch (saveFileDialog1->FilterIndex)
+//				 {
+//				 case 1:
+//					 this->button2->Image->Save(fs,
+//						 System::Drawing::Imaging::ImageFormat::Jpeg);
+//					 break;
+//				 case 2:
+//					 this->button2->Image->Save(fs,
+//						 System::Drawing::Imaging::ImageFormat::Bmp);
+//					 break;
+//				 case 3:
+//					 this->button2->Image->Save(fs,
+//						 System::Drawing::Imaging::ImageFormat::Gif);
+//					 break;
+//				 }
+//				 fs->Close();
 			 }
-			 
-			 //if(SaveBMP())
-			 if(SaveImgBGRRes())
-				MessageBox::Show("Success!");
-			 else
-				 MessageBox::Show("Fail!");
+
 		 }
 
 		 //Выход
@@ -2885,6 +2929,10 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 
 			 if (checkBoxDisplayOptionalWindows->Checked == true)
 			 {
+				 cv::imshow("1. imgLABforDetectMat", imgLABforDetectMat);
+				 cv::imshow("2. imgShadowMask", imgShadowMask);
+				 cv::imshow("3. imgMedianFilter", imgMedianFilter);
+
 				 cv::imshow("imgMedianFilter", imgMedianFilter);
 				 cv::imshow("imgShadowMask", imgShadowMask);
 				 cv::imshow("shadowMaskClosingMat", shadowMaskClosingMat);
@@ -3081,7 +3129,7 @@ private: void CopyMatToArray(cv::Mat source, UCHAR *dest){
 					 j_buff += 1;
 
 					 if (i_buff < 0)
-						 throw gcnew Exception("i_buff index less than 0 !");
+						 throw gcnew System::Exception("i_buff index less than 0 !");
 					 
 				 }
 				 i_buff -= 1;
@@ -3355,7 +3403,7 @@ private: void ApplyMeanShiftAndCorrections(cv::Mat &imgForCluster, cv::Mat &imgF
 					 //Loop through current shadow region's pixels and find adjacent non shadow regions
 					 std::vector<int> adjacent_labels;
 					 int min_adjacent_labels_required = 1;
-					 int min_deviation = 6;
+					 int min_deviation = 1;
 					 int max_deviation = 20;
 					 int max_iterations = max_deviation*100;
 					 for (int it = 0; adjacent_labels.size() < min_adjacent_labels_required; it++) {
@@ -3822,8 +3870,10 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
  
 			 cv::GaussianBlur(imgBGR, imgGaussian, cv::Size(7, 7), 0);
 
-			 //cv::pyrMeanShiftFiltering(imgGaussian, imgMeanShift, 20, 20, 1);
-			 cv::pyrMeanShiftFiltering(imgGaussian, imgMeanShift, 25, 25, 1);
+			 double sp = 25; //The spatial window radius.
+			 double sr = 25; //The color window radius.
+			 int maxLevel = 1; //Maximum level of the pyramid for the segmentation.
+			 cv::pyrMeanShiftFiltering(imgGaussian, imgMeanShift, sp, sr, maxLevel);
 			 imgMeanShiftRes = imgMeanShift.clone();
 			 floodFillPostprocess(imgMeanShiftRes, cv::Scalar::all(2));
 
@@ -3879,7 +3929,25 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
 				 textBoxShadowDetectionThreshold->Text = System::Convert::ToString(thresh);
 			 }
 			 
+			 //Apply global binarization
 			 cv::threshold(imgMeanShiftGrayscal, imgThresholdFixed, thresh, maxValue, CV_THRESH_BINARY_INV); // Binary Threshold
+
+			 //Apply adaptive binarization
+//			 cv::Mat imgThresholdFixedAdaptive;
+//			 cv::Mat imgThresholdFixedAdaptiveGauss;
+//			 double maxValueAdaptive = 255;
+//			 int adaptiveMethod = ADAPTIVE_THRESH_MEAN_C;
+//			 //int adaptiveMethod = ADAPTIVE_THRESH_GAUSSIAN_C;
+//			 int thresholdTypeAdaptive = THRESH_BINARY;
+//			 int blockSizeAdaptive = 5; //It decides the size of neighbourhood area.
+//			 double CAdaptive = 7; //It is just a constant which is subtracted from the mean or weighted mean calculated.
+//			 adaptiveThreshold(imgMeanShiftGrayscal, imgThresholdFixedAdaptive, maxValueAdaptive, adaptiveMethod, thresholdTypeAdaptive, blockSizeAdaptive, CAdaptive);
+//			 adaptiveThreshold(imgMeanShiftGrayscal, imgThresholdFixedAdaptiveGauss, maxValueAdaptive, ADAPTIVE_THRESH_GAUSSIAN_C, thresholdTypeAdaptive, blockSizeAdaptive, CAdaptive);
+//			 cv::imshow("imgThresholdFixed", imgThresholdFixed);
+//			 cv::imshow("imgThresholdFixedAdaptive", imgThresholdFixedAdaptive);
+//			 cv::imshow("imgThresholdFixedAdaptiveGauss", imgThresholdFixedAdaptiveGauss);
+//
+//			 floodFillPostprocess(imgMeanShiftGrayscal, cv::Scalar::all(2));
 
 //			 //Morfological operations
 //			 cv::Mat elementDil1 = getStructuringElement(cv::MORPH_RECT,
@@ -3901,16 +3969,12 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
 
 			 if (checkBoxDisplayOptionalWindows->Checked == true)
 			 {
-				 //cv::imshow("imgThresholdFixedDil1", imgThresholdFixedDil1);
-				 //			 cv::imshow("imgThresholdFixedDil2", imgThresholdFixedDil2);
-				 //			 cv::imshow("imgThresholdFixedErode1", imgThresholdFixedErode1);
-
-				 //			 cv::imshow("1 imgBGR", imgBGR);
-				 //			 cv::imshow("2 imgGaussian", imgGaussian);
-				 //			 cv::imshow("3 imgMeanShift", imgMeanShift);
-				 //			 cv::imshow("4 imgMeanShiftRes", imgMeanShiftRes);
-				 cv::imshow("5 imgMeanShiftGrayscal", imgMeanShiftGrayscal);
-				 //cv::imshow("6 imgThresholdFixed", imgThresholdFixed);
+				cv::imshow("1 imgBGR", imgBGR);
+				cv::imshow("2 imgGaussian", imgGaussian);
+				cv::imshow("3 imgMeanShift", imgMeanShift);
+				cv::imshow("4 imgMeanShiftRes", imgMeanShiftRes);
+				cv::imshow("5 imgMeanShiftGrayscal", imgMeanShiftGrayscal);
+				cv::imshow("6 imgThresholdFixed", imgThresholdFixed);
 			 }
 
 			 cv::cvtColor(imgThresholdFixed, imgShadowMask, CV_GRAY2BGR);
@@ -3945,79 +4009,6 @@ private: void floodFillPostprocess(cv::Mat& img, const cv::Scalar& colorDiff /*=
 	}
 }
 
-
-private: System::Void buttonHandleEdges_Click(System::Object^  sender, System::EventArgs^  e) {
-
-			 //imgBGRRes = imgBGR.clone();
-
-			 //Shadow edge detection
-			 cv::Mat imgShadowMaskGRAY;
-			 cv::Mat imgEdge;
-			 cv::Mat imgEdgeDilated;
-			 cv::Mat imgEdgeDilated5;
-			 cv::Mat imgEdgeDilated7;
-			 cv::Mat imgEdgeDilatedForInpaint;
-			 cv::Mat imgEdgeGaussianWhole;
-			 cv::Mat imgEdgeGaussianEdgeOnly;
-			 
-			 cv::Mat imgMedianEdgeOnly;
-			 cv::Mat imgMedianEdgeOnly2;
-
-			 cv::cvtColor(imgShadowMask, imgShadowMaskGRAY, CV_BGR2GRAY);
-			 
-			 cv::Canny(imgShadowMaskGRAY, imgEdge, 50, 150, 3);
-
-			 cv::Mat elementDil5 = getStructuringElement(cv::MORPH_RECT,
-				 cv::Size(5, 5));
-			 cv::Mat elementDil7 = getStructuringElement(cv::MORPH_RECT,
-				 cv::Size(7, 7));
-
-			 
-
-			 //Load inpaint params from UI
-			 System::String^ inpaintDilationKernelSizeStr = textBoxEdgesProcDilationKernelSize->Text;
-			 
-			 int inpaintDilationKernelSize = System::String::IsNullOrWhiteSpace(inpaintDilationKernelSizeStr) ? INPAINT_DILATION_KERNEL_SIZE : System::Convert::ToInt32(inpaintDilationKernelSizeStr);
-			 System::String^ inpaintRadiusStr = textBoxEdgesProcInpaintRadius->Text; 
-			 
-			 double inpaintRadius = System::String::IsNullOrWhiteSpace(inpaintRadiusStr) ? INPAINT_RADIUS : System::Convert::ToDouble(inpaintRadiusStr);
-
-			 cv::Mat elementDilationForInpaint = getStructuringElement(cv::MORPH_RECT,
-				 cv::Size(inpaintDilationKernelSize, inpaintDilationKernelSize));
-			 cv::dilate(imgEdge, imgEdgeDilated, elementDil5);
-			 cv::dilate(imgEdge, imgEdgeDilated5, elementDil5);
-			 cv::dilate(imgEdge, imgEdgeDilated7, elementDil7);
-			 cv::dilate(imgEdge, imgEdgeDilatedForInpaint, elementDilationForInpaint);
-
-			 imgEdgeGaussianEdgeOnly = imgBGRRes.clone();
-			 cv::GaussianBlur(imgBGRRes, imgEdgeGaussianWhole, cv::Size(3, 3), 0);
-			 imgEdgeGaussianWhole.copyTo(imgEdgeGaussianEdgeOnly, imgEdgeDilated);
-
-			 cv::Mat imgMedianWhole3;
-			 cv::Mat imgMedianWhole5;
-			 imgMedianEdgeOnly = imgBGRRes.clone();
-			 imgMedianEdgeOnly2 = imgBGRRes.clone();
-			 cv::medianBlur(imgBGRRes, imgMedianWhole3, 3);
-			 cv::medianBlur(imgBGRRes, imgMedianWhole5, 5);
-			 imgMedianWhole3.copyTo(imgMedianEdgeOnly, imgEdgeDilated);
-			 imgMedianWhole5.copyTo(imgMedianEdgeOnly2, imgEdgeDilated);
-			 ///
-
-			 
-
-			 //Inpaint edge artifacts
-			 cv::Mat imgBGRInpainted;
-			 //cv::inpaint(imgBGRres, imgEdgeDilatedForInpaint, imgBGRInpainted, 7, CV_INPAINT_TELEA);//CV_INPAINT_NS
-			 cv::inpaint(imgBGRRes, imgEdgeDilatedForInpaint, imgBGRInpainted, inpaintRadius, CV_INPAINT_TELEA);//CV_INPAINT_NS
-
-			 cv::imshow("imgBGRres", imgBGRRes);
-			 cv::imshow("imgBGRInpainted", imgBGRInpainted);
-
-			 cv::imshow("imgEdgeGaussianEdgeOnly", imgEdgeGaussianEdgeOnly);
-
-			 cv::imshow("imgMedianEdgeOnly", imgMedianEdgeOnly);
-			 cv::imshow("imgMedianEdgeOnly2", imgMedianEdgeOnly2);
-}
 
 private: System::Void buttonTestMEANSHIFT_Click(System::Object^  sender, System::EventArgs^  e) {
 
@@ -4825,9 +4816,12 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 						 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
 						 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-
+//
 						 f_a_R += pow(P_pixel.val[2] - S_pixel.val[2] * a_R, 2);
 						 f_b_R += pow(P_pixel.val[2] - S_pixel.val[2] * b_R, 2);
+
+//						 f_a_R += pow(P_pixel.val[2] - S_pixel.val[2] + a_R, 2);
+//						 f_b_R += pow(P_pixel.val[2] - S_pixel.val[2] + b_R, 2);
 					 }
 
 					 if (f_a_R < f_b_R)
@@ -4865,6 +4859,9 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 						 f_a_G += pow(P_pixel.val[1] - S_pixel.val[1] * a_G, 2);
 						 f_b_G += pow(P_pixel.val[1] - S_pixel.val[1] * b_G, 2);
+
+//						 f_a_G += pow(P_pixel.val[1] - S_pixel.val[1] + a_G, 2);
+//						 f_b_G += pow(P_pixel.val[1] - S_pixel.val[1] + b_G, 2);
 					 }
 
 					 if (f_a_G < f_b_G)
@@ -4902,6 +4899,9 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 
 						 f_a_B += pow(P_pixel.val[0] - S_pixel.val[0] * a_B, 2);
 						 f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] * b_B, 2);
+
+//						 f_a_B += pow(P_pixel.val[0] - S_pixel.val[0] + a_B, 2);
+//						 f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] + b_B, 2);
 					 }
 
 					 if (f_a_B < f_b_B)
@@ -5245,7 +5245,9 @@ private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::
 			 cv::dilate(imgEdge, imgEdgeDilatedForInpaint, elementDilationForInpaint);
 
 			 //Inpaint edge artifacts
-			 cv::inpaint(imgBGRResSource, imgEdgeDilatedForInpaint, imgBGRInpainted, inpaintRadius, CV_INPAINT_TELEA);//CV_INPAINT_NS
+			 //int inpaintinMethod = CV_INPAINT_NS; //Navier-Stokes based method.
+			 int inpaintinMethod = CV_INPAINT_TELEA; //Method by Alexandru Telea
+			 cv::inpaint(imgBGRResSource, imgEdgeDilatedForInpaint, imgBGRInpainted, inpaintRadius, inpaintinMethod);//CV_INPAINT_NS
 
 			 if (checkBoxDisplayOptionalWindows->Checked == true)
 			 {
@@ -5361,6 +5363,43 @@ private: System::Void buttonSmoothUsingMedianFilter_Click(System::Object^  sende
 			 ShowImgBGRRes();
 }
 
+		 //Remove fog using dark channel prior
+private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 cv::Mat imgFog = imgBGR;
+			 cv::Mat imgDarkChannel;
+			 cv::Mat T; //Transmission
+			 cv::Mat fogfree;
+			 cv::Mat imgBeforeAfter = cv::Mat::zeros(imgFog.rows, 2 * imgFog.cols, CV_8UC3);
+
+			 cv::Rect roil(0, 0, imgFog.cols, imgFog.rows);
+			 cv::Rect roir(imgFog.cols, 0, imgFog.cols, imgFog.rows);
+
+			 int Airlight;
+			 namedWindow("before and after", CV_WINDOW_AUTOSIZE);
+
+			 //int patchSize = 5;
+			 int patchSize = 5;
+			 imgDarkChannel = getMedianDarkChannel(imgFog, patchSize);
+			 //imgDarkChannel = DarkChannel(imgFog, patchSize);
+			 //Airlight = estimateA(imgDarkChannel);
+			 Airlight = estimateAAdvance(imgDarkChannel);
+			 T = estimateTransmission(imgDarkChannel, Airlight);
+			 fogfree = getDehazed(imgFog, T, Airlight);
+
+			 imshow("darkChannel MDCP", imgDarkChannel);
+			 imshow("estimateTransmission", T);
+
+			 imgFog.copyTo(imgBeforeAfter(roil));
+			 fogfree.copyTo(imgBeforeAfter(roir));
+			 imwrite("./dehazed.jpg", fogfree);
+			 imshow("before and after", imgBeforeAfter);
+			 imshow("fogfree", fogfree);
+
+			 imgBGRRes = fogfree;
+
+			 ShowImgBGRRes();
+}
 };
 
 

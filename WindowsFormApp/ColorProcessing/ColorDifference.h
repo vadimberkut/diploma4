@@ -3,6 +3,9 @@
 //#include "opencv2/imgproc/imgproc.hpp"
 //#include "opencv2/imgproc/imgproc_c.h"
 
+//https://ru.wikipedia.org/wiki/Формула_цветового_отличия
+
+
 //CIE76 standart to determine Color difference (useing delta E metric)
 class CIE76
 {

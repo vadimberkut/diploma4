@@ -68,7 +68,6 @@ int MeanShift(const IplImage* img, int **labels)
 	cvCvtColor(img, result, CV_RGB2Lab);
 
 	// Step One. Filtering stage of meanshift segmentation
-	// http://rsbweb.nih.gov/ij/plugins/download/Mean_Shift.java
 	for(int i=0;i<img->height;i++) 
 		for(int j=0;j<img->width;j++)
 		{

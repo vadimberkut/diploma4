@@ -30,16 +30,37 @@ inline int color_distance( const IplImage* img, int x1, int y1, int x2, int y2 )
 	- ((uchar *)(img->imageData + x2*img->widthStep))[y2*img->nChannels + 2];
 	return r*r+g*g+b*b;
 }
+
 inline float color_distance( const float* a, const float* b)
 {
 	float l = a[0]-b[0], u=a[1]-b[1], v=a[2]-b[2];
 	return l*l+u*u+v*v;
 }
+
 inline float color_distance(const cv::Vec3f& a, const cv::Vec3f& b)
 {
 	float l = a.val[0]-b.val[0], u=a.val[1]-b.val[1], v=a.val[2]-b.val[2];
 	return l*l+u*u+v*v;
 }
+//Without L
+//inline int color_distance(const IplImage* img, int x1, int y1, int x2, int y2)
+//{
+//	int g = ((uchar *)(img->imageData + x1*img->widthStep))[y1*img->nChannels + 1]
+//		- ((uchar *)(img->imageData + x2*img->widthStep))[y2*img->nChannels + 1];
+//	int b = ((uchar *)(img->imageData + x1*img->widthStep))[y1*img->nChannels + 2]
+//		- ((uchar *)(img->imageData + x2*img->widthStep))[y2*img->nChannels + 2];
+//	return g*g + b*b;
+//}
+//inline float color_distance(const float* a, const float* b)
+//{
+//	float  u = a[1] - b[1], v = a[2] - b[2];
+//	return u*u + v*v;
+//}
+//inline float color_distance(const cv::Vec3f& a, const cv::Vec3f& b)
+//{
+//	float u = a.val[1] - b.val[1], v = a.val[2] - b.val[2];
+//	return u*u + v*v;
+//}
 inline int spatial_distance( const CvPoint& q, const CvPoint& p ) 
 {
 	int a = q.x-p.x, b=q.y-p.y;

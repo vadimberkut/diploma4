@@ -71,6 +71,9 @@
     <ClInclude Include="Histogram\Histogram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FogRemoval\FogRemoval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">

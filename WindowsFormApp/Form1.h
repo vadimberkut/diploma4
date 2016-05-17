@@ -163,7 +163,7 @@ private: System::Windows::Forms::Button^  button1Shadow4Math;
 
 private: System::Windows::Forms::Button^  buttonTestMEANSHIFT;
 
-private: System::Windows::Forms::Button^  buttonBasicLightModelLAB;
+
 private: System::Windows::Forms::TextBox^  textBoxGrayAvg;
 private: System::Windows::Forms::TextBox^  textBoxGrayDev;
 
@@ -286,7 +286,6 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->button11RemveLab = (gcnew System::Windows::Forms::Button());
 			this->button1Shadow4Math = (gcnew System::Windows::Forms::Button());
 			this->buttonTestMEANSHIFT = (gcnew System::Windows::Forms::Button());
-			this->buttonBasicLightModelLAB = (gcnew System::Windows::Forms::Button());
 			this->textBoxGrayAvg = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxGrayDev = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxShadowDetectionThreshold = (gcnew System::Windows::Forms::TextBox());
@@ -617,16 +616,6 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->buttonTestMEANSHIFT->UseVisualStyleBackColor = true;
 			this->buttonTestMEANSHIFT->Click += gcnew System::EventHandler(this, &Form1::buttonTestMEANSHIFT_Click);
 			// 
-			// buttonBasicLightModelLAB
-			// 
-			this->buttonBasicLightModelLAB->Location = System::Drawing::Point(12, 96);
-			this->buttonBasicLightModelLAB->Name = L"buttonBasicLightModelLAB";
-			this->buttonBasicLightModelLAB->Size = System::Drawing::Size(163, 25);
-			this->buttonBasicLightModelLAB->TabIndex = 78;
-			this->buttonBasicLightModelLAB->Text = L"Basic light model removal (Lab)";
-			this->buttonBasicLightModelLAB->UseVisualStyleBackColor = true;
-			this->buttonBasicLightModelLAB->Click += gcnew System::EventHandler(this, &Form1::buttonBasicLightModelLAB_Click);
-			// 
 			// textBoxGrayAvg
 			// 
 			this->textBoxGrayAvg->Enabled = false;
@@ -864,7 +853,6 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->panel2->Controls->Add(this->buttonBasicLightModel);
 			this->panel2->Controls->Add(this->buttonYCbCr);
 			this->panel2->Controls->Add(this->button11RemveLab);
-			this->panel2->Controls->Add(this->buttonBasicLightModelLAB);
 			this->panel2->Controls->Add(this->buttonRemoveFogUsingDarkChannelPprior);
 			this->panel2->Location = System::Drawing::Point(456, 431);
 			this->panel2->Name = L"panel2";
@@ -5705,105 +5693,6 @@ private: System::Void buttonTestMEANSHIFT_Click(System::Object^  sender, System:
 			 cvNamedWindow("MeanShift", CV_WINDOW_AUTOSIZE);
 			 cvShowImage("MeanShift", img);
 }
-
-private: System::Void buttonBasicLightModelLAB_Click(System::Object^  sender, System::EventArgs^  e) {
-
-			 //Add diff to L and correct A and B
-
-			 //cv::Mat imgBGR = cv::imread(myPath_char);
-			 cv::Mat imgLAB;
-			 cv::cvtColor(imgBGR, imgLAB, CV_BGR2Lab);
-
-			 int count_shadow = 0;
-			 int count_non_shadow = 0;
-
-			 double L_shadow = 0;
-			 double A_shadow = 0;
-			 double B_shadow = 0;
-
-			 double L_non_shadow = 0;
-			 double A_non_shadow = 0;
-			 double B_non_shadow = 0;
-
-			 for (int i = 0; i < imgLAB.rows; i++) {
-				 for (int j = 0; j < imgLAB.cols; j++) {
-
-					 cv::Vec3b &shadowPixelMask = imgShadowMask.at<cv::Vec3b>(i, j);
-					 cv::Vec3b &pixel = imgLAB.at<cv::Vec3b>(i, j);
-					 if (shadowPixelMask.val[0] == 255)
-					 {
-						 L_shadow += pixel.val[0];
-						 A_shadow += pixel.val[1];
-						 B_shadow += pixel.val[2];
-
-						 count_shadow += 1;
-					 }
-					 else
-					 {
-						 L_non_shadow += pixel.val[0];
-						 A_non_shadow += pixel.val[1];
-						 B_non_shadow += pixel.val[2];
-
-						 count_non_shadow += 1;
-					 }
-				 }
-			 }
-
-			 L_shadow /= count_shadow;
-			 A_shadow /= count_shadow;
-			 B_shadow /= count_shadow;
-
-			 L_non_shadow /= count_non_shadow;
-			 A_non_shadow /= count_non_shadow;
-			 B_non_shadow /= count_non_shadow;
-
-			 double diff_L = L_non_shadow - L_shadow;
-			 double diff_A = A_non_shadow - A_shadow;
-			 double diff_B = B_non_shadow - B_shadow;
-
-			 double ratio_L = L_non_shadow / L_shadow;
-			 double ratio_A = A_non_shadow / A_shadow;
-			 double ratio_B = B_non_shadow / B_shadow;
-
-			 //Mul on ratio
-			 for (int i = 0; i < imgLAB.rows; i++) {
-				 for (int j = 0; j < imgLAB.cols; j++) {
-
-					 cv::Vec3b &shadowPixelMask = imgShadowMask.at<cv::Vec3b>(i, j);
-					 cv::Vec3b &pixel = imgLAB.at<cv::Vec3b>(i, j);
-					 if (shadowPixelMask.val[0] == 255)
-					 {
-						 int L = pixel.val[0];
-						 int A = pixel.val[1];
-						 int B = pixel.val[2];
-
-						 L *= ratio_L;
-						 A *= ratio_A;
-						 B *= ratio_B;
-
-
-//						 L += diff_L;
-//						 A += diff_A;
-//						 B += diff_B;
-
-						 L = L > 255 ? 255 : (L < 0 ? 0 : L);
-						 A = A > 255 ? 255 : (A < 0 ? 0 : A);
-						 B = B > 255 ? 255 : (B < 0 ? 0 : B);
-
-						 pixel.val[0] = L;
-						 pixel.val[1] = A;
-						 pixel.val[2] = B;
-					 }
-				 }
-			 }
-
-			 cv::cvtColor(imgLAB, imgBGRRes, CV_Lab2BGR);
-
-			 imgBGRResOriginal = imgBGRRes.clone();
-
-			 ShowImgBGRRes();
-}
-
 
 
 		 //Apply mean shift segentation params

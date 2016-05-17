@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="ColorProcessing\ColorDifference.cpp" />
+    <ClCompile Include="ImagesStats\ImageStats.cpp" />
     <ClCompile Include="MeanShift\MeanShift.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -113,6 +114,7 @@
     <ClInclude Include="MeanShift\MeanShift.h" />
     <ClInclude Include="OpenedImageData\OpenedImageData.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ImagesStats\ImagesStats.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

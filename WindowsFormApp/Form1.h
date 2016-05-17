@@ -23,6 +23,7 @@
 #include "OpenedImageData\OpenedImageData.h"
 #include "Helper\Helper.h"
 #include "FogRemoval\FogRemoval.h"
+#include "ImagesStats\ImagesStats.h"
 
 #include <msclr\marshal_cppstd.h> //for System::String to std::string
 
@@ -62,6 +63,8 @@ namespace WindowsFormApp {
 
 	int GAUSSIAN_FILTER_KERNEL_SIZE = 3;
 	int MEDIAN_FILTER_KERNEL_SIZE = 3;
+
+	int LAB_SHADOW_DETECTION_THRESHOLD = 256;
 
 	//Type required for removing range of indices from  C++ containers (built in array, vector, list)
 	template<typename Cont, typename It>
@@ -245,6 +248,12 @@ private: System::Windows::Forms::Label^  label21;
 private: System::Windows::Forms::TextBox^  textBoxShadowDetectionTime;
 private: System::Windows::Forms::TextBox^  textBoxShadowRemovalTime;
 private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
+private: System::Windows::Forms::Label^  label25;
+private: System::Windows::Forms::Label^  label27;
+private: System::Windows::Forms::Label^  label26;
+private: System::Windows::Forms::Label^  label28;
+private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
+
 
 
 
@@ -310,8 +319,14 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->label12 = (gcnew System::Windows::Forms::Label());
 			this->panel1 = (gcnew System::Windows::Forms::Panel());
 			this->panel2 = (gcnew System::Windows::Forms::Panel());
+			this->label27 = (gcnew System::Windows::Forms::Label());
+			this->textBoxShadowRemovalTime = (gcnew System::Windows::Forms::TextBox());
 			this->panel3 = (gcnew System::Windows::Forms::Panel());
+			this->label28 = (gcnew System::Windows::Forms::Label());
+			this->textBoxLabShadowDetectionThreshold = (gcnew System::Windows::Forms::TextBox());
 			this->label13 = (gcnew System::Windows::Forms::Label());
+			this->label25 = (gcnew System::Windows::Forms::Label());
+			this->textBoxShadowDetectionTime = (gcnew System::Windows::Forms::TextBox());
 			this->panel4 = (gcnew System::Windows::Forms::Panel());
 			this->checkBoxEdgesProcComposeResults = (gcnew System::Windows::Forms::CheckBox());
 			this->buttonEdgesProcSaveToResultImage = (gcnew System::Windows::Forms::Button());
@@ -339,10 +354,9 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->saveFileDialog1 = (gcnew System::Windows::Forms::SaveFileDialog());
 			this->panel5 = (gcnew System::Windows::Forms::Panel());
-			this->label21 = (gcnew System::Windows::Forms::Label());
-			this->textBoxShadowDetectionTime = (gcnew System::Windows::Forms::TextBox());
-			this->textBoxShadowRemovalTime = (gcnew System::Windows::Forms::TextBox());
+			this->label26 = (gcnew System::Windows::Forms::Label());
 			this->textBoxFogRemovalTime = (gcnew System::Windows::Forms::TextBox());
+			this->label21 = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGRRes))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGR))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgShadowMask))->BeginInit();
@@ -470,9 +484,9 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// buttonRestoreImage
 			// 
 			this->buttonRestoreImage->Enabled = false;
-			this->buttonRestoreImage->Location = System::Drawing::Point(8, 495);
+			this->buttonRestoreImage->Location = System::Drawing::Point(1319, 404);
 			this->buttonRestoreImage->Name = L"buttonRestoreImage";
-			this->buttonRestoreImage->Size = System::Drawing::Size(193, 25);
+			this->buttonRestoreImage->Size = System::Drawing::Size(85, 22);
 			this->buttonRestoreImage->TabIndex = 21;
 			this->buttonRestoreImage->Text = L"Restore image";
 			this->buttonRestoreImage->UseVisualStyleBackColor = true;
@@ -539,7 +553,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// pictureBoxImgShadowMask
 			// 
-			this->pictureBoxImgShadowMask->Location = System::Drawing::Point(478, 23);
+			this->pictureBoxImgShadowMask->Location = System::Drawing::Point(478, 24);
 			this->pictureBoxImgShadowMask->Name = L"pictureBoxImgShadowMask";
 			this->pictureBoxImgShadowMask->Size = System::Drawing::Size(460, 380);
 			this->pictureBoxImgShadowMask->TabIndex = 61;
@@ -578,9 +592,9 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// button1Shadow2Lab
 			// 
-			this->button1Shadow2Lab->Location = System::Drawing::Point(19, 32);
+			this->button1Shadow2Lab->Location = System::Drawing::Point(3, 4);
 			this->button1Shadow2Lab->Name = L"button1Shadow2Lab";
-			this->button1Shadow2Lab->Size = System::Drawing::Size(141, 25);
+			this->button1Shadow2Lab->Size = System::Drawing::Size(141, 33);
 			this->button1Shadow2Lab->TabIndex = 70;
 			this->button1Shadow2Lab->Text = L"Detect with LAB";
 			this->button1Shadow2Lab->UseVisualStyleBackColor = true;
@@ -588,7 +602,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// button11RemveLab
 			// 
-			this->button11RemveLab->Location = System::Drawing::Point(12, 127);
+			this->button11RemveLab->Location = System::Drawing::Point(12, 95);
 			this->button11RemveLab->Name = L"button11RemveLab";
 			this->button11RemveLab->Size = System::Drawing::Size(163, 25);
 			this->button11RemveLab->TabIndex = 71;
@@ -598,9 +612,9 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// button1Shadow4Math
 			// 
-			this->button1Shadow4Math->Location = System::Drawing::Point(19, 61);
+			this->button1Shadow4Math->Location = System::Drawing::Point(3, 42);
 			this->button1Shadow4Math->Name = L"button1Shadow4Math";
-			this->button1Shadow4Math->Size = System::Drawing::Size(141, 25);
+			this->button1Shadow4Math->Size = System::Drawing::Size(141, 31);
 			this->button1Shadow4Math->TabIndex = 73;
 			this->button1Shadow4Math->Text = L"Detect with MS";
 			this->button1Shadow4Math->UseVisualStyleBackColor = true;
@@ -619,7 +633,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// textBoxGrayAvg
 			// 
 			this->textBoxGrayAvg->Enabled = false;
-			this->textBoxGrayAvg->Location = System::Drawing::Point(28, 125);
+			this->textBoxGrayAvg->Location = System::Drawing::Point(19, 107);
 			this->textBoxGrayAvg->Multiline = true;
 			this->textBoxGrayAvg->Name = L"textBoxGrayAvg";
 			this->textBoxGrayAvg->Size = System::Drawing::Size(40, 20);
@@ -629,7 +643,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// textBoxGrayDev
 			// 
 			this->textBoxGrayDev->Enabled = false;
-			this->textBoxGrayDev->Location = System::Drawing::Point(74, 125);
+			this->textBoxGrayDev->Location = System::Drawing::Point(65, 107);
 			this->textBoxGrayDev->Multiline = true;
 			this->textBoxGrayDev->Name = L"textBoxGrayDev";
 			this->textBoxGrayDev->Size = System::Drawing::Size(40, 20);
@@ -638,7 +652,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// textBoxShadowDetectionThreshold
 			// 
-			this->textBoxShadowDetectionThreshold->Location = System::Drawing::Point(120, 126);
+			this->textBoxShadowDetectionThreshold->Location = System::Drawing::Point(111, 108);
 			this->textBoxShadowDetectionThreshold->Multiline = true;
 			this->textBoxShadowDetectionThreshold->Name = L"textBoxShadowDetectionThreshold";
 			this->textBoxShadowDetectionThreshold->Size = System::Drawing::Size(40, 20);
@@ -648,7 +662,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// label5
 			// 
 			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(117, 110);
+			this->label5->Location = System::Drawing::Point(108, 92);
 			this->label5->Name = L"label5";
 			this->label5->Size = System::Drawing::Size(43, 13);
 			this->label5->TabIndex = 83;
@@ -657,7 +671,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// label6
 			// 
 			this->label6->AutoSize = true;
-			this->label6->Location = System::Drawing::Point(26, 109);
+			this->label6->Location = System::Drawing::Point(17, 91);
 			this->label6->Name = L"label6";
 			this->label6->Size = System::Drawing::Size(29, 13);
 			this->label6->TabIndex = 84;
@@ -666,7 +680,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// label7
 			// 
 			this->label7->AutoSize = true;
-			this->label7->Location = System::Drawing::Point(71, 110);
+			this->label7->Location = System::Drawing::Point(62, 92);
 			this->label7->Name = L"label7";
 			this->label7->Size = System::Drawing::Size(44, 13);
 			this->label7->TabIndex = 85;
@@ -674,7 +688,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// buttonRemoveFogUsingDarkChannelPprior
 			// 
-			this->buttonRemoveFogUsingDarkChannelPprior->Location = System::Drawing::Point(12, 158);
+			this->buttonRemoveFogUsingDarkChannelPprior->Location = System::Drawing::Point(12, 126);
 			this->buttonRemoveFogUsingDarkChannelPprior->Name = L"buttonRemoveFogUsingDarkChannelPprior";
 			this->buttonRemoveFogUsingDarkChannelPprior->Size = System::Drawing::Size(163, 25);
 			this->buttonRemoveFogUsingDarkChannelPprior->TabIndex = 86;
@@ -803,9 +817,9 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// buttonDestroyAlllWindows
 			// 
-			this->buttonDestroyAlllWindows->Location = System::Drawing::Point(8, 465);
+			this->buttonDestroyAlllWindows->Location = System::Drawing::Point(22, 450);
 			this->buttonDestroyAlllWindows->Name = L"buttonDestroyAlllWindows";
-			this->buttonDestroyAlllWindows->Size = System::Drawing::Size(193, 25);
+			this->buttonDestroyAlllWindows->Size = System::Drawing::Size(157, 25);
 			this->buttonDestroyAlllWindows->TabIndex = 105;
 			this->buttonDestroyAlllWindows->Text = L"Destroy alll windows";
 			this->buttonDestroyAlllWindows->UseVisualStyleBackColor = true;
@@ -814,7 +828,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// label11
 			// 
 			this->label11->AutoSize = true;
-			this->label11->Location = System::Drawing::Point(256, 417);
+			this->label11->Location = System::Drawing::Point(220, 417);
 			this->label11->Name = L"label11";
 			this->label11->Size = System::Drawing::Size(93, 13);
 			this->label11->TabIndex = 106;
@@ -849,41 +863,105 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// panel2
 			// 
 			this->panel2->BackColor = System::Drawing::SystemColors::ControlLight;
+			this->panel2->Controls->Add(this->label27);
 			this->panel2->Controls->Add(this->buttonAdditive);
 			this->panel2->Controls->Add(this->buttonBasicLightModel);
+			this->panel2->Controls->Add(this->textBoxShadowRemovalTime);
 			this->panel2->Controls->Add(this->buttonYCbCr);
 			this->panel2->Controls->Add(this->button11RemveLab);
 			this->panel2->Controls->Add(this->buttonRemoveFogUsingDarkChannelPprior);
 			this->panel2->Location = System::Drawing::Point(456, 431);
 			this->panel2->Name = L"panel2";
-			this->panel2->Size = System::Drawing::Size(185, 195);
+			this->panel2->Size = System::Drawing::Size(185, 198);
 			this->panel2->TabIndex = 109;
+			// 
+			// label27
+			// 
+			this->label27->AutoSize = true;
+			this->label27->Location = System::Drawing::Point(19, 160);
+			this->label27->Name = L"label27";
+			this->label27->Size = System::Drawing::Size(59, 13);
+			this->label27->TabIndex = 132;
+			this->label27->Text = L"Time (sec):";
+			this->label27->Click += gcnew System::EventHandler(this, &Form1::label27_Click);
+			// 
+			// textBoxShadowRemovalTime
+			// 
+			this->textBoxShadowRemovalTime->Location = System::Drawing::Point(22, 172);
+			this->textBoxShadowRemovalTime->Multiline = true;
+			this->textBoxShadowRemovalTime->Name = L"textBoxShadowRemovalTime";
+			this->textBoxShadowRemovalTime->Size = System::Drawing::Size(40, 20);
+			this->textBoxShadowRemovalTime->TabIndex = 129;
+			this->textBoxShadowRemovalTime->Text = L"0";
+			this->textBoxShadowRemovalTime->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxShadowRemovalTime_TextChanged);
 			// 
 			// panel3
 			// 
 			this->panel3->BackColor = System::Drawing::SystemColors::ControlLight;
+			this->panel3->Controls->Add(this->label28);
+			this->panel3->Controls->Add(this->textBoxLabShadowDetectionThreshold);
 			this->panel3->Controls->Add(this->label13);
+			this->panel3->Controls->Add(this->label25);
 			this->panel3->Controls->Add(this->button1Shadow2Lab);
 			this->panel3->Controls->Add(this->button1Shadow4Math);
 			this->panel3->Controls->Add(this->textBoxShadowDetectionThreshold);
 			this->panel3->Controls->Add(this->textBoxGrayAvg);
 			this->panel3->Controls->Add(this->textBoxGrayDev);
+			this->panel3->Controls->Add(this->textBoxShadowDetectionTime);
 			this->panel3->Controls->Add(this->label5);
 			this->panel3->Controls->Add(this->label6);
 			this->panel3->Controls->Add(this->label7);
-			this->panel3->Location = System::Drawing::Point(259, 433);
+			this->panel3->Location = System::Drawing::Point(223, 433);
 			this->panel3->Name = L"panel3";
-			this->panel3->Size = System::Drawing::Size(175, 163);
+			this->panel3->Size = System::Drawing::Size(217, 157);
 			this->panel3->TabIndex = 110;
+			// 
+			// label28
+			// 
+			this->label28->AutoSize = true;
+			this->label28->Location = System::Drawing::Point(147, 2);
+			this->label28->Name = L"label28";
+			this->label28->Size = System::Drawing::Size(43, 13);
+			this->label28->TabIndex = 133;
+			this->label28->Text = L"Thresh:";
+			// 
+			// textBoxLabShadowDetectionThreshold
+			// 
+			this->textBoxLabShadowDetectionThreshold->Location = System::Drawing::Point(150, 17);
+			this->textBoxLabShadowDetectionThreshold->Multiline = true;
+			this->textBoxLabShadowDetectionThreshold->Name = L"textBoxLabShadowDetectionThreshold";
+			this->textBoxLabShadowDetectionThreshold->Size = System::Drawing::Size(40, 20);
+			this->textBoxLabShadowDetectionThreshold->TabIndex = 132;
+			this->textBoxLabShadowDetectionThreshold->Text = L"0";
 			// 
 			// label13
 			// 
 			this->label13->AutoSize = true;
-			this->label13->Location = System::Drawing::Point(16, 93);
+			this->label13->Location = System::Drawing::Point(7, 75);
 			this->label13->Name = L"label13";
 			this->label13->Size = System::Drawing::Size(137, 13);
 			this->label13->TabIndex = 86;
 			this->label13->Text = L"Grayscale image properties:";
+			// 
+			// label25
+			// 
+			this->label25->AutoSize = true;
+			this->label25->Location = System::Drawing::Point(154, 114);
+			this->label25->Name = L"label25";
+			this->label25->Size = System::Drawing::Size(59, 13);
+			this->label25->TabIndex = 131;
+			this->label25->Text = L"Time (sec):";
+			this->label25->Click += gcnew System::EventHandler(this, &Form1::label25_Click);
+			// 
+			// textBoxShadowDetectionTime
+			// 
+			this->textBoxShadowDetectionTime->Location = System::Drawing::Point(157, 127);
+			this->textBoxShadowDetectionTime->Multiline = true;
+			this->textBoxShadowDetectionTime->Name = L"textBoxShadowDetectionTime";
+			this->textBoxShadowDetectionTime->Size = System::Drawing::Size(40, 20);
+			this->textBoxShadowDetectionTime->TabIndex = 87;
+			this->textBoxShadowDetectionTime->Text = L"0";
+			this->textBoxShadowDetectionTime->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxShadowDetectionTime_TextChanged);
 			// 
 			// panel4
 			// 
@@ -1128,9 +1206,9 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(4, 34);
+			this->button2->Location = System::Drawing::Point(13, 5);
 			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(196, 25);
+			this->button2->Size = System::Drawing::Size(174, 25);
 			this->button2->TabIndex = 87;
 			this->button2->Text = L"Remove fog using dark channel";
 			this->button2->UseVisualStyleBackColor = true;
@@ -1139,11 +1217,31 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// panel5
 			// 
 			this->panel5->BackColor = System::Drawing::SystemColors::ControlLight;
+			this->panel5->Controls->Add(this->label26);
 			this->panel5->Controls->Add(this->button2);
+			this->panel5->Controls->Add(this->textBoxFogRemovalTime);
 			this->panel5->Location = System::Drawing::Point(1161, 432);
 			this->panel5->Name = L"panel5";
-			this->panel5->Size = System::Drawing::Size(200, 100);
+			this->panel5->Size = System::Drawing::Size(200, 89);
 			this->panel5->TabIndex = 127;
+			// 
+			// label26
+			// 
+			this->label26->AutoSize = true;
+			this->label26->Location = System::Drawing::Point(10, 36);
+			this->label26->Name = L"label26";
+			this->label26->Size = System::Drawing::Size(59, 13);
+			this->label26->TabIndex = 133;
+			this->label26->Text = L"Time (sec):";
+			// 
+			// textBoxFogRemovalTime
+			// 
+			this->textBoxFogRemovalTime->Location = System::Drawing::Point(13, 49);
+			this->textBoxFogRemovalTime->Multiline = true;
+			this->textBoxFogRemovalTime->Name = L"textBoxFogRemovalTime";
+			this->textBoxFogRemovalTime->Size = System::Drawing::Size(40, 20);
+			this->textBoxFogRemovalTime->TabIndex = 130;
+			this->textBoxFogRemovalTime->Text = L"0";
 			// 
 			// label21
 			// 
@@ -1154,42 +1252,12 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->label21->TabIndex = 128;
 			this->label21->Text = L"Fog removal";
 			// 
-			// textBoxShadowDetectionTime
-			// 
-			this->textBoxShadowDetectionTime->Location = System::Drawing::Point(309, 603);
-			this->textBoxShadowDetectionTime->Multiline = true;
-			this->textBoxShadowDetectionTime->Name = L"textBoxShadowDetectionTime";
-			this->textBoxShadowDetectionTime->Size = System::Drawing::Size(40, 20);
-			this->textBoxShadowDetectionTime->TabIndex = 87;
-			this->textBoxShadowDetectionTime->Text = L"0";
-			// 
-			// textBoxShadowRemovalTime
-			// 
-			this->textBoxShadowRemovalTime->Location = System::Drawing::Point(355, 603);
-			this->textBoxShadowRemovalTime->Multiline = true;
-			this->textBoxShadowRemovalTime->Name = L"textBoxShadowRemovalTime";
-			this->textBoxShadowRemovalTime->Size = System::Drawing::Size(40, 20);
-			this->textBoxShadowRemovalTime->TabIndex = 129;
-			this->textBoxShadowRemovalTime->Text = L"0";
-			// 
-			// textBoxFogRemovalTime
-			// 
-			this->textBoxFogRemovalTime->Location = System::Drawing::Point(401, 602);
-			this->textBoxFogRemovalTime->Multiline = true;
-			this->textBoxFogRemovalTime->Name = L"textBoxFogRemovalTime";
-			this->textBoxFogRemovalTime->Size = System::Drawing::Size(40, 20);
-			this->textBoxFogRemovalTime->TabIndex = 130;
-			this->textBoxFogRemovalTime->Text = L"0";
-			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->ClientSize = System::Drawing::Size(1416, 662);
-			this->Controls->Add(this->textBoxFogRemovalTime);
-			this->Controls->Add(this->textBoxShadowRemovalTime);
-			this->Controls->Add(this->textBoxShadowDetectionTime);
 			this->Controls->Add(this->label21);
 			this->Controls->Add(this->panel5);
 			this->Controls->Add(this->checkBoxDisplayOptionalWindows);
@@ -1229,6 +1297,7 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"Form1";
 			this->Activated += gcnew System::EventHandler(this, &Form1::Form1_Activated);
+			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &Form1::Form1_FormClosed);
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
 			this->ResizeEnd += gcnew System::EventHandler(this, &Form1::Form1_ResizeEnd);
 			this->Scroll += gcnew System::Windows::Forms::ScrollEventHandler(this, &Form1::Form1_Scroll);
@@ -1238,11 +1307,13 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->panel1->ResumeLayout(false);
 			this->panel1->PerformLayout();
 			this->panel2->ResumeLayout(false);
+			this->panel2->PerformLayout();
 			this->panel3->ResumeLayout(false);
 			this->panel3->PerformLayout();
 			this->panel4->ResumeLayout(false);
 			this->panel4->PerformLayout();
 			this->panel5->ResumeLayout(false);
+			this->panel5->PerformLayout();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -1415,6 +1486,10 @@ private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e)
 			 textBoxMSSColorRadius->Text = System::Convert::ToString(MeanShiftParams::COLOR_RADIUS);
 			 textBoxMSSMinRegionSize->Text = System::Convert::ToString(MeanShiftParams::MIN_REGION_SIZE);
 
+			 textBoxLabShadowDetectionThreshold->Text = System::Convert::ToString(LAB_SHADOW_DETECTION_THRESHOLD);
+
+			 ImagesStats::LoadStatsFromFile();
+
 			 DisplayEdgesProcessingDefaultParams();
 		 }
 
@@ -1423,18 +1498,6 @@ private: System::Void panel1_Scroll(System::Object^  sender, System::Windows::Fo
 
 		 //Сохранить
 private: System::Void button2save_Click(System::Object^  sender, System::EventArgs^  e) {
-		
-//			 //проверка на открытый файл
-//			 if(!OPEN){
-//				 MessageBox::Show("No file to save!");
-//				 return;
-//			 }
-//			 
-//			 //if(SaveBMP())
-//			 if(SaveImgBGRRes())
-//				MessageBox::Show("Success!");
-//			 else
-//				 MessageBox::Show("Fail!");
 
 			 // Displays a SaveFileDialog so the user can save the Image
 			 // assigned to Button2.
@@ -1480,6 +1543,7 @@ private: System::Void button2save_Click(System::Object^  sender, System::EventAr
 
 		 //Выход
 private: System::Void button3exit_Click(System::Object^  sender, System::EventArgs^  e) {
+			 ImagesStats::SaveStatsToFile();
 			 exit(0);
 		 }
 
@@ -1511,8 +1575,9 @@ private: System::Void Form1_Activated(System::Object^  sender, System::EventArgs
 private: System::Void pictureBoxImgBGRRes_Click(System::Object^  sender, System::EventArgs^  e) {
 			 if(OPEN)
 			 {
-				 //ShowBmp();
+				 
 			 }
+			 ResetImgBGRRes();
 		 }
 
 private: void ReleaseImage()
@@ -1591,11 +1656,16 @@ private: System::Void button7colorCorrection_Click(System::Object^  sender, Syst
 			 ShowImgBGRRes();
 		 }
 
+private: void ResetImgBGRRes() 
+{
+			 imgBGRRes = imgBGRResOriginal.clone();
+			 ShowImgBGRRes();
+			 
+}
 		 //Востановить массив пикселей, который был при откритии файла
 private: System::Void buttonRestoreImage_Click(System::Object^  sender, System::EventArgs^  e) {
 
-			 imgBGRRes = imgBGR.clone();
-			 ShowImgBGRRes();
+			 ResetImgBGRRes();
 		 }
 
 		 //Обнулить значения цветов
@@ -2469,6 +2539,9 @@ private: System::Void buttonAdditive_Click(System::Object^  sender, System::Even
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowRemovalTime->Text = System::Convert::ToString(excecutionTime);
 
+			 ImagesStats::AddStat(ImagesStats::SHADOW_REMOVAL_ADITIVE, endTime - startTime);
+			 ImagesStats::CalcStats();
+
 			 imgBGRResOriginal.release();
 			 imgBGRResOriginal = imgBGRRes.clone();
 
@@ -2572,6 +2645,8 @@ private: System::Void buttonBasicLightModel_Click(System::Object^  sender, Syste
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowRemovalTime->Text = System::Convert::ToString(excecutionTime);
 
+			 ImagesStats::AddStat(ImagesStats::SHADOW_REMOVAL_BASIC_LIGHT_MODEL, endTime - startTime);
+
 			 imgBGRResOriginal = imgBGRRes.clone();
 
 			 ShowImgBGRRes();
@@ -2673,6 +2748,8 @@ private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventAr
 			 endTime = clock();
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowRemovalTime->Text = System::Convert::ToString(excecutionTime);
+
+			 ImagesStats::AddStat(ImagesStats::SHADOW_REMOVAL_COMBINED, endTime - startTime);
 
 			 imgBGRResOriginal = imgBGRRes.clone();
 
@@ -3402,6 +3479,8 @@ private: System::Void button11RemveLab_Click(System::Object^  sender, System::Ev
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowRemovalTime->Text = System::Convert::ToString(excecutionTime);
 
+			 ImagesStats::AddStat(ImagesStats::SHADOW_REMOVAL_LAB, endTime - startTime);
+
 			 //Show results
 			 if (checkBoxDisplayOptionalWindows->Checked == true)
 			 {
@@ -3558,6 +3637,8 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 			 clock_t startTime = clock();
 			 clock_t endTime;
 			 double excecutionTime;
+
+			 imgBGRRes = imgBGR.clone();
 
 			 cv::Mat shadowMaskGRAY;
 			 cv::cvtColor(imgShadowMask, shadowMaskGRAY, CV_BGR2GRAY);
@@ -4312,6 +4393,8 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowRemovalTime->Text = System::Convert::ToString(excecutionTime);
 
+			 ImagesStats::AddStat(ImagesStats::SHADOW_REMOVAL_CONSTANT, endTime - startTime);
+
 			 imgBGRResOriginal = imgBGRRes.clone();
 
 			 ShowImgBGRRes();
@@ -4394,6 +4477,18 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			stdDevL = stdDevL*(1.0 / ((double)count - 1.0));
 			stdDevL = sqrt(stdDevL);
 
+			//Load threshold
+			int threshold;
+			try
+			{
+				int formThreshold = System::Convert::ToInt32(textBoxLabShadowDetectionThreshold->Text);
+				threshold = formThreshold;
+			}
+			catch (...)
+			{
+				threshold = 256;
+			}
+
 			for (int i = 0; i < imgShadowMask.rows; i += 1) {
 				for (int j = 0; j < imgShadowMask.cols; j += 1) {
 
@@ -4405,7 +4500,8 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 					double CIE_A = pixel.val[1];
 					double CIE_B = pixel.val[2];
 
-					if (CIE_A_avg + CIE_B_avg >= 256)//256
+					//if (CIE_A_avg + CIE_B_avg >= threshold)//256
+					if (CIE_A_avg + CIE_B_avg <= threshold)//256
 					{
 						if (CIE_L <= (CIE_L_avg - stdDevL / 3.0))
 						{
@@ -4518,6 +4614,8 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			 endTime = clock();
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowDetectionTime->Text = System::Convert::ToString(excecutionTime);
+
+			 ImagesStats::AddStat(ImagesStats::SHADOW_DETECTION_LAB, endTime - startTime);
 
 			 //extract L channel (for dislay only)
 			 Mat imgLabL;	
@@ -4676,6 +4774,8 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
 			 endTime = clock();
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowDetectionTime->Text = System::Convert::ToString(excecutionTime);
+
+			 ImagesStats::AddStat(ImagesStats::SHADOW_DETECTION_MS, endTime - startTime);
 
 			 if (checkBoxDisplayOptionalWindows->Checked == true)
 			 {
@@ -5797,6 +5897,8 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxFogRemovalTime->Text = System::Convert::ToString(excecutionTime);
 
+			 ImagesStats::AddStat(ImagesStats::FOG_REMOVAL_DARK_CHANNEL_PRIOR, endTime - startTime);
+
 			 imshow("darkChannel MDCP", imgDarkChannel);
 			 imshow("estimateTransmission", T);
 
@@ -5809,6 +5911,19 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 			 imgBGRRes = fogfree;
 
 			 ShowImgBGRRes();
+}
+private: System::Void label26_Click(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void textBoxShadowRemovalTime_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void label25_Click(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void textBoxShadowDetectionTime_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void label27_Click(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void Form1_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
+			 ImagesStats::SaveStatsToFile();
 }
 };
 

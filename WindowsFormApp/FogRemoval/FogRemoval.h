@@ -10,21 +10,21 @@ using namespace cv;
 using namespace std;
 
 //median filtered dark channel
-Mat getMedianDarkChannel(Mat src, int patch)
+Mat getMedianFilteredDarkChannel(Mat sourceImg, int patchSize)
 {
-	Mat rgbmin = Mat::zeros(src.rows, src.cols, CV_8UC1);
+	Mat rgbMinImg = Mat::zeros(sourceImg.rows, sourceImg.cols, CV_8UC1);
 	Mat MDCP;
 	Vec3b intensity;
 
-	for (int m = 0; m<src.rows; m++)
+	for (int m = 0; m < sourceImg.rows; m++)
 	{
-		for (int n = 0; n<src.cols; n++)
+		for (int n = 0; n < sourceImg.cols; n++)
 		{
-			intensity = src.at<Vec3b>(m, n);
-			rgbmin.at<uchar>(m, n) = min(min(intensity.val[0], intensity.val[1]), intensity.val[2]);
+			intensity = sourceImg.at<Vec3b>(m, n);
+			rgbMinImg.at<uchar>(m, n) = min(min(intensity.val[0], intensity.val[1]), intensity.val[2]);
 		}
 	}
-	medianBlur(rgbmin, MDCP, patch);
+	medianBlur(rgbMinImg, MDCP, patchSize);
 	return MDCP;
 
 }
@@ -78,7 +78,7 @@ void minValue3b(const Mat3b& src, Mat1b& dst)
 	}
 }
 
-Mat1b DarkChannel(const Mat3b& img, int patchSize)
+Mat1b getDarkChannel(const Mat3b& img, int patchSize)
 {
 	int radius = patchSize / 2;
 
@@ -92,7 +92,7 @@ Mat1b DarkChannel(const Mat3b& img, int patchSize)
 }
 //END dark channel2
 
-//estimate airlight by the brightest pixel in dark channel (proposed by He et al.)
+//estimate airlight by the brightest pixel in dark channel
 int estimateA(Mat DC)
 {
 	double minDC, maxDC;
@@ -102,46 +102,78 @@ int estimateA(Mat DC)
 }
 
 //estimate airlight by the 0.1% brightest pixels in dark channel
-int estimateAAdvance(Mat DC)
+int estimateAAdvance(Mat DC, Mat inputImage) //DC - darkChannel
 {
 	double minDC, maxDC;
-	//uchar intensity;
 	int size = DC.rows*DC.cols;
-	uchar *DCArray = new uchar[size]; // 1 channel
-	//cv::minMaxLoc(DC, &minDC, &maxDC);
+	double requiredPercent = 0.001; //0.1%
+	int requiredAmount = size*requiredPercent; //
 
-	//to array
-	for (int i = 0; i < DC.rows; i++)
+	////////////////////
+	minMaxLoc(DC, &minDC, &maxDC);
+	double max = maxDC;
+	std::vector<int*> brightestDarkChannelPixels;
+	for (int k = 0; k < requiredAmount && max >= 0; max--)
 	{
-		for (int j = 0; j < DC.cols; j++)
+		for (int i = 0; i < DC.rows; i++)
 		{
-			DCArray[i*DC.cols + j] = DC.at<uchar>(i, j);
+			bool _break = false;
+			for (int j = 0; j < DC.cols; j++)
+			{
+				uchar val = DC.at<uchar>(i, j);
+				if (val == max)
+					brightestDarkChannelPixels.push_back(new int[2] { i, j } );
 
+				if (brightestDarkChannelPixels.size() >= requiredAmount - 1){
+					_break = true;
+					break;
+				}
+			}
+			if (_break)
+				break;
 		}
+
+		if (brightestDarkChannelPixels.size() >= requiredAmount)
+			break;
 	}
 
-	//find 0.1% brightest pixels in dark channel
-	std::sort(DCArray, DCArray + size);  //// using default comparison (operator <)
+	//take pixels with highest intensity in the input image
+	Mat inputImageLab;
+	cvtColor(inputImage,inputImageLab,CV_BGR2Lab);
+	int airlight = -1;
+	for (int r = 0; r != brightestDarkChannelPixels.size(); r++)
+	{
+		int i = brightestDarkChannelPixels[r][0];
+		int j = brightestDarkChannelPixels[r][1];
 
-	cout << "estimated airlight is:" << maxDC << endl;
-	return maxDC;
+		cv::Vec3b pixel = inputImageLab.at<cv::Vec3b>(i, j);
+
+		double L = pixel.val[0];
+		double intensity = L; //take Lab L as insetsity
+		if (intensity > airlight)
+			airlight = intensity;
+	}
+	
+	/////////////////
+
+	return airlight;
 }
 
 
 //estimate transmission map
-Mat estimateTransmission(Mat DCP, int ac)
+Mat estimateTransmission(Mat DC, int airlight) //DC - darkChannel
 {
 	double w = 0.75;
 	//double w = 0.95;
-	Mat transmission = Mat::zeros(DCP.rows, DCP.cols, CV_8UC1);
+	Mat transmission = Mat::zeros(DC.rows, DC.cols, CV_8UC1);
 	Scalar intensity;
 
-	for (int m = 0; m<DCP.rows; m++)
+	for (int m = 0; m<DC.rows; m++)
 	{
-		for (int n = 0; n<DCP.cols; n++)
+		for (int n = 0; n<DC.cols; n++)
 		{
-			intensity = DCP.at<uchar>(m, n);
-			transmission.at<uchar>(m, n) = (1 - w * intensity.val[0] / ac) * 255;
+			intensity = DC.at<uchar>(m, n);
+			transmission.at<uchar>(m, n) = (1 - w * (intensity.val[0] / airlight)) * 255;
 		}
 	}
 	return transmission;
@@ -149,27 +181,32 @@ Mat estimateTransmission(Mat DCP, int ac)
 
 
 //dehazing foggy image
-Mat getDehazed(Mat source, Mat t, int al)
+Mat getDehazed(Mat sourceImg, Mat transmissionImg, int airlight)
 {
 	double t0 = 0.1;
 	double tmax;
 
-	Scalar inttran;
-	Vec3b intsrc;
-	Mat dehazed = Mat::zeros(source.rows, source.cols, CV_8UC3);
+	int A = airlight;//airlight
+	Scalar t; //transmission
+	Vec3b I; //I(x) - source image pixel
+	Mat dehazed = Mat::zeros(sourceImg.rows, sourceImg.cols, CV_8UC3);
 
-	for (int i = 0; i<source.rows; i++)
+	for (int i = 0; i<sourceImg.rows; i++)
 	{
-		for (int j = 0; j<source.cols; j++)
+		for (int j = 0; j<sourceImg.cols; j++)
 		{
-			inttran = t.at<uchar>(i, j);
-			intsrc = source.at<Vec3b>(i, j);
-			tmax = (inttran.val[0] / 255) < t0 ? t0 : (inttran.val[0] / 255);
+			t = transmissionImg.at<uchar>(i, j);
+			I = sourceImg.at<Vec3b>(i, j);
+			tmax = (t.val[0] / 255) < t0 ? t0 : (t.val[0] / 255);
 			for (int k = 0; k<3; k++)
 			{
-				dehazed.at<Vec3b>(i, j)[k] = abs((intsrc.val[k] - al) / tmax + al) > 255 ? 255 : abs((intsrc.val[k] - al) / tmax + al);
+				dehazed.at<Vec3b>(i, j)[k] = abs((I.val[k] - A) / tmax + A) > 255 ? 255 : abs((I.val[k] - A) / tmax + A);
 			}
 		}
 	}
 	return dehazed;
+}
+Mat removeFog(Mat source, Mat t, int al)
+{
+	return getDehazed(source,t,al);
 }

@@ -55,6 +55,28 @@ UCHAR** CreateMatrix(int m, int n, UCHAR defaultVal)
 	return Create2DArray(m, n, defaultVal);
 }
 
+//INT
+int** Create2DArray(int m, int n, int defaultVal)
+{
+	int** matrix = new  int*[m];
+
+	for (int i = 0; i < m; i++)
+	{
+		matrix[i] = new int[n];
+
+		for (int j = 0; j < n; j++)
+		{
+			matrix[i][j] = defaultVal;
+		}
+	}
+
+	return matrix;
+}
+int** CreateMatrix(int m, int n, int defaultVal)
+{
+	return Create2DArray(m, n, defaultVal);
+}
+
 //BOOL
 bool** Create2DArray(int m, int n, bool defaultVal)
 {

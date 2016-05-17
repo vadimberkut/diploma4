@@ -159,7 +159,7 @@ private: System::Windows::Forms::Button^  button1Shadow2Lab;
 private: System::Windows::Forms::Button^  button11RemveLab;
 
 private: System::Windows::Forms::Button^  button1Shadow4Math;
-private: System::Windows::Forms::Button^  buttonShadow0YCbCr;
+
 
 private: System::Windows::Forms::Button^  buttonTestMEANSHIFT;
 
@@ -285,7 +285,6 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->button1Shadow2Lab = (gcnew System::Windows::Forms::Button());
 			this->button11RemveLab = (gcnew System::Windows::Forms::Button());
 			this->button1Shadow4Math = (gcnew System::Windows::Forms::Button());
-			this->buttonShadow0YCbCr = (gcnew System::Windows::Forms::Button());
 			this->buttonTestMEANSHIFT = (gcnew System::Windows::Forms::Button());
 			this->buttonBasicLightModelLAB = (gcnew System::Windows::Forms::Button());
 			this->textBoxGrayAvg = (gcnew System::Windows::Forms::TextBox());
@@ -608,16 +607,6 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			this->button1Shadow4Math->UseVisualStyleBackColor = true;
 			this->button1Shadow4Math->Click += gcnew System::EventHandler(this, &Form1::button1Shadow4Math_Click);
 			// 
-			// buttonShadow0YCbCr
-			// 
-			this->buttonShadow0YCbCr->Location = System::Drawing::Point(19, 3);
-			this->buttonShadow0YCbCr->Name = L"buttonShadow0YCbCr";
-			this->buttonShadow0YCbCr->Size = System::Drawing::Size(141, 25);
-			this->buttonShadow0YCbCr->TabIndex = 74;
-			this->buttonShadow0YCbCr->Text = L"Detect with YCbCr";
-			this->buttonShadow0YCbCr->UseVisualStyleBackColor = true;
-			this->buttonShadow0YCbCr->Click += gcnew System::EventHandler(this, &Form1::buttonShadow0YCbCr_Click);
-			// 
 			// buttonTestMEANSHIFT
 			// 
 			this->buttonTestMEANSHIFT->Location = System::Drawing::Point(7, 104);
@@ -886,7 +875,6 @@ private: System::Windows::Forms::TextBox^  textBoxFogRemovalTime;
 			// 
 			this->panel3->BackColor = System::Drawing::SystemColors::ControlLight;
 			this->panel3->Controls->Add(this->label13);
-			this->panel3->Controls->Add(this->buttonShadow0YCbCr);
 			this->panel3->Controls->Add(this->button1Shadow2Lab);
 			this->panel3->Controls->Add(this->button1Shadow4Math);
 			this->panel3->Controls->Add(this->textBoxShadowDetectionThreshold);
@@ -4345,78 +4333,6 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 		 //
 		 //SHADOW DETECTION
 		 //
-private: System::Void buttonShadow0YCbCr_Click(System::Object^  sender, System::EventArgs^  e) {
-
-			 imgShadowMask.release();
-			 imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
-
-			 //convert to YCbCr;
-			 cv::Mat imgYcbcr;
-			 cv::cvtColor(imgBGR, imgYcbcr, CV_BGR2YCrCb);
-
-			 //FIND Shadow Mask
-			 //Computing the average at Y channel 
-			 float averageY = 1;
-			 float sum = 0;
-			 int count = 0;
-			 
-			 for (int i = 0; i < imgYcbcr.rows; i += 1) {
-				 for (int j = 0; j < imgYcbcr.cols; j += 1) {
-
-					 cv::Vec3b &pixel = imgYcbcr.at<cv::Vec3b>(i, j);
-
-					 int Y = pixel.val[0];
-					 sum += Y;
-					 count += 1;
-				 }
-			 }
-			 averageY = sum / (float)(imgYcbcr.cols*imgYcbcr.rows);
-
-//			 ///////////////
-//
-//			 //standart deviation for Y
-//			 double stdDevY = 0;
-//
-//			 for (int i = 0; i < imgYcbcr.rows; i += 1) {
-//				 for (int j = 0; j < imgYcbcr.cols; j += 1) {
-//
-//					 cv::Vec3b &pixel = imgYcbcr.at<cv::Vec3b>(i, j);
-//
-//					 double Y = pixel.val[0];
-//
-//					 stdDevY += pow(Y - averageY, 2);
-//				 }
-//			 }
-//			 stdDevY = stdDevY*(1.0 / ((double)count - 1.0));
-//			 stdDevY = sqrt(stdDevY);
-//
-//			 /////////////////////
-
-			 //find shadow mask
-			 for (int i = 0; i < imgYcbcr.rows; i += 1) {
-				 for (int j = 0; j < imgYcbcr.cols; j += 1) {
-
-					 cv::Vec3b &pixel = imgYcbcr.at<cv::Vec3b>(i, j);
-					 cv::Vec3b &shadowMaskPixel = imgShadowMask.at<cv::Vec3b>(i, j);
-
-					 int Y = pixel.val[0];
-
-					 if (Y < averageY){
-						 shadowMaskPixel.val[0] = 255;
-						 shadowMaskPixel.val[1] = 255;
-						 shadowMaskPixel.val[2] = 255;
-					 }
-					 else{
-						 shadowMaskPixel.val[0] = 0;
-						 shadowMaskPixel.val[1] = 0;
-						 shadowMaskPixel.val[2] = 0;
-					 }
-				 }
-			 }
-
-			 ShowImgShadowMask();
-}
-
 private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::EventArgs^  e) {
 
 			 clock_t startTime = clock();

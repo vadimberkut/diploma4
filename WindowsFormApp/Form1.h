@@ -132,7 +132,7 @@ namespace WindowsFormApp {
 
 
 	private: System::Windows::Forms::Button^  button2save;
-	private: System::Windows::Forms::Button^  button6Close;
+
 	private: System::Windows::Forms::Button^  button7colorCorrection;
 	private: System::Windows::Forms::TextBox^  textBoxRed;
 	private: System::Windows::Forms::TextBox^  textBoxGreen;
@@ -212,7 +212,7 @@ private: System::Windows::Forms::TextBox^  textBoxEdgesProcInpaintRadius;
 
 private: System::Windows::Forms::Label^  label16;
 private: System::Windows::Forms::Button^  buttonEdgesProcessingDefault;
-private: System::Windows::Forms::Label^  label17;
+
 private: System::Windows::Forms::Button^  buttonInpaintEdges;
 private: System::Windows::Forms::Button^  buttonSmoothUsingGaussianFilter;
 private: System::Windows::Forms::Button^  buttonSmoothUsingMedianFilter;
@@ -222,7 +222,7 @@ private: System::Windows::Forms::Label^  label20;
 private: System::Windows::Forms::TextBox^  textBoxEdgesProcGaussianFilterKernelSize;
 
 private: System::Windows::Forms::Label^  label19;
-private: System::Windows::Forms::Label^  label18;
+
 
 
 
@@ -240,7 +240,7 @@ private: System::Windows::Forms::Label^  label23;
 private: System::Windows::Forms::Label^  label24;
 private: System::Windows::Forms::CheckBox^  checkBoxDisplayOptionalWindows;
 private: System::Windows::Forms::CheckBox^  checkBoxEdgesProcComposeResults;
-private: System::Windows::Forms::Button^  buttonEdgesProcSaveToResultImage;
+
 private: System::Windows::Forms::Button^  button2;
 private: System::Windows::Forms::SaveFileDialog^  saveFileDialog1;
 private: System::Windows::Forms::Panel^  panel5;
@@ -253,6 +253,7 @@ private: System::Windows::Forms::Label^  label27;
 private: System::Windows::Forms::Label^  label26;
 private: System::Windows::Forms::Label^  label28;
 private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
+private: System::Windows::Forms::Button^  buttonRefreshForm;
 
 
 
@@ -274,7 +275,6 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->pictureBoxImgBGRRes = (gcnew System::Windows::Forms::PictureBox());
 			this->button2save = (gcnew System::Windows::Forms::Button());
 			this->button3exit = (gcnew System::Windows::Forms::Button());
-			this->button6Close = (gcnew System::Windows::Forms::Button());
 			this->button7colorCorrection = (gcnew System::Windows::Forms::Button());
 			this->textBoxRed = (gcnew System::Windows::Forms::TextBox());
 			this->textBoxGreen = (gcnew System::Windows::Forms::TextBox());
@@ -328,8 +328,6 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->label25 = (gcnew System::Windows::Forms::Label());
 			this->textBoxShadowDetectionTime = (gcnew System::Windows::Forms::TextBox());
 			this->panel4 = (gcnew System::Windows::Forms::Panel());
-			this->checkBoxEdgesProcComposeResults = (gcnew System::Windows::Forms::CheckBox());
-			this->buttonEdgesProcSaveToResultImage = (gcnew System::Windows::Forms::Button());
 			this->textBoxEdgesProcMedianFilterDilationKernelSize = (gcnew System::Windows::Forms::TextBox());
 			this->label23 = (gcnew System::Windows::Forms::Label());
 			this->textBoxEdgesProcGaussianFilterDilationKernelSize = (gcnew System::Windows::Forms::TextBox());
@@ -338,16 +336,15 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->label20 = (gcnew System::Windows::Forms::Label());
 			this->textBoxEdgesProcGaussianFilterKernelSize = (gcnew System::Windows::Forms::TextBox());
 			this->label19 = (gcnew System::Windows::Forms::Label());
-			this->label18 = (gcnew System::Windows::Forms::Label());
 			this->buttonSmoothUsingMedianFilter = (gcnew System::Windows::Forms::Button());
 			this->buttonSmoothUsingGaussianFilter = (gcnew System::Windows::Forms::Button());
 			this->buttonInpaintEdges = (gcnew System::Windows::Forms::Button());
-			this->label17 = (gcnew System::Windows::Forms::Label());
 			this->textBoxEdgesProcInpaintRadius = (gcnew System::Windows::Forms::TextBox());
 			this->label16 = (gcnew System::Windows::Forms::Label());
 			this->buttonEdgesProcessingDefault = (gcnew System::Windows::Forms::Button());
 			this->textBoxEdgesProcDilationKernelSize = (gcnew System::Windows::Forms::TextBox());
 			this->label15 = (gcnew System::Windows::Forms::Label());
+			this->checkBoxEdgesProcComposeResults = (gcnew System::Windows::Forms::CheckBox());
 			this->label14 = (gcnew System::Windows::Forms::Label());
 			this->label24 = (gcnew System::Windows::Forms::Label());
 			this->checkBoxDisplayOptionalWindows = (gcnew System::Windows::Forms::CheckBox());
@@ -357,6 +354,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->label26 = (gcnew System::Windows::Forms::Label());
 			this->textBoxFogRemovalTime = (gcnew System::Windows::Forms::TextBox());
 			this->label21 = (gcnew System::Windows::Forms::Label());
+			this->buttonRefreshForm = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGRRes))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgBGR))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBoxImgShadowMask))->BeginInit();
@@ -378,7 +376,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// button1open
 			// 
-			this->button1open->Location = System::Drawing::Point(8, 523);
+			this->button1open->Location = System::Drawing::Point(8, 551);
 			this->button1open->Name = L"button1open";
 			this->button1open->Size = System::Drawing::Size(193, 25);
 			this->button1open->TabIndex = 1;
@@ -392,6 +390,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// pictureBoxImgBGRRes
 			// 
+			this->pictureBoxImgBGRRes->BorderStyle = System::Windows::Forms::BorderStyle::Fixed3D;
 			this->pictureBoxImgBGRRes->Location = System::Drawing::Point(944, 23);
 			this->pictureBoxImgBGRRes->Name = L"pictureBoxImgBGRRes";
 			this->pictureBoxImgBGRRes->Size = System::Drawing::Size(460, 380);
@@ -401,7 +400,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// button2save
 			// 
-			this->button2save->Location = System::Drawing::Point(8, 551);
+			this->button2save->Location = System::Drawing::Point(8, 579);
 			this->button2save->Name = L"button2save";
 			this->button2save->Size = System::Drawing::Size(193, 25);
 			this->button2save->TabIndex = 5;
@@ -418,16 +417,6 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->button3exit->Text = L"Exit";
 			this->button3exit->UseVisualStyleBackColor = true;
 			this->button3exit->Click += gcnew System::EventHandler(this, &Form1::button3exit_Click);
-			// 
-			// button6Close
-			// 
-			this->button6Close->Location = System::Drawing::Point(8, 579);
-			this->button6Close->Name = L"button6Close";
-			this->button6Close->Size = System::Drawing::Size(193, 25);
-			this->button6Close->TabIndex = 15;
-			this->button6Close->Text = L"Close";
-			this->button6Close->UseVisualStyleBackColor = true;
-			this->button6Close->Click += gcnew System::EventHandler(this, &Form1::button6Close_Click);
 			// 
 			// button7colorCorrection
 			// 
@@ -545,6 +534,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// pictureBoxImgBGR
 			// 
+			this->pictureBoxImgBGR->BorderStyle = System::Windows::Forms::BorderStyle::Fixed3D;
 			this->pictureBoxImgBGR->Location = System::Drawing::Point(12, 23);
 			this->pictureBoxImgBGR->Name = L"pictureBoxImgBGR";
 			this->pictureBoxImgBGR->Size = System::Drawing::Size(460, 380);
@@ -553,6 +543,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// pictureBoxImgShadowMask
 			// 
+			this->pictureBoxImgShadowMask->BorderStyle = System::Windows::Forms::BorderStyle::Fixed3D;
 			this->pictureBoxImgShadowMask->Location = System::Drawing::Point(478, 24);
 			this->pictureBoxImgShadowMask->Name = L"pictureBoxImgShadowMask";
 			this->pictureBoxImgShadowMask->Size = System::Drawing::Size(460, 380);
@@ -863,13 +854,13 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// panel2
 			// 
 			this->panel2->BackColor = System::Drawing::SystemColors::ControlLight;
-			this->panel2->Controls->Add(this->label27);
 			this->panel2->Controls->Add(this->buttonAdditive);
+			this->panel2->Controls->Add(this->label27);
 			this->panel2->Controls->Add(this->buttonBasicLightModel);
-			this->panel2->Controls->Add(this->textBoxShadowRemovalTime);
 			this->panel2->Controls->Add(this->buttonYCbCr);
 			this->panel2->Controls->Add(this->button11RemveLab);
 			this->panel2->Controls->Add(this->buttonRemoveFogUsingDarkChannelPprior);
+			this->panel2->Controls->Add(this->textBoxShadowRemovalTime);
 			this->panel2->Location = System::Drawing::Point(456, 431);
 			this->panel2->Name = L"panel2";
 			this->panel2->Size = System::Drawing::Size(185, 198);
@@ -907,13 +898,13 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->panel3->Controls->Add(this->textBoxShadowDetectionThreshold);
 			this->panel3->Controls->Add(this->textBoxGrayAvg);
 			this->panel3->Controls->Add(this->textBoxGrayDev);
-			this->panel3->Controls->Add(this->textBoxShadowDetectionTime);
 			this->panel3->Controls->Add(this->label5);
 			this->panel3->Controls->Add(this->label6);
+			this->panel3->Controls->Add(this->textBoxShadowDetectionTime);
 			this->panel3->Controls->Add(this->label7);
 			this->panel3->Location = System::Drawing::Point(223, 433);
 			this->panel3->Name = L"panel3";
-			this->panel3->Size = System::Drawing::Size(217, 157);
+			this->panel3->Size = System::Drawing::Size(217, 181);
 			this->panel3->TabIndex = 110;
 			// 
 			// label28
@@ -946,7 +937,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// label25
 			// 
 			this->label25->AutoSize = true;
-			this->label25->Location = System::Drawing::Point(154, 114);
+			this->label25->Location = System::Drawing::Point(16, 138);
 			this->label25->Name = L"label25";
 			this->label25->Size = System::Drawing::Size(59, 13);
 			this->label25->TabIndex = 131;
@@ -955,7 +946,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// textBoxShadowDetectionTime
 			// 
-			this->textBoxShadowDetectionTime->Location = System::Drawing::Point(157, 127);
+			this->textBoxShadowDetectionTime->Location = System::Drawing::Point(19, 151);
 			this->textBoxShadowDetectionTime->Multiline = true;
 			this->textBoxShadowDetectionTime->Name = L"textBoxShadowDetectionTime";
 			this->textBoxShadowDetectionTime->Size = System::Drawing::Size(40, 20);
@@ -966,8 +957,6 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// panel4
 			// 
 			this->panel4->BackColor = System::Drawing::SystemColors::ControlLight;
-			this->panel4->Controls->Add(this->checkBoxEdgesProcComposeResults);
-			this->panel4->Controls->Add(this->buttonEdgesProcSaveToResultImage);
 			this->panel4->Controls->Add(this->textBoxEdgesProcMedianFilterDilationKernelSize);
 			this->panel4->Controls->Add(this->label23);
 			this->panel4->Controls->Add(this->textBoxEdgesProcGaussianFilterDilationKernelSize);
@@ -976,11 +965,9 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->panel4->Controls->Add(this->label20);
 			this->panel4->Controls->Add(this->textBoxEdgesProcGaussianFilterKernelSize);
 			this->panel4->Controls->Add(this->label19);
-			this->panel4->Controls->Add(this->label18);
 			this->panel4->Controls->Add(this->buttonSmoothUsingMedianFilter);
 			this->panel4->Controls->Add(this->buttonSmoothUsingGaussianFilter);
 			this->panel4->Controls->Add(this->buttonInpaintEdges);
-			this->panel4->Controls->Add(this->label17);
 			this->panel4->Controls->Add(this->textBoxEdgesProcInpaintRadius);
 			this->panel4->Controls->Add(this->label16);
 			this->panel4->Controls->Add(this->buttonEdgesProcessingDefault);
@@ -988,31 +975,12 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->panel4->Controls->Add(this->label15);
 			this->panel4->Location = System::Drawing::Point(839, 431);
 			this->panel4->Name = L"panel4";
-			this->panel4->Size = System::Drawing::Size(303, 213);
+			this->panel4->Size = System::Drawing::Size(303, 173);
 			this->panel4->TabIndex = 111;
-			// 
-			// checkBoxEdgesProcComposeResults
-			// 
-			this->checkBoxEdgesProcComposeResults->AutoSize = true;
-			this->checkBoxEdgesProcComposeResults->Location = System::Drawing::Point(193, 3);
-			this->checkBoxEdgesProcComposeResults->Name = L"checkBoxEdgesProcComposeResults";
-			this->checkBoxEdgesProcComposeResults->Size = System::Drawing::Size(103, 17);
-			this->checkBoxEdgesProcComposeResults->TabIndex = 127;
-			this->checkBoxEdgesProcComposeResults->Text = L"Compose results";
-			this->checkBoxEdgesProcComposeResults->UseVisualStyleBackColor = true;
-			// 
-			// buttonEdgesProcSaveToResultImage
-			// 
-			this->buttonEdgesProcSaveToResultImage->Location = System::Drawing::Point(151, 172);
-			this->buttonEdgesProcSaveToResultImage->Name = L"buttonEdgesProcSaveToResultImage";
-			this->buttonEdgesProcSaveToResultImage->Size = System::Drawing::Size(143, 25);
-			this->buttonEdgesProcSaveToResultImage->TabIndex = 122;
-			this->buttonEdgesProcSaveToResultImage->Text = L"SaveToResultImage";
-			this->buttonEdgesProcSaveToResultImage->UseVisualStyleBackColor = true;
 			// 
 			// textBoxEdgesProcMedianFilterDilationKernelSize
 			// 
-			this->textBoxEdgesProcMedianFilterDilationKernelSize->Location = System::Drawing::Point(24, 139);
+			this->textBoxEdgesProcMedianFilterDilationKernelSize->Location = System::Drawing::Point(18, 109);
 			this->textBoxEdgesProcMedianFilterDilationKernelSize->Multiline = true;
 			this->textBoxEdgesProcMedianFilterDilationKernelSize->Name = L"textBoxEdgesProcMedianFilterDilationKernelSize";
 			this->textBoxEdgesProcMedianFilterDilationKernelSize->Size = System::Drawing::Size(95, 20);
@@ -1022,7 +990,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// label23
 			// 
 			this->label23->AutoSize = true;
-			this->label23->Location = System::Drawing::Point(21, 123);
+			this->label23->Location = System::Drawing::Point(15, 93);
 			this->label23->Name = L"label23";
 			this->label23->Size = System::Drawing::Size(98, 13);
 			this->label23->TabIndex = 121;
@@ -1030,7 +998,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// textBoxEdgesProcGaussianFilterDilationKernelSize
 			// 
-			this->textBoxEdgesProcGaussianFilterDilationKernelSize->Location = System::Drawing::Point(24, 98);
+			this->textBoxEdgesProcGaussianFilterDilationKernelSize->Location = System::Drawing::Point(18, 68);
 			this->textBoxEdgesProcGaussianFilterDilationKernelSize->Multiline = true;
 			this->textBoxEdgesProcGaussianFilterDilationKernelSize->Name = L"textBoxEdgesProcGaussianFilterDilationKernelSize";
 			this->textBoxEdgesProcGaussianFilterDilationKernelSize->Size = System::Drawing::Size(95, 20);
@@ -1040,7 +1008,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// label22
 			// 
 			this->label22->AutoSize = true;
-			this->label22->Location = System::Drawing::Point(21, 82);
+			this->label22->Location = System::Drawing::Point(15, 52);
 			this->label22->Name = L"label22";
 			this->label22->Size = System::Drawing::Size(98, 13);
 			this->label22->TabIndex = 119;
@@ -1048,17 +1016,18 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// textBoxEdgesProcMedianFilterKernelSize
 			// 
-			this->textBoxEdgesProcMedianFilterKernelSize->Location = System::Drawing::Point(125, 139);
+			this->textBoxEdgesProcMedianFilterKernelSize->Location = System::Drawing::Point(119, 109);
 			this->textBoxEdgesProcMedianFilterKernelSize->Multiline = true;
 			this->textBoxEdgesProcMedianFilterKernelSize->Name = L"textBoxEdgesProcMedianFilterKernelSize";
 			this->textBoxEdgesProcMedianFilterKernelSize->Size = System::Drawing::Size(64, 20);
 			this->textBoxEdgesProcMedianFilterKernelSize->TabIndex = 114;
 			this->textBoxEdgesProcMedianFilterKernelSize->Text = L"0";
+			this->textBoxEdgesProcMedianFilterKernelSize->TextChanged += gcnew System::EventHandler(this, &Form1::textBoxEdgesProcMedianFilterKernelSize_TextChanged);
 			// 
 			// label20
 			// 
 			this->label20->AutoSize = true;
-			this->label20->Location = System::Drawing::Point(122, 123);
+			this->label20->Location = System::Drawing::Point(117, 94);
 			this->label20->Name = L"label20";
 			this->label20->Size = System::Drawing::Size(61, 13);
 			this->label20->TabIndex = 115;
@@ -1066,7 +1035,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// textBoxEdgesProcGaussianFilterKernelSize
 			// 
-			this->textBoxEdgesProcGaussianFilterKernelSize->Location = System::Drawing::Point(123, 97);
+			this->textBoxEdgesProcGaussianFilterKernelSize->Location = System::Drawing::Point(120, 67);
 			this->textBoxEdgesProcGaussianFilterKernelSize->Multiline = true;
 			this->textBoxEdgesProcGaussianFilterKernelSize->Name = L"textBoxEdgesProcGaussianFilterKernelSize";
 			this->textBoxEdgesProcGaussianFilterKernelSize->Size = System::Drawing::Size(64, 20);
@@ -1076,26 +1045,17 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// label19
 			// 
 			this->label19->AutoSize = true;
-			this->label19->Location = System::Drawing::Point(120, 82);
+			this->label19->Location = System::Drawing::Point(117, 52);
 			this->label19->Name = L"label19";
 			this->label19->Size = System::Drawing::Size(61, 13);
 			this->label19->TabIndex = 113;
 			this->label19->Text = L"Kernel size:";
 			// 
-			// label18
-			// 
-			this->label18->AutoSize = true;
-			this->label18->Location = System::Drawing::Point(3, 61);
-			this->label18->Name = L"label18";
-			this->label18->Size = System::Drawing::Size(46, 13);
-			this->label18->TabIndex = 111;
-			this->label18->Text = L"Smooth:";
-			// 
 			// buttonSmoothUsingMedianFilter
 			// 
-			this->buttonSmoothUsingMedianFilter->Location = System::Drawing::Point(193, 134);
+			this->buttonSmoothUsingMedianFilter->Location = System::Drawing::Point(190, 107);
 			this->buttonSmoothUsingMedianFilter->Name = L"buttonSmoothUsingMedianFilter";
-			this->buttonSmoothUsingMedianFilter->Size = System::Drawing::Size(102, 25);
+			this->buttonSmoothUsingMedianFilter->Size = System::Drawing::Size(99, 25);
 			this->buttonSmoothUsingMedianFilter->TabIndex = 109;
 			this->buttonSmoothUsingMedianFilter->Text = L"Median filter";
 			this->buttonSmoothUsingMedianFilter->UseVisualStyleBackColor = true;
@@ -1103,9 +1063,9 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// buttonSmoothUsingGaussianFilter
 			// 
-			this->buttonSmoothUsingGaussianFilter->Location = System::Drawing::Point(193, 95);
+			this->buttonSmoothUsingGaussianFilter->Location = System::Drawing::Point(190, 65);
 			this->buttonSmoothUsingGaussianFilter->Name = L"buttonSmoothUsingGaussianFilter";
-			this->buttonSmoothUsingGaussianFilter->Size = System::Drawing::Size(102, 25);
+			this->buttonSmoothUsingGaussianFilter->Size = System::Drawing::Size(99, 25);
 			this->buttonSmoothUsingGaussianFilter->TabIndex = 108;
 			this->buttonSmoothUsingGaussianFilter->Text = L"Gaussian filter";
 			this->buttonSmoothUsingGaussianFilter->UseVisualStyleBackColor = true;
@@ -1113,46 +1073,37 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// buttonInpaintEdges
 			// 
-			this->buttonInpaintEdges->Location = System::Drawing::Point(201, 31);
+			this->buttonInpaintEdges->Location = System::Drawing::Point(190, 24);
 			this->buttonInpaintEdges->Name = L"buttonInpaintEdges";
-			this->buttonInpaintEdges->Size = System::Drawing::Size(93, 25);
+			this->buttonInpaintEdges->Size = System::Drawing::Size(99, 25);
 			this->buttonInpaintEdges->TabIndex = 107;
 			this->buttonInpaintEdges->Text = L"Inpaint";
 			this->buttonInpaintEdges->UseVisualStyleBackColor = true;
 			this->buttonInpaintEdges->Click += gcnew System::EventHandler(this, &Form1::buttonInpaintEdges_Click);
 			// 
-			// label17
-			// 
-			this->label17->AutoSize = true;
-			this->label17->Location = System::Drawing::Point(3, 2);
-			this->label17->Name = L"label17";
-			this->label17->Size = System::Drawing::Size(42, 13);
-			this->label17->TabIndex = 106;
-			this->label17->Text = L"Inpaint:";
-			// 
 			// textBoxEdgesProcInpaintRadius
 			// 
-			this->textBoxEdgesProcInpaintRadius->Location = System::Drawing::Point(125, 34);
+			this->textBoxEdgesProcInpaintRadius->Location = System::Drawing::Point(120, 27);
 			this->textBoxEdgesProcInpaintRadius->Multiline = true;
 			this->textBoxEdgesProcInpaintRadius->Name = L"textBoxEdgesProcInpaintRadius";
-			this->textBoxEdgesProcInpaintRadius->Size = System::Drawing::Size(70, 20);
+			this->textBoxEdgesProcInpaintRadius->Size = System::Drawing::Size(64, 20);
 			this->textBoxEdgesProcInpaintRadius->TabIndex = 104;
 			this->textBoxEdgesProcInpaintRadius->Text = L"0";
 			// 
 			// label16
 			// 
 			this->label16->AutoSize = true;
-			this->label16->Location = System::Drawing::Point(122, 18);
+			this->label16->Location = System::Drawing::Point(117, 11);
 			this->label16->Name = L"label16";
-			this->label16->Size = System::Drawing::Size(73, 13);
+			this->label16->Size = System::Drawing::Size(43, 13);
 			this->label16->TabIndex = 105;
-			this->label16->Text = L"Inpaint radius:";
+			this->label16->Text = L"Radius:";
 			// 
 			// buttonEdgesProcessingDefault
 			// 
-			this->buttonEdgesProcessingDefault->Location = System::Drawing::Point(6, 174);
+			this->buttonEdgesProcessingDefault->Location = System::Drawing::Point(18, 135);
 			this->buttonEdgesProcessingDefault->Name = L"buttonEdgesProcessingDefault";
-			this->buttonEdgesProcessingDefault->Size = System::Drawing::Size(75, 23);
+			this->buttonEdgesProcessingDefault->Size = System::Drawing::Size(96, 23);
 			this->buttonEdgesProcessingDefault->TabIndex = 102;
 			this->buttonEdgesProcessingDefault->Text = L"Default";
 			this->buttonEdgesProcessingDefault->UseVisualStyleBackColor = true;
@@ -1160,7 +1111,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// textBoxEdgesProcDilationKernelSize
 			// 
-			this->textBoxEdgesProcDilationKernelSize->Location = System::Drawing::Point(24, 34);
+			this->textBoxEdgesProcDilationKernelSize->Location = System::Drawing::Point(19, 27);
 			this->textBoxEdgesProcDilationKernelSize->Multiline = true;
 			this->textBoxEdgesProcDilationKernelSize->Name = L"textBoxEdgesProcDilationKernelSize";
 			this->textBoxEdgesProcDilationKernelSize->Size = System::Drawing::Size(95, 20);
@@ -1170,11 +1121,22 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// label15
 			// 
 			this->label15->AutoSize = true;
-			this->label15->Location = System::Drawing::Point(21, 18);
+			this->label15->Location = System::Drawing::Point(16, 11);
 			this->label15->Name = L"label15";
 			this->label15->Size = System::Drawing::Size(98, 13);
 			this->label15->TabIndex = 103;
 			this->label15->Text = L"Dilation kernel size:";
+			// 
+			// checkBoxEdgesProcComposeResults
+			// 
+			this->checkBoxEdgesProcComposeResults->AutoSize = true;
+			this->checkBoxEdgesProcComposeResults->Location = System::Drawing::Point(1039, 413);
+			this->checkBoxEdgesProcComposeResults->Name = L"checkBoxEdgesProcComposeResults";
+			this->checkBoxEdgesProcComposeResults->Size = System::Drawing::Size(103, 17);
+			this->checkBoxEdgesProcComposeResults->TabIndex = 127;
+			this->checkBoxEdgesProcComposeResults->Text = L"Compose results";
+			this->checkBoxEdgesProcComposeResults->UseVisualStyleBackColor = true;
+			this->checkBoxEdgesProcComposeResults->Visible = false;
 			// 
 			// label14
 			// 
@@ -1228,7 +1190,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// label26
 			// 
 			this->label26->AutoSize = true;
-			this->label26->Location = System::Drawing::Point(10, 36);
+			this->label26->Location = System::Drawing::Point(19, 36);
 			this->label26->Name = L"label26";
 			this->label26->Size = System::Drawing::Size(59, 13);
 			this->label26->TabIndex = 133;
@@ -1236,7 +1198,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			// 
 			// textBoxFogRemovalTime
 			// 
-			this->textBoxFogRemovalTime->Location = System::Drawing::Point(13, 49);
+			this->textBoxFogRemovalTime->Location = System::Drawing::Point(22, 49);
 			this->textBoxFogRemovalTime->Multiline = true;
 			this->textBoxFogRemovalTime->Name = L"textBoxFogRemovalTime";
 			this->textBoxFogRemovalTime->Size = System::Drawing::Size(40, 20);
@@ -1252,12 +1214,24 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->label21->TabIndex = 128;
 			this->label21->Text = L"Fog removal";
 			// 
+			// buttonRefreshForm
+			// 
+			this->buttonRefreshForm->Location = System::Drawing::Point(8, 521);
+			this->buttonRefreshForm->Name = L"buttonRefreshForm";
+			this->buttonRefreshForm->Size = System::Drawing::Size(193, 25);
+			this->buttonRefreshForm->TabIndex = 129;
+			this->buttonRefreshForm->Text = L"Refresh form";
+			this->buttonRefreshForm->UseVisualStyleBackColor = true;
+			this->buttonRefreshForm->Click += gcnew System::EventHandler(this, &Form1::buttonRefreshForm_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoScroll = true;
 			this->ClientSize = System::Drawing::Size(1416, 662);
+			this->Controls->Add(this->buttonRefreshForm);
+			this->Controls->Add(this->checkBoxEdgesProcComposeResults);
 			this->Controls->Add(this->label21);
 			this->Controls->Add(this->panel5);
 			this->Controls->Add(this->checkBoxDisplayOptionalWindows);
@@ -1287,7 +1261,6 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->Controls->Add(this->textBoxGreen);
 			this->Controls->Add(this->textBoxRed);
 			this->Controls->Add(this->button7colorCorrection);
-			this->Controls->Add(this->button6Close);
 			this->Controls->Add(this->button3exit);
 			this->Controls->Add(this->button2save);
 			this->Controls->Add(this->pictureBoxImgBGRRes);
@@ -1295,7 +1268,7 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 			this->Controls->Add(this->textBox1open);
 			this->Name = L"Form1";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
-			this->Text = L"Form1";
+			this->Text = L"Shadow detection and removal";
 			this->Activated += gcnew System::EventHandler(this, &Form1::Form1_Activated);
 			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &Form1::Form1_FormClosed);
 			this->Load += gcnew System::EventHandler(this, &Form1::Form1_Load);
@@ -1459,16 +1432,19 @@ private: System::Windows::Forms::TextBox^  textBoxLabShadowDetectionThreshold;
 
 	//END
 		 
-		 //Открыть
+		 //OPEN
 private: System::Void button1open_Click(System::Object^  sender, System::EventArgs^  e) {
 
-				 button6Close_Click(sender,e);
+				 //button6Close_Click(sender,e);
+
+				ResetImage();
 
 				 //if( !OpenBmp(true) )
 				 if (!OpenImage(true))
 					 return;
 
 				 ShowImgBGR();
+				 ShowImgShadowMask();
 				 ShowImgBGRRes();
 				
 				 button7colorCorrection->Enabled=true;
@@ -1491,13 +1467,19 @@ private: System::Void Form1_Load(System::Object^  sender, System::EventArgs^  e)
 			 ImagesStats::LoadStatsFromFile();
 
 			 DisplayEdgesProcessingDefaultParams();
+
+
+			 ResetImage();
 		 }
 
 private: System::Void panel1_Scroll(System::Object^  sender, System::Windows::Forms::ScrollEventArgs^  e) {			
 		 }
 
-		 //Сохранить
+		 //SAVE
 private: System::Void button2save_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 if (OPEN == false)
+				 return;
 
 			 // Displays a SaveFileDialog so the user can save the Image
 			 // assigned to Button2.
@@ -1541,43 +1523,31 @@ private: System::Void button2save_Click(System::Object^  sender, System::EventAr
 
 		 }
 
-		 //Выход
+		 //EXIT
 private: System::Void button3exit_Click(System::Object^  sender, System::EventArgs^  e) {
 			 ImagesStats::SaveStatsToFile();
 			 exit(0);
 		 }
 
-		 //Обновить изображение при изменении размеров формы
+		 //
 private: System::Void Form1_ResizeEnd(System::Object^  sender, System::EventArgs^  e) {
-			 if(OPEN)
-			 {
-				 //ShowBmp();
-			 }
+			 
 		 }
 
-		 //Обновить изображение при прокрутке формы
+		 //
 private: System::Void Form1_Scroll(System::Object^  sender, System::Windows::Forms::ScrollEventArgs^  e) {
-			 if(OPEN)
-			 {
-				 //ShowBmp();
-			 }
+			 
 		 }
 
-		 //Получение фокуса
+		 //
 private: System::Void Form1_Activated(System::Object^  sender, System::EventArgs^  e) {
-			 if(OPEN)
-			 {
-				 //ShowBmp();
-			 }
+			 
 		 }
 
-		 //Обновить при нажатии мишкой
+		 //
 private: System::Void pictureBoxImgBGRRes_Click(System::Object^  sender, System::EventArgs^  e) {
-			 if(OPEN)
-			 {
-				 
-			 }
-			 ResetImgBGRRes();
+
+			 //ResetImgBGRRes();
 		 }
 
 private: void ReleaseImage()
@@ -1586,26 +1556,40 @@ private: void ReleaseImage()
 			 imgBGRRes.release();
 			 imgShadowMask.release();
 }
-		 
-		 //Закрыть
-private: System::Void button6Close_Click(System::Object^  sender, System::EventArgs^  e) {
-			 
+
+private: void ResetImage()
+{
 			 ReleaseImage();
 
-			 pictureBoxImgBGRRes->Image = nullptr;
-			 pictureBoxImgBGR->Image = nullptr;
-			 pictureBoxImgShadowMask->Image = nullptr;
+			 int width = pictureBoxImgBGR->Width;
+			 int height = pictureBoxImgBGR->Height;
+			 cv::Scalar defColor = cv::Scalar(198, 198, 198);
 
-			 pictureBoxImgBGRRes->Refresh();
-			 pictureBoxImgBGR->Refresh();
-			 pictureBoxImgShadowMask->Refresh();
-
-			 button7colorCorrection->Enabled=false;
-			 buttonRestoreImage->Enabled=false;
-	
-			 textBox1open->Clear();
-			 OPEN=false;
-		 }
+			 //img filled woth gray by default
+			 imgBGR = cv::Mat(height, width, CV_8UC3, defColor);
+			 imgBGRRes = cv::Mat(height, width, CV_8UC3, defColor);
+			 imgShadowMask = cv::Mat(height, width, CV_8UC3, defColor);
+}
+		 
+//		 //Close image
+//private: System::Void button6Close_Click(System::Object^  sender, System::EventArgs^  e) {
+//			 
+//			 ReleaseImage();
+//
+//			 pictureBoxImgBGRRes->Image = nullptr;
+//			 pictureBoxImgBGR->Image = nullptr;
+//			 pictureBoxImgShadowMask->Image = nullptr;
+//
+//			 pictureBoxImgBGRRes->Refresh();
+//			 pictureBoxImgBGR->Refresh();
+//			 pictureBoxImgShadowMask->Refresh();
+//
+//			 button7colorCorrection->Enabled=false;
+//			 buttonRestoreImage->Enabled=false;
+//	
+//			 textBox1open->Clear();
+//			 OPEN=false;
+//		 }
 
 		 //Цветовая коррекция
 private: System::Void button7colorCorrection_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -3323,7 +3307,7 @@ private: System::Void button11RemveLab_Click(System::Object^  sender, System::Ev
 					 //Compare chrom values to define minimum diff region
 					 double currentChromaDeltaEMetric = CIE76::GetMetric(new double[2]{A_shadow_avg, B_shadow_avg}, new double[2]{ A_non_shadow_avg_, B_non_shadow_avg_}, 2);
 					 double currentLuminanceAndChromaDeltaEMetric = CIE76::GetMetric(new double[3]{L_shadow_avg, A_shadow_avg, B_shadow_avg}, new double[3]{ L_non_shadow_avg_, A_non_shadow_avg_, B_non_shadow_avg_}, 3);
-					 if (currentChromaDeltaEMetric < chromaDeltaEMetric || currentLuminanceAndChromaDeltaEMetric < luminanceAndChromaDeltaEMetric)
+					 if (currentChromaDeltaEMetric < chromaDeltaEMetric)// || currentLuminanceAndChromaDeltaEMetric < luminanceAndChromaDeltaEMetric)
 					 {
 						 chromaDeltaEMetric = currentChromaDeltaEMetric;
 						 adjacentRegionForAlign = adjacentNonShadowRegion;
@@ -4800,6 +4784,10 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
 		  //InpaintEdges
 private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::EventArgs^  e) {
 
+			 clock_t startTime = clock();
+			 clock_t endTime;
+			 double excecutionTime;
+
 			 cv::Mat imgShadowMaskGRAY;
 			 cv::Mat imgEdge;
 			 cv::Mat imgEdgeDilatedForInpaint;
@@ -4836,6 +4824,13 @@ private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::
 			 //int inpaintinMethod = CV_INPAINT_NS; //Navier-Stokes based method.
 			 int inpaintinMethod = CV_INPAINT_TELEA; //Method by Alexandru Telea
 			 cv::inpaint(imgBGRResSource, imgEdgeDilatedForInpaint, imgBGRInpainted, inpaintRadius, inpaintinMethod);//CV_INPAINT_NS
+
+			 endTime = clock();
+			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
+			 //textBoxShadowRemovalTime->Text = System::Convert::ToString(excecutionTime);
+
+			 ImagesStats::AddStat(ImagesStats::SHADOW_EDGES_PROCESSING_INPAINT, endTime - startTime);
+			 ImagesStats::CalcStats();
 
 			 if (checkBoxDisplayOptionalWindows->Checked == true)
 			 {
@@ -5882,7 +5877,7 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 			 cv::Rect roir(imgFog.cols, 0, imgFog.cols, imgFog.rows);
 
 			 int Airlight;
-			 namedWindow("before and after", CV_WINDOW_AUTOSIZE);
+			 
 
 			 //int patchSize = 5;
 			 int patchSize = 7;
@@ -5899,17 +5894,28 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 
 			 ImagesStats::AddStat(ImagesStats::FOG_REMOVAL_DARK_CHANNEL_PRIOR, endTime - startTime);
 
-			 imshow("darkChannel MDCP", imgDarkChannel);
-			 imshow("estimateTransmission", T);
+			 if (checkBoxDisplayOptionalWindows->Checked)
+			 {
+				 imshow("darkChannel MDCP", imgDarkChannel);
+				 imshow("estimateTransmission", T);
 
-			 imgFog.copyTo(imgBeforeAfter(roil));
-			 fogfree.copyTo(imgBeforeAfter(roir));
-			 imwrite("./dehazed.jpg", fogfree);
-			 imshow("before and after", imgBeforeAfter);
-			 imshow("fogfree", fogfree);
+				 namedWindow("before and after", CV_WINDOW_AUTOSIZE);
+				 imgFog.copyTo(imgBeforeAfter(roil));
+				 fogfree.copyTo(imgBeforeAfter(roir));
+				 imwrite("./dehazed.jpg", fogfree);
+				 imshow("before and after", imgBeforeAfter);
+				 imshow("fogfree", fogfree);
+			 }
+
+//			 cv::Mat T_BGR;
+//			 cvtColor(T, T_BGR, CV_GRAY2BGR);
+//			 imgShadowMask = T_BGR.clone();
+
+			 cvtColor(T, imgShadowMask, CV_GRAY2BGR);
 
 			 imgBGRRes = fogfree;
 
+			 ShowImgShadowMask();
 			 ShowImgBGRRes();
 }
 private: System::Void label26_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -5924,6 +5930,19 @@ private: System::Void label27_Click(System::Object^  sender, System::EventArgs^ 
 }
 private: System::Void Form1_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
 			 ImagesStats::SaveStatsToFile();
+}
+
+private: System::Void textBoxEdgesProcMedianFilterKernelSize_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+}
+
+		 //REFRESH
+private: System::Void buttonRefreshForm_Click(System::Object^  sender, System::EventArgs^  e) {
+//			 if (OPEN == false)
+//				 return;
+
+			 ShowImgBGR();
+			 ShowImgShadowMask();
+			 ShowImgBGRRes();
 }
 };
 

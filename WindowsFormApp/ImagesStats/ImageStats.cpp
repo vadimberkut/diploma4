@@ -5,7 +5,8 @@
 #include <map>
 
 // defining it fixes the unresolved external:
-std::string ImagesStats::statsFilename = "methods_stats.txt";
+std::string ImagesStats::statsFilename = "stats.txt";
+std::string ImagesStats::resultStatsFilename = "result_stats.txt";
 
 std::vector<std::string> ImagesStats::images; //image file names
 std::vector<int> ImagesStats::methods; //detection, removal methods names in int

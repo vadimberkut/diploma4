@@ -2428,7 +2428,9 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 	//
 	//SHADOW REMOVAL
 	//
-private: System::Void buttonAdditive_Click(System::Object^  sender, System::EventArgs^  e) {
+
+private: void RemoveShadowUsingAditiveMethod()
+{
 
 			 clock_t startTime = clock();
 			 clock_t endTime;
@@ -2534,7 +2536,8 @@ private: System::Void buttonAdditive_Click(System::Object^  sender, System::Even
 			 return;
 }
 
-private: System::Void buttonBasicLightModel_Click(System::Object^  sender, System::EventArgs^  e) {
+private: void RemoveShadowUsingBasicLightModelMethod()
+{
 
 			 clock_t startTime = clock();
 			 clock_t endTime;
@@ -2638,7 +2641,8 @@ private: System::Void buttonBasicLightModel_Click(System::Object^  sender, Syste
 			 return;
 }
 
-private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventArgs^  e) {
+private: void RemoveShadowUsingCombinedMethod()
+{
 
 			 clock_t startTime = clock();
 			 clock_t endTime;
@@ -2646,7 +2650,7 @@ private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventAr
 
 			 //RGBtoYCbCr();
 			 cv::Mat imgYcbCr;
-			 cv::cvtColor(imgBGR, imgYcbCr,CV_BGR2YCrCb);
+			 cv::cvtColor(imgBGR, imgYcbCr, CV_BGR2YCrCb);
 
 			 float Y = 0;
 			 float Cb = 0;
@@ -2727,7 +2731,7 @@ private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventAr
 				 }
 			 }
 
-			 cv::cvtColor(imgYcbCr,imgBGRRes,CV_YCrCb2BGR);
+			 cv::cvtColor(imgYcbCr, imgBGRRes, CV_YCrCb2BGR);
 
 			 endTime = clock();
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
@@ -2742,7 +2746,9 @@ private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventAr
 			 return;
 }
 
-private: System::Void button11RemveLab_Click(System::Object^  sender, System::EventArgs^  e) {
+private: void RemoveShadowUsingLabMethod()
+{
+
 
 			 clock_t startTime = clock();
 			 clock_t endTime;
@@ -3488,7 +3494,6 @@ private: cv::Scalar GenerateRandomColor()
 			 cv::RNG rng(n);
 			 return cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
 }
-
 private: void GoThroughAllAdjacentShadowPixelsRec(std::vector<cv::Point> currentContour, bool **passedThroughPixels)
 {
 			 cv::Mat imgShadowMaskCopy = imgShadowMask.clone();
@@ -3615,8 +3620,8 @@ private: void GoThroughAllAdjacentShadowPixelsRec(std::vector<cv::Point> current
 			 }
 
 }
-
-private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, System::EventArgs^  e) {
+private: void RemoveShadowUsingConstantMethod()
+{
 
 			 clock_t startTime = clock();
 			 clock_t endTime;
@@ -4384,139 +4389,165 @@ private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, S
 			 ShowImgBGRRes();
 }
 
+private: System::Void buttonAdditive_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 RemoveShadowUsingAditiveMethod();
+}
+
+private: System::Void buttonBasicLightModel_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 RemoveShadowUsingBasicLightModelMethod();
+}
+
+private: System::Void buttonYCbCr_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 RemoveShadowUsingCombinedMethod();
+}
+
+private: System::Void button11RemveLab_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 RemoveShadowUsingLabMethod();
+}
+
+private: System::Void buttonRemoveUsingConstant_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 RemoveShadowUsingConstantMethod();
+}
+
 
 		 //
 		 //SHADOW DETECTION
 		 //
-private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::EventArgs^  e) {
 
+private: void DetectShadowUsingLabMethod()
+{
 			 clock_t startTime = clock();
 			 clock_t endTime;
 			 double excecutionTime;
 
-			cv::Mat imgLABforDetectMat;
-			cv::cvtColor(imgBGR, imgLABforDetectMat, CV_BGR2Lab);
+			 cv::Mat imgLABforDetectMat;
+			 cv::cvtColor(imgBGR, imgLABforDetectMat, CV_BGR2Lab);
 
-			cv::Mat imgBufferCIELAB = imgLABforDetectMat.clone();
+			 cv::Mat imgBufferCIELAB = imgLABforDetectMat.clone();
 
-			imgShadowMask.release();
-			imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
+			 imgShadowMask.release();
+			 imgShadowMask = cv::Mat(imgBGR.rows, imgBGR.cols, CV_8UC3);
 
-			double CIE_L_avg = 0;
-			double CIE_A_avg = 0;
-			double CIE_B_avg = 0;
+			 double CIE_L_avg = 0;
+			 double CIE_A_avg = 0;
+			 double CIE_B_avg = 0;
 
-			int count = 0;
+			 int count = 0;
 
-			double CIE_L_min = 255;
-			double CIE_A_min = 255;
-			double CIE_B_min = 255;
+			 double CIE_L_min = 255;
+			 double CIE_A_min = 255;
+			 double CIE_B_min = 255;
 
-			double CIE_L_max = 0;
-			double CIE_A_max = 0;
-			double CIE_B_max = 0;
+			 double CIE_L_max = 0;
+			 double CIE_A_max = 0;
+			 double CIE_B_max = 0;
 
-			for (int i = 0; i < imgBufferCIELAB.rows; i += 1) {
-				for (int j = 0; j < imgBufferCIELAB.cols; j += 1) {
+			 for (int i = 0; i < imgBufferCIELAB.rows; i += 1) {
+				 for (int j = 0; j < imgBufferCIELAB.cols; j += 1) {
 
-					cv::Vec3b &pixel = imgBufferCIELAB.at<cv::Vec3b>(i, j);
+					 cv::Vec3b &pixel = imgBufferCIELAB.at<cv::Vec3b>(i, j);
 
-					double CIE_L = pixel.val[0];
-					double CIE_A = pixel.val[1];
-					double CIE_B = pixel.val[2];
+					 double CIE_L = pixel.val[0];
+					 double CIE_A = pixel.val[1];
+					 double CIE_B = pixel.val[2];
 
-					CIE_L_avg += CIE_L;
-					CIE_A_avg += CIE_A;
-					CIE_B_avg += CIE_B;
+					 CIE_L_avg += CIE_L;
+					 CIE_A_avg += CIE_A;
+					 CIE_B_avg += CIE_B;
 
-					count += 1;
+					 count += 1;
 
-					CIE_L_min = CIE_L < CIE_L_min ? CIE_L : CIE_L_min;
-					CIE_A_min = CIE_A < CIE_A_min ? CIE_A : CIE_A_min;
-					CIE_B_min = CIE_B < CIE_B_min ? CIE_B : CIE_B_min;
+					 CIE_L_min = CIE_L < CIE_L_min ? CIE_L : CIE_L_min;
+					 CIE_A_min = CIE_A < CIE_A_min ? CIE_A : CIE_A_min;
+					 CIE_B_min = CIE_B < CIE_B_min ? CIE_B : CIE_B_min;
 
-					CIE_L_max = CIE_L > CIE_L_max ? CIE_L : CIE_L_max;
-					CIE_A_max = CIE_A > CIE_A_max ? CIE_A : CIE_A_max;
-					CIE_B_max = CIE_B > CIE_B_max ? CIE_B : CIE_B_max;
-				}
-			}
+					 CIE_L_max = CIE_L > CIE_L_max ? CIE_L : CIE_L_max;
+					 CIE_A_max = CIE_A > CIE_A_max ? CIE_A : CIE_A_max;
+					 CIE_B_max = CIE_B > CIE_B_max ? CIE_B : CIE_B_max;
+				 }
+			 }
 
-			CIE_L_avg /= count;
-			CIE_A_avg /= count;
-			CIE_B_avg /= count;
+			 CIE_L_avg /= count;
+			 CIE_A_avg /= count;
+			 CIE_B_avg /= count;
 
-			//standart deviation for L
-			double stdDevL = 0;
+			 //standart deviation for L
+			 double stdDevL = 0;
 
-			for (int i = 0; i < imgBufferCIELAB.rows; i += 1) {
-				for (int j = 0; j < imgBufferCIELAB.cols; j += 1) {
+			 for (int i = 0; i < imgBufferCIELAB.rows; i += 1) {
+				 for (int j = 0; j < imgBufferCIELAB.cols; j += 1) {
 
-					cv::Vec3b &pixel = imgBufferCIELAB.at<cv::Vec3b>(i, j);
+					 cv::Vec3b &pixel = imgBufferCIELAB.at<cv::Vec3b>(i, j);
 
-					double CIE_L = pixel.val[0];
+					 double CIE_L = pixel.val[0];
 
-					stdDevL += pow(CIE_L - CIE_L_avg, 2);
-				}
-			}
-			stdDevL = stdDevL*(1.0 / ((double)count - 1.0));
-			stdDevL = sqrt(stdDevL);
+					 stdDevL += pow(CIE_L - CIE_L_avg, 2);
+				 }
+			 }
+			 stdDevL = stdDevL*(1.0 / ((double)count - 1.0));
+			 stdDevL = sqrt(stdDevL);
 
-			//Load threshold
-			int threshold;
-			try
-			{
-				int formThreshold = System::Convert::ToInt32(textBoxLabShadowDetectionThreshold->Text);
-				threshold = formThreshold;
-			}
-			catch (...)
-			{
-				threshold = 256;
-			}
+			 //Load threshold
+			 int threshold;
+			 try
+			 {
+				 int formThreshold = System::Convert::ToInt32(textBoxLabShadowDetectionThreshold->Text);
+				 threshold = formThreshold;
+			 }
+			 catch (...)
+			 {
+				 threshold = 256;
+			 }
 
-			for (int i = 0; i < imgShadowMask.rows; i += 1) {
-				for (int j = 0; j < imgShadowMask.cols; j += 1) {
+			 for (int i = 0; i < imgShadowMask.rows; i += 1) {
+				 for (int j = 0; j < imgShadowMask.cols; j += 1) {
 
-					//cv::Vec3b &pixel = imgBGR.at<cv::Vec3b>(i, j);
-					cv::Vec3b &pixel = imgLABforDetectMat.at<cv::Vec3b>(i, j);
-					cv::Vec3b &shadowMaskPixel = imgShadowMask.at<cv::Vec3b>(i, j);
+					 //cv::Vec3b &pixel = imgBGR.at<cv::Vec3b>(i, j);
+					 cv::Vec3b &pixel = imgLABforDetectMat.at<cv::Vec3b>(i, j);
+					 cv::Vec3b &shadowMaskPixel = imgShadowMask.at<cv::Vec3b>(i, j);
 
-					double CIE_L = pixel.val[0];
-					double CIE_A = pixel.val[1];
-					double CIE_B = pixel.val[2];
+					 double CIE_L = pixel.val[0];
+					 double CIE_A = pixel.val[1];
+					 double CIE_B = pixel.val[2];
 
-					//if (CIE_A_avg + CIE_B_avg >= threshold)//256
-					if (CIE_A_avg + CIE_B_avg <= threshold)//256
-					{
-						if (CIE_L <= (CIE_L_avg - stdDevL / 3.0))
-						{
-							shadowMaskPixel.val[0] = 255;
-							shadowMaskPixel.val[1] = 255;
-							shadowMaskPixel.val[2] = 255;
-						}
-						else
-						{
-							shadowMaskPixel.val[0] = 0;
-							shadowMaskPixel.val[1] = 0;
-							shadowMaskPixel.val[2] = 0;
-						}
-					}
-					else
-					{
-						if (CIE_L < CIE_L_avg && CIE_B < CIE_B_avg)
-						{
-							shadowMaskPixel.val[0] = 255;
-							shadowMaskPixel.val[1] = 255;
-							shadowMaskPixel.val[2] = 255;
-						}
-						else
-						{
-							shadowMaskPixel.val[0] = 0;
-							shadowMaskPixel.val[1] = 0;
-							shadowMaskPixel.val[2] = 0;
-						}
-					}
-				}
-			}
+					 //if (CIE_A_avg + CIE_B_avg >= threshold)//256
+					 if (CIE_A_avg + CIE_B_avg <= threshold)//256
+					 {
+						 if (CIE_L <= (CIE_L_avg - stdDevL / 3.0))
+						 {
+							 shadowMaskPixel.val[0] = 255;
+							 shadowMaskPixel.val[1] = 255;
+							 shadowMaskPixel.val[2] = 255;
+						 }
+						 else
+						 {
+							 shadowMaskPixel.val[0] = 0;
+							 shadowMaskPixel.val[1] = 0;
+							 shadowMaskPixel.val[2] = 0;
+						 }
+					 }
+					 else
+					 {
+						 if (CIE_L < CIE_L_avg && CIE_B < CIE_B_avg)
+						 {
+							 shadowMaskPixel.val[0] = 255;
+							 shadowMaskPixel.val[1] = 255;
+							 shadowMaskPixel.val[2] = 255;
+						 }
+						 else
+						 {
+							 shadowMaskPixel.val[0] = 0;
+							 shadowMaskPixel.val[1] = 0;
+							 shadowMaskPixel.val[2] = 0;
+						 }
+					 }
+				 }
+			 }
 
 			 //cv::Mat shadowMaskMat = cv::Mat(InfoHeader.biHeight, InfoHeader.biWidth,CV_8UC3);
 			 cv::Mat shadowMaskClosingMat;
@@ -4562,7 +4593,7 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 				 cv::MORPH_CLOSE, structure_elem33);
 			 cv::morphologyEx(imgShadowMask, tmp,
 				 cv::MORPH_OPEN, structure_elem44);
-			 
+
 
 			 // Apply Erosion  Followed By Dilation 
 			 cv::Mat elementEr = getStructuringElement(cv::MORPH_RECT,
@@ -4576,7 +4607,7 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			 cv::Mat imgMedianFilter;
 			 int kernelSize = 7;
 			 cv::medianBlur(imgShadowMask, imgMedianFilter, kernelSize);
-			 
+
 
 			 // Apply Dilation Followed By Erosion
 			 cv::Mat elementDil2 = getStructuringElement(cv::MORPH_RECT,
@@ -4587,13 +4618,13 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			 //cv::dilate(imgMedianFilter, tmp, elementDil2);
 			 cv::erode(tmp, shadowMaskDilationFollowedByErosion, elementEr2);
 
-//			 //Cleaning
-//			 cv::Mat imgCleaning;
-//			 int ddepth = CV_8UC3; // -1 same as src
-//			 int kernelSize = 3;
-//			 cv::Mat filter2DKernel = cv::Mat::ones(kernelSize, kernelSize, CV_32F) / (float)(kernelSize*kernelSize);
-//			 cv::filter2D(imgShadowMask, imgCleaning, ddepth, filter2DKernel);
-//			 cv::imshow("imgCleaning", imgCleaning);
+			 //			 //Cleaning
+			 //			 cv::Mat imgCleaning;
+			 //			 int ddepth = CV_8UC3; // -1 same as src
+			 //			 int kernelSize = 3;
+			 //			 cv::Mat filter2DKernel = cv::Mat::ones(kernelSize, kernelSize, CV_32F) / (float)(kernelSize*kernelSize);
+			 //			 cv::filter2D(imgShadowMask, imgCleaning, ddepth, filter2DKernel);
+			 //			 cv::imshow("imgCleaning", imgCleaning);
 
 			 endTime = clock();
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
@@ -4602,9 +4633,9 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 			 ImagesStats::AddStat(ImagesStats::SHADOW_DETECTION_LAB, endTime - startTime);
 
 			 //extract L channel (for dislay only)
-			 Mat imgLabL;	
-			 Mat imgLabA;	
-			 Mat imgLabB;	
+			 Mat imgLabL;
+			 Mat imgLabA;
+			 Mat imgLabB;
 			 vector<Mat> channels(3);  // "channels" is a vector of 3 Mat arrays:
 			 // split img:
 			 split(imgLABforDetectMat, channels);
@@ -4628,20 +4659,20 @@ private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::E
 				 cv::imshow("ErosionFollowedByDilation", shadowMaskErosionFollowedByDilation);
 				 cv::imshow("DilationFollowedByErosion", shadowMaskDilationFollowedByErosion);
 
-//				 cv::imshow("imgLabL", imgLabL);
-//				 cv::imshow("imgLabA", imgLabA);
-//				 cv::imshow("imgLabB", imgLabB);
+				 //				 cv::imshow("imgLabL", imgLabL);
+				 //				 cv::imshow("imgLabA", imgLabA);
+				 //				 cv::imshow("imgLabB", imgLabB);
 			 }
-			 
-			 
+
+
 
 			 //imgShadowMask = shadowMaskErosionFollowedByDilation.clone();
 			 imgShadowMask = imgMedianFilter.clone();
 			 ShowImgShadowMask();
 }
 
-private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::EventArgs^  e) {
-
+private: void DetectShadowUsingMSMethod()
+{
 			 clock_t startTime = clock();
 			 clock_t endTime;
 			 double excecutionTime;
@@ -4777,13 +4808,24 @@ private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::
 }
 
 
+private: System::Void button1Shadow2Lab_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 DetectShadowUsingLabMethod();
+}
+
+private: System::Void button1Shadow4Math_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 DetectShadowUsingMSMethod();
+}
+
+
 		//
 		//SHADOW EDGES PROCESSING
 		//
 
-		  //InpaintEdges
-private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::EventArgs^  e) {
-
+		//InpaintEdges
+private: void InpaintSEdges()
+{
 			 clock_t startTime = clock();
 			 clock_t endTime;
 			 double excecutionTime;
@@ -4842,8 +4884,8 @@ private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::
 			 ShowImgBGRRes();
 }
 		 //Smooth Using Gaussian Filter
-private: System::Void buttonSmoothUsingGaussianFilter_Click(System::Object^  sender, System::EventArgs^  e) {
-
+private: void SmoothSEdgesUsingGaussianFilter()
+{
 			 //Shadow edge detection
 			 cv::Mat imgShadowMaskGRAY;
 			 cv::Mat imgEdge;
@@ -4894,10 +4936,9 @@ private: System::Void buttonSmoothUsingGaussianFilter_Click(System::Object^  sen
 			 imgBGRRes = imgEdgeGaussianEdgeOnly.clone();
 			 ShowImgBGRRes();
 }
-
 		 //Smooth Using Median Filter
-private: System::Void buttonSmoothUsingMedianFilter_Click(System::Object^  sender, System::EventArgs^  e) {
-
+private: void SmoothSEdgesUsingMedianFilter()
+{
 			 cv::Mat imgShadowMaskGRAY;
 			 cv::Mat imgEdge;
 			 cv::Mat imgEdgeDilated;
@@ -4944,6 +4985,21 @@ private: System::Void buttonSmoothUsingMedianFilter_Click(System::Object^  sende
 
 			 imgBGRRes = imgMedianEdgeOnly.clone();
 			 ShowImgBGRRes();
+}
+
+private: System::Void buttonInpaintEdges_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 InpaintSEdges();
+}
+		 
+private: System::Void buttonSmoothUsingGaussianFilter_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 SmoothSEdgesUsingGaussianFilter();
+}
+	 
+private: System::Void buttonSmoothUsingMedianFilter_Click(System::Object^  sender, System::EventArgs^  e) {
+
+			 SmoothSEdgesUsingMedianFilter();
 }
 
 private: System::Void pictureBoxImgShadowMask_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -5918,8 +5974,10 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 			 ShowImgShadowMask();
 			 ShowImgBGRRes();
 }
+
 private: System::Void label26_Click(System::Object^  sender, System::EventArgs^  e) {
 }
+
 private: System::Void textBoxShadowRemovalTime_TextChanged(System::Object^  sender, System::EventArgs^  e) {
 }
 private: System::Void label25_Click(System::Object^  sender, System::EventArgs^  e) {

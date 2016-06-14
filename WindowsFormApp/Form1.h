@@ -2748,8 +2748,6 @@ private: void RemoveShadowUsingCombinedMethod()
 
 private: void RemoveShadowUsingLabMethod()
 {
-
-
 			 clock_t startTime = clock();
 			 clock_t endTime;
 			 double excecutionTime;
@@ -2763,8 +2761,7 @@ private: void RemoveShadowUsingLabMethod()
 			 cv::cvtColor(imgBGR, imgLAB, CV_BGR2Lab);
 			 cv::cvtColor(imgBGR, imgLAB_ORIGIN, CV_BGR2Lab);
 
-			 //			 /////////////Calc average values for whole image
-
+			 //Calc average values for whole image
 			 double L_avg_shadow_img = 0;
 			 double A_avg_shadow_img = 0;
 			 double B_avg_shadow_img = 0;
@@ -2809,57 +2806,11 @@ private: void RemoveShadowUsingLabMethod()
 			 L_avg_non_shadow_img /= count_non_shadow;
 			 A_avg_non_shadow_img /= count_non_shadow;
 			 B_avg_non_shadow_img /= count_non_shadow;
-			 //////////
-			 //
-			 //			 //add diff to shadow pixels
-			 //			 for (int i = 0; i < imgLAB.rows; i++) {
-			 //				 for (int j = 0; j < imgLAB.cols; j++) {
-			 //
-			 //					 cv::Vec3b &shadowMaskPixel = imgShadowMask.at<cv::Vec3b>(i, j);
-			 //					 cv::Vec3b &imgLABPixel = imgLAB.at<cv::Vec3b>(i, j);
-			 //					 
-			 //
-			 //					 if (shadowMaskPixel.val[0] == 255 && imgLABPixel.val[0] < CIE_L_avg_img){
-			 //						 int L = imgLABPixel.val[0];
-			 ////						 int A = imgLABPixel.val[1];
-			 ////						 int B = imgLABPixel.val[2];
-			 //
-			 //						 //L+= L_diff;
-			 //						 //L *= L_ratio;
-			 //
-			 ////						 A *= A_ratio;
-			 ////						 B *= B_ratio;
-			 //
-			 //						 L = (L > 255 ? 255 : (L < 0 ? 0 : L));
-			 ////						 A = (A > 255 ? 255 : (A < 0 ? 0 : A));
-			 ////						 B = (B > 255 ? 255 : (B < 0 ? 0 : B));
-			 //
-			 //						 imgLABPixel.val[0] = L;
-			 ////						 imgLABPixel.val[1] = A;
-			 ////						 imgLABPixel.val[2] = B;
-			 //					 } 
-			 //				 }
-			 //			 }
 
 			 cv::cvtColor(imgLAB, imgBGRbeforeCluster, CV_Lab2BGR);
 
-			 //			 //Mean Shift  takes BGR and do in LAB, writes res in first param
-			 //			 cv::Mat imgMeanShiftVisual = imgBGR.clone();
-			 //			 cv::Mat imgForMeanShiftCluster;
-			 //			 cv::Mat imgForMeanShiftAlign;
-			 //			 cv::cvtColor(imgLAB, imgForMeanShiftAlign, CV_Lab2BGR);
-			 //			 cv::cvtColor(imgLAB_ORIGIN, imgForMeanShiftCluster, CV_Lab2BGR);
-			 //			 ApplyMeanShiftAndCorrections(imgForMeanShiftCluster, imgForMeanShiftAlign, imgMeanShiftVisual);
-			 //			 
-			 //			 imgBGRRes = imgForMeanShiftAlign.clone();
-
-			 ///////////////////////////////////
 			 cv::Mat imgSourceLAB = imgLAB.clone();
 			 cv::Mat imgResLAB = imgLAB.clone();
-
-			 cv::Mat imgMeanShiftVisual = imgBGR.clone();
-			 //cv::Mat imgForMeanShiftCluster;
-			 cv::Mat imgForMeanShiftAlign;
 
 			 //Apply Mean shift
 			 IplImage *imgForMeanShiftCluster = cvCloneImage(&(IplImage)imgLAB);
@@ -2990,8 +2941,7 @@ private: void RemoveShadowUsingLabMethod()
 				 cv::imshow("imgSegmentationResNew", imgSegmentationResNew);
 			 }
 
-			 //Count pixels for each region
-			 //and determine shadow regions
+			 //Count pixels for each region and determine shadow regions
 			 int *ilablesCount = new int[regionCount];
 			 bool *isShadowRegion = new bool[regionCount];
 			 for (int r = 0; r < regionCount; r++)
@@ -3020,14 +2970,6 @@ private: void RemoveShadowUsingLabMethod()
 					 }
 				 }
 			 }
-
-			 //			 //test isShadowRegion
-			 //			 for (int r = 0; r < regionCount; r++)
-			 //			 {
-			 //				 
-			 //				 bool siShadow = isShadowRegion[r];
-			 //				 int we = 0;
-			 //			 }
 
 			 //Define adjacent regions matrix
 			 bool **adjacentRegionsMatrix = new bool*[regionCount];
@@ -3146,42 +3088,6 @@ private: void RemoveShadowUsingLabMethod()
 				 }
 			 }
 
-			 //			 //calc avg values for all regions
-			 //			 std::vector<double[3]> regionAverages(regionCount);
-			 //			 for (int region = 0; region < regionCount; region++)
-			 //			 {
-			 //				 double L_avg = 0;
-			 //				 double A_avg = 0;
-			 //				 double B_avg = 0;
-			 //				 int regionCount = ilablesCount[region];
-			 //
-			 //				 for (int i = 0; i < imgSourceLAB.rows; i++) {
-			 //					 for (int j = 0; j < imgSourceLAB.cols; j++) {
-			 //
-			 //						 //Handle adjacent region
-			 //						 int cl = ilabels[i][j];
-			 //						 if (cl != region)
-			 //						 {
-			 //							 continue;
-			 //						 }
-			 //
-			 //						 cv::Vec3b &pixel = imgSourceLAB.at<cv::Vec3b>(i, j);
-			 //
-			 //						 L_avg += pixel.val[0];
-			 //						 A_avg += pixel.val[1];
-			 //						 B_avg += pixel.val[2];
-			 //					 }
-			 //				 }
-			 //				 L_avg /= regionCount;
-			 //				 A_avg /= regionCount;
-			 //				 B_avg /= regionCount;
-			 //
-			 //				 regionAverages[region][0] = L_avg;
-			 //				 regionAverages[region][1] = A_avg;
-			 //				 regionAverages[region][2] = B_avg;
-			 //			 }
-
-
 			 bool *shadowRegionsUsedForAlign = new bool[regionCount]; //handled shadow regions that can be used to align remaining shadow regions
 			 bool *shadowRegionsWithNoLighAdjacentRegions = new bool[regionCount]; //
 			 for (int i = 0; i < regionCount; i++)
@@ -3201,8 +3107,7 @@ private: void RemoveShadowUsingLabMethod()
 				 shadowRegionsForRelight.push_back(currentRegion);
 			 }
 
-			 ///
-			 ///
+
 			 //loop through shadow regions and find adjacent non-shadow
 			 int MAX_ITERATIONS = 1000;
 			 //for (int currentRegion = 0; currentRegion < regionCount; currentRegion++)
@@ -3214,10 +3119,6 @@ private: void RemoveShadowUsingLabMethod()
 				 //int currentRegion = shadowRegionsForRelight[0];
 				 int currentRegion = *(shadowRegionsForRelight.begin());
 
-				 //				 //skip non-shadow regions - take shadow region
-				 //				 if (isShadowRegion[currentRegion] == false)
-				 //					 continue;
-
 				 //find non-shadow adjacent regions or aligned shadow regions
 				 std::vector<int> adjacentNonShadowRegions;
 				 for (int k = 0; k < regionCount; k++)
@@ -3226,7 +3127,6 @@ private: void RemoveShadowUsingLabMethod()
 					 bool isRegionNotForAlign = regionsNotForAlign[k];
 					 bool isShadowRegion___ = isShadowRegion[k];
 					 bool isShadowRegionForAlign = shadowRegionsUsedForAlign[k];
-					 //if (isAdjacentRegion == true && isShadowRegion[k] == false && regionsNotForAlign[k] == false)
 					 if (isAdjacentRegion == true && isRegionNotForAlign == false && (isShadowRegion___ == false || (isShadowRegionForAlign == true && shadowRegionsWithNoLighAdjacentRegions[currentRegion])))
 					 {
 						 adjacentNonShadowRegions.push_back(k);
@@ -3276,14 +3176,6 @@ private: void RemoveShadowUsingLabMethod()
 					 int adjacentNonShadowRegion = adjacentNonShadowRegions[r2];
 					 adjacentRegionCount = ilablesCount[adjacentNonShadowRegion];
 
-					 //					 //skip small regions
-					 //					 if (adjacentRegionCount < currentRegionCount*0.01)
-					 //						 continue;
-
-					 //					 double L_avg = regionAverages[adjacentNonShadowRegion][0];
-					 //					 double A_avg = regionAverages[adjacentNonShadowRegion][1];
-					 //					 double B_avg = regionAverages[adjacentNonShadowRegion][2];
-
 					 //Calc avg values for adjacent non-shadow region
 					 double L_non_shadow_avg_ = 0;
 					 double A_non_shadow_avg_ = 0;
@@ -3313,7 +3205,7 @@ private: void RemoveShadowUsingLabMethod()
 					 //Compare chrom values to define minimum diff region
 					 double currentChromaDeltaEMetric = CIE76::GetMetric(new double[2]{A_shadow_avg, B_shadow_avg}, new double[2]{ A_non_shadow_avg_, B_non_shadow_avg_}, 2);
 					 double currentLuminanceAndChromaDeltaEMetric = CIE76::GetMetric(new double[3]{L_shadow_avg, A_shadow_avg, B_shadow_avg}, new double[3]{ L_non_shadow_avg_, A_non_shadow_avg_, B_non_shadow_avg_}, 3);
-					 if (currentChromaDeltaEMetric < chromaDeltaEMetric)// || currentLuminanceAndChromaDeltaEMetric < luminanceAndChromaDeltaEMetric)
+					 if (currentChromaDeltaEMetric < chromaDeltaEMetric)
 					 {
 						 chromaDeltaEMetric = currentChromaDeltaEMetric;
 						 adjacentRegionForAlign = adjacentNonShadowRegion;
@@ -3336,23 +3228,7 @@ private: void RemoveShadowUsingLabMethod()
 					 continue;
 				 }
 
-				 //				 //find by count
-				 //				 int regionByCount = -1;
-				 //				 for (int i = 0; i < regionCount; i++)
-				 //				 {
-				 //					 if (ilablesCount[i] == adjacentRegionCount)
-				 //					 {
-				 //						 regionByCount = i;
-				 //						 break;
-				 //					 }
-				 //				 }
-
-				 // Draw random color for selected region
-				 //				 cv::vector<int> color(regionCount);
-				 //				 CvRNG rng = cvRNG(cvGetTickCount());
-				 //				 for (int i = 0; i<regionCount; i++)
-				 //					 color[i] = cvRandInt(&rng);
-
+				 //Visualize current regions
 				 cv::Mat imgAdjacentRegions(imgForMeanShiftCluster);
 				 for (int i = 0; i < imgAdjacentRegions.rows; i++) {
 					 for (int j = 0; j < imgAdjacentRegions.cols; j++) {
@@ -3383,8 +3259,6 @@ private: void RemoveShadowUsingLabMethod()
 					 int integer2 = adjacentRegionForAlign;
 					 sprintf(integer_string2, "%d", integer2);
 					 char spliter[2] = "_";
-					 //					 char other_string[64] = "visualRes"; // make sure you allocate enough space to append the other string
-					 //					 strcat(other_string, integer_string); // other_string now contains "Integer: 1234"
 					 std::string windowName = "imgAdjacentRegions";
 					 windowName += (integer_string);
 					 windowName += (spliter);
@@ -3417,39 +3291,15 @@ private: void RemoveShadowUsingLabMethod()
 							 continue;
 						 }
 
-						 //						 //Handle shadow region
-						 //						 cv::Vec3b &shadowPixelMask = imgShadowMask.at<cv::Vec3b>(i, j);
-						 //						 if (shadowPixelMask.val[0] != 255)
-						 //						 {
-						 //							 continue;
-						 //						 }
-
 						 cv::Vec3b &pixel = imgResLAB.at<cv::Vec3b>(i, j);
 
 						 double L = pixel.val[0];
 						 double A = pixel.val[1];
 						 double B = pixel.val[2];
 
-						 //L *= L_ratio;
-						 //L = ((L*L_ratio) + (L + L_diff_))/2.0;
 						 L += L_diff_;
-						 // L += (L_avg_non_shadow_img - L_avg_shadow_img);
 						 A *= A_ratio;
 						 B *= B_ratio;
-
-						 //							 //If region colors too far from shadow region colors - only relight
-						 //							 int COLOR_METRIC_THRESHOLD = 20;
-						 //							 if (LAB_delta_e_metric < COLOR_METRIC_THRESHOLD)
-						 //							 {
-						 //								 L *= L_ratio;
-						 //								 A *= A_ratio;
-						 //								 B *= B_ratio;
-						 //							 }
-						 //							 else
-						 //							 {
-						 //								 L *= L_ratio;
-						 //								 //L += L_diff_;
-						 //							 }
 
 						 L = (L > 255 ? 255 : (L < 0 ? 0 : L));
 						 A = (A > 255 ? 255 : (A < 0 ? 0 : A));
@@ -3471,19 +3321,7 @@ private: void RemoveShadowUsingLabMethod()
 
 			 ImagesStats::AddStat(ImagesStats::SHADOW_REMOVAL_LAB, endTime - startTime);
 
-			 //Show results
-			 if (checkBoxDisplayOptionalWindows->Checked == true)
-			 {
-				 //cv::imshow("imgMeanShiftVisual", imgMeanShiftVisual);
-
-				 //cv::imshow("imgBGR", imgBGR);
-				 //cv::imshow("imgLAB", imgLAB);
-				 //cv::imshow("imgBGRRelight", imgBGRbeforeCluster);
-				 cv::imshow("imgBGRRes", imgBGRRes);
-			 }
-
 			 imgBGRResOriginal = imgBGRRes.clone();
-
 			 ShowImgBGRRes();
 }
 
@@ -3622,7 +3460,6 @@ private: void GoThroughAllAdjacentShadowPixelsRec(std::vector<cv::Point> current
 }
 private: void RemoveShadowUsingConstantMethod()
 {
-
 			 clock_t startTime = clock();
 			 clock_t endTime;
 			 double excecutionTime;
@@ -3636,7 +3473,7 @@ private: void RemoveShadowUsingConstantMethod()
 			 cv::Mat imgEdgeCopy;
 			 cv::Mat imgEdgeD;
 
-			 int aperture_size = 5;// — размер для оператора Собеля
+			 int aperture_size = 5;// — розмір для оператора Собеля
 			 cv::Canny(shadowMaskGRAY, imgEdge, 50, 150, aperture_size);
 
 			 cv::Mat elementD = getStructuringElement(cv::MORPH_RECT,
@@ -3700,7 +3537,7 @@ private: void RemoveShadowUsingConstantMethod()
 
 #pragma endregion
 
-#pragma region FIND CONTOURS (MY REALISTION) - NOT COMPLETED
+#pragma region FIND CONTOURS (MY REALISАTION) - NOT COMPLETED
 
 			 //			 ///FIND CONTOURS (MY REALISTION) - NOT COMPLETED
 			 //			 //determine shadow regions lookig at edges 
@@ -3958,103 +3795,6 @@ private: void RemoveShadowUsingConstantMethod()
 				 //
 				 //FINDING A CONSTANT
 
-				 ////2-nd way MNK - NOT WORKING/ take average -> get grey pixels
-				 //			 double min_a_B = 99999999999999;
-				 //			 double min_a_G = 99999999999999;
-				 //			 double min_a_R = 99999999999999;
-				 //
-				 //			 int i_min_a_B = 9999999999999;
-				 //			 int i_min_a_G = 9999999999999;
-				 //			 int i_min_a_R = 9999999999999;
-				 //
-				 //
-				 //			 //take stat data P and S vectors
-				 //
-				 //			 //MNK x - S; y - P
-				 //
-				 //			 //sum xi
-				 //			 double sum_Si_B = 0;
-				 //			 double sum_Si_G = 0;
-				 //			 double sum_Si_R = 0;
-				 //
-				 //			 //sum xi^2
-				 //			 double sum_Si2_B = 0;
-				 //			 double sum_Si2_G = 0;
-				 //			 double sum_Si2_R = 0;
-				 //			 
-				 //			 //sum yi
-				 //			 double sum_Pi_B = 0;
-				 //			 double sum_Pi_G = 0;
-				 //			 double sum_Pi_R = 0;
-				 //
-				 //			 //sum xi*yi
-				 //			 double sum_SiPi_R = 0;
-				 //			 double sum_SiPi_G = 0;
-				 //			 double sum_SiPi_B = 0;
-				 //
-				 //			 //y = a*x + b; 
-				 //			 //P = a*S + b
-				 //			 double mnk_n = border_adjacent_shadow_pixels_indexes.size();
-				 //			 //double mnk_n = 100;
-				 //
-				 //			 double mnk_a_B = 0;
-				 //			 double mnk_a_G = 0;
-				 //			 double mnk_a_R = 0;
-				 //
-				 //			 double mnk_b_B = 0;
-				 //			 double mnk_b_G = 0;
-				 //			 double mnk_b_R = 0;
-				 //
-				 //			 //sum Si sum Pi sum Si^2
-				 //			 for (std::vector<int>::size_type r = 1; r != mnk_n; r++)
-				 //			 {
-				 //				 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-				 //				 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-				 //
-				 //				 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-				 //				 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-				 //
-				 //				 sum_Si_B += S_pixel.val[0];
-				 //				 sum_Si_G += S_pixel.val[1];
-				 //				 sum_Si_R += S_pixel.val[2];
-				 //
-				 //				 sum_Si2_B += pow(S_pixel.val[0], 2);
-				 //				 sum_Si2_G += pow(S_pixel.val[1], 2);
-				 //				 sum_Si2_R += pow(S_pixel.val[2], 2);
-				 //
-				 //				 sum_Pi_B += P_pixel.val[0];
-				 //				 sum_Pi_G += P_pixel.val[1];
-				 //				 sum_Pi_R += P_pixel.val[2];
-				 //			 }
-				 //
-				 //			 //sum Si*Pi
-				 //			 for (std::vector<int>::size_type r = 1; r != mnk_n; r++)
-				 //			 {
-				 //				 int *Si_indexes = border_adjacent_shadow_pixels_indexes[r];
-				 //				 int *Pi_indexes = border_adjacent_non_shadow_pixels_indexes[r];
-				 //
-				 //				 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
-				 //				 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-				 //
-				 //				 sum_SiPi_B += S_pixel.val[0] * P_pixel.val[0];
-				 //				 sum_SiPi_G += S_pixel.val[1] * P_pixel.val[1];
-				 //				 sum_SiPi_R += S_pixel.val[2] * P_pixel.val[2];
-				 //			 }
-				 //
-				 //			 mnk_a_B = (mnk_n*sum_SiPi_B - sum_Si_B*sum_Pi_B) / (mnk_n*sum_Si2_B - pow(sum_Si_B, 2));
-				 //			 mnk_a_G = (mnk_n*sum_SiPi_G - sum_Si_G*sum_Pi_G) / (mnk_n*sum_Si2_G - pow(sum_Si_G, 2));
-				 //			 mnk_a_R = (mnk_n*sum_SiPi_R - sum_Si_R*sum_Pi_R) / (mnk_n*sum_Si2_R - pow(sum_Si_R, 2));
-				 //
-				 //			 mnk_b_B = (sum_Pi_B - mnk_a_B*sum_Si_B) / mnk_n;
-				 //			 mnk_b_G = (sum_Pi_G - mnk_a_G*sum_Si_G) / mnk_n;
-				 //			 mnk_b_R = (sum_Pi_R - mnk_a_R*sum_Si_R) / mnk_n;
-				 //
-				 //			 double c_res_B = 0;
-				 //			 double c_res_G = 0;
-				 //			 double c_res_R = 0;
-
-				 //2-nd way Metod Deleniya popolam
-
 				 double a_B = 0;
 				 double a_G = 0;
 				 double a_R = 0;
@@ -4090,9 +3830,6 @@ private: void RemoveShadowUsingConstantMethod()
 
 						 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
 						 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-						 //
-						 //						 f_a_R += pow(P_pixel.val[2] - S_pixel.val[2] * a_R, 2);
-						 //						 f_b_R += pow(P_pixel.val[2] - S_pixel.val[2] * b_R, 2);
 
 						 f_a_R += pow(P_pixel.val[2] - S_pixel.val[2] - a_R, 2);
 						 f_b_R += pow(P_pixel.val[2] - S_pixel.val[2] - b_R, 2);
@@ -4131,9 +3868,6 @@ private: void RemoveShadowUsingConstantMethod()
 						 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
 						 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
 
-						 //						 f_a_G += pow(P_pixel.val[1] - S_pixel.val[1] * a_G, 2);
-						 //						 f_b_G += pow(P_pixel.val[1] - S_pixel.val[1] * b_G, 2);
-
 						 f_a_G += pow(P_pixel.val[1] - S_pixel.val[1] - a_G, 2);
 						 f_b_G += pow(P_pixel.val[1] - S_pixel.val[1] - b_G, 2);
 					 }
@@ -4170,9 +3904,6 @@ private: void RemoveShadowUsingConstantMethod()
 
 						 cv::Vec3b &S_pixel = imgBGR.at<cv::Vec3b>(Si_indexes[0], Si_indexes[1]);
 						 cv::Vec3b &P_pixel = imgBGR.at<cv::Vec3b>(Pi_indexes[0], Pi_indexes[1]);
-
-						 //						 f_a_B += pow(P_pixel.val[0] - S_pixel.val[0] * a_B, 2);
-						 //						 f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] * b_B, 2);
 
 						 f_a_B += pow(P_pixel.val[0] - S_pixel.val[0] - a_B, 2);
 						 f_b_B += pow(P_pixel.val[0] - S_pixel.val[0] - b_B, 2);
@@ -4249,14 +3980,6 @@ private: void RemoveShadowUsingConstantMethod()
 							 }
 						 }
 					 }
-
-					 //				 for (int k = 0; k < currentContour.size(); k++) //draw countour pixels only
-					 //				 {
-					 //					 int j = currentContour[k].x;
-					 //					 int i = currentContour[k].y;
-					 //					 cv::Vec3b &pixel = visualRes.at<cv::Vec3b>(i, j);
-					 //					 pixel.val[2] = 200;
-					 //				 }
 
 					 char integer_string[32];
 					 int integer = contour_i;
@@ -4351,15 +4074,6 @@ private: void RemoveShadowUsingConstantMethod()
 							 G += c_res_G;
 							 R += c_res_R;
 
-							 //						B = B*mnk_a_B + mnk_b_B;
-							 //						G = G*mnk_a_G + mnk_b_G;
-							 //						R = R*mnk_a_R + mnk_b_R;
-
-							 //						//wall
-							 //						B *= 1.705;
-							 //						G *= 2.04;
-							 //						R *= 2.59;
-
 							 B = B > 255 ? 255 : (B < 0 ? 0 : B);
 							 G = G > 255 ? 255 : (G < 0 ? 0 : G);
 							 R = R > 255 ? 255 : (R < 0 ? 0 : R);
@@ -4385,7 +4099,6 @@ private: void RemoveShadowUsingConstantMethod()
 			 ImagesStats::AddStat(ImagesStats::SHADOW_REMOVAL_CONSTANT, endTime - startTime);
 
 			 imgBGRResOriginal = imgBGRRes.clone();
-
 			 ShowImgBGRRes();
 }
 
@@ -4439,14 +4152,6 @@ private: void DetectShadowUsingLabMethod()
 
 			 int count = 0;
 
-			 double CIE_L_min = 255;
-			 double CIE_A_min = 255;
-			 double CIE_B_min = 255;
-
-			 double CIE_L_max = 0;
-			 double CIE_A_max = 0;
-			 double CIE_B_max = 0;
-
 			 for (int i = 0; i < imgBufferCIELAB.rows; i += 1) {
 				 for (int j = 0; j < imgBufferCIELAB.cols; j += 1) {
 
@@ -4461,14 +4166,6 @@ private: void DetectShadowUsingLabMethod()
 					 CIE_B_avg += CIE_B;
 
 					 count += 1;
-
-					 CIE_L_min = CIE_L < CIE_L_min ? CIE_L : CIE_L_min;
-					 CIE_A_min = CIE_A < CIE_A_min ? CIE_A : CIE_A_min;
-					 CIE_B_min = CIE_B < CIE_B_min ? CIE_B : CIE_B_min;
-
-					 CIE_L_max = CIE_L > CIE_L_max ? CIE_L : CIE_L_max;
-					 CIE_A_max = CIE_A > CIE_A_max ? CIE_A : CIE_A_max;
-					 CIE_B_max = CIE_B > CIE_B_max ? CIE_B : CIE_B_max;
 				 }
 			 }
 
@@ -4618,31 +4315,23 @@ private: void DetectShadowUsingLabMethod()
 			 //cv::dilate(imgMedianFilter, tmp, elementDil2);
 			 cv::erode(tmp, shadowMaskDilationFollowedByErosion, elementEr2);
 
-			 //			 //Cleaning
-			 //			 cv::Mat imgCleaning;
-			 //			 int ddepth = CV_8UC3; // -1 same as src
-			 //			 int kernelSize = 3;
-			 //			 cv::Mat filter2DKernel = cv::Mat::ones(kernelSize, kernelSize, CV_32F) / (float)(kernelSize*kernelSize);
-			 //			 cv::filter2D(imgShadowMask, imgCleaning, ddepth, filter2DKernel);
-			 //			 cv::imshow("imgCleaning", imgCleaning);
-
 			 endTime = clock();
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds
 			 textBoxShadowDetectionTime->Text = System::Convert::ToString(excecutionTime);
 
 			 ImagesStats::AddStat(ImagesStats::SHADOW_DETECTION_LAB, endTime - startTime);
 
-			 //extract L channel (for dislay only)
-			 Mat imgLabL;
-			 Mat imgLabA;
-			 Mat imgLabB;
-			 vector<Mat> channels(3);  // "channels" is a vector of 3 Mat arrays:
-			 // split img:
-			 split(imgLABforDetectMat, channels);
-			 // get the channels 
-			 imgLabL = channels[0];
-			 imgLabA = channels[1];
-			 imgLabB = channels[2];
+//			 //extract L channel (for dislay only)
+//			 Mat imgLabL;
+//			 Mat imgLabA;
+//			 Mat imgLabB;
+//			 vector<Mat> channels(3);  // "channels" is a vector of 3 Mat arrays:
+//			 // split img:
+//			 split(imgLABforDetectMat, channels);
+//			 // get the channels 
+//			 imgLabL = channels[0];
+//			 imgLabA = channels[1];
+//			 imgLabB = channels[2];
 
 			 if (checkBoxDisplayOptionalWindows->Checked == true)
 			 {
@@ -4652,6 +4341,7 @@ private: void DetectShadowUsingLabMethod()
 
 				 cv::imshow("imgMedianFilter", imgMedianFilter);
 				 cv::imshow("imgShadowMask", imgShadowMask);
+
 				 cv::imshow("shadowMaskClosingMat", shadowMaskClosingMat);
 				 cv::imshow("shadowMaskOpeningMat", shadowMaskOpeningMat);
 				 cv::imshow("shadowMaskOpeningClosingMat", shadowMaskOpeningClosingMat);
@@ -5937,12 +5627,12 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 
 			 //int patchSize = 5;
 			 int patchSize = 7;
-			 imgDarkChannel = getMedianFilteredDarkChannel(imgFog, patchSize);
+			 imgDarkChannel = getDarkChannel(imgFog, patchSize);
 			 //imgDarkChannel = DarkChannel(imgFog, patchSize);
 			 //Airlight = estimateA(imgDarkChannel);
-			 Airlight = estimateAAdvance(imgDarkChannel, imgFog);
+			 Airlight = estimateAirlight(imgDarkChannel, imgFog);
 			 T = estimateTransmission(imgDarkChannel, Airlight);
-			 fogfree = getDehazed(imgFog, T, Airlight);
+			 fogfree = removeFog(imgFog, T, Airlight);
 
 			 endTime = clock();
 			 excecutionTime = ((double)(endTime - startTime)) / (double)CLK_TCK; //to Seconds

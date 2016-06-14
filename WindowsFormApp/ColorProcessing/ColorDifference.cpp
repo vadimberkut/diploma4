@@ -1,4 +1,5 @@
-﻿#include "ColorDifference.h"
+﻿//#include "stdafx.h"
+#include "ColorDifference.h"
 
 double CIE76::STANDART_HUMAN_EYE_DELTA_E = 2.3;
 

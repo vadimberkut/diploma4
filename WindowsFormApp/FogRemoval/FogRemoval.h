@@ -10,7 +10,7 @@ using namespace cv;
 using namespace std;
 
 //median filtered dark channel
-Mat getMedianFilteredDarkChannel(Mat sourceImg, int patchSize)
+Mat getDarkChannel(Mat sourceImg, int patchSize)
 {
 	Mat rgbMinImg = Mat::zeros(sourceImg.rows, sourceImg.cols, CV_8UC1);
 	Mat MDCP;
@@ -29,80 +29,80 @@ Mat getMedianFilteredDarkChannel(Mat sourceImg, int patchSize)
 
 }
 
-// dark channel2
-void minFilter(const Mat1b& src, Mat1b& dst, int radius)
-{
-	Mat1b padded;
-	copyMakeBorder(src, padded, radius, radius, radius, radius, BORDER_CONSTANT, Scalar(255));
+//// dark channel2
+//void minFilter(const Mat1b& src, Mat1b& dst, int radius)
+//{
+//	Mat1b padded;
+//	copyMakeBorder(src, padded, radius, radius, radius, radius, BORDER_CONSTANT, Scalar(255));
+//
+//	int rr = src.rows;
+//	int cc = src.cols;
+//	dst = Mat1b(rr, cc, uchar(0));
+//
+//	for (int c = 0; c < cc; ++c)
+//	{
+//		for (int r = 0; r < rr; ++r)
+//		{
+//			uchar lowest = 255;
+//			for (int i = -radius; i <= radius; ++i)
+//			{
+//				for (int j = -radius; j <= radius; ++j)
+//				{
+//					uchar val = padded(radius + r + i, radius + c + j);
+//					if (val < lowest) lowest = val;
+//				}
+//			}
+//			dst(r, c) = lowest;
+//		}
+//	}
+//}
+//
+//void minValue3b(const Mat3b& src, Mat1b& dst)
+//{
+//	int rr = src.rows;
+//	int cc = src.cols;
+//
+//	dst = Mat1b(rr, cc, uchar(0));
+//
+//	for (int c = 0; c<cc; ++c)
+//	{
+//		for (int r = 0; r<rr; ++r)
+//		{
+//			const Vec3b& v = src(r, c);
+//
+//			uchar lowest = v[0];
+//			if (v[1] < lowest) lowest = v[1];
+//			if (v[2] < lowest) lowest = v[2];
+//			dst(r, c) = lowest;
+//		}
+//	}
+//}
+//
+//Mat1b getDarkChannel(const Mat3b& img, int patchSize)
+//{
+//	int radius = patchSize / 2;
+//
+//	Mat1b dark;
+//
+//	Mat1b low;
+//	minValue3b(img, low);
+//	minFilter(low, dark, radius);
+//
+//	return dark;
+//}
+////END dark channel2
 
-	int rr = src.rows;
-	int cc = src.cols;
-	dst = Mat1b(rr, cc, uchar(0));
-
-	for (int c = 0; c < cc; ++c)
-	{
-		for (int r = 0; r < rr; ++r)
-		{
-			uchar lowest = 255;
-			for (int i = -radius; i <= radius; ++i)
-			{
-				for (int j = -radius; j <= radius; ++j)
-				{
-					uchar val = padded(radius + r + i, radius + c + j);
-					if (val < lowest) lowest = val;
-				}
-			}
-			dst(r, c) = lowest;
-		}
-	}
-}
-
-void minValue3b(const Mat3b& src, Mat1b& dst)
-{
-	int rr = src.rows;
-	int cc = src.cols;
-
-	dst = Mat1b(rr, cc, uchar(0));
-
-	for (int c = 0; c<cc; ++c)
-	{
-		for (int r = 0; r<rr; ++r)
-		{
-			const Vec3b& v = src(r, c);
-
-			uchar lowest = v[0];
-			if (v[1] < lowest) lowest = v[1];
-			if (v[2] < lowest) lowest = v[2];
-			dst(r, c) = lowest;
-		}
-	}
-}
-
-Mat1b getDarkChannel(const Mat3b& img, int patchSize)
-{
-	int radius = patchSize / 2;
-
-	Mat1b dark;
-
-	Mat1b low;
-	minValue3b(img, low);
-	minFilter(low, dark, radius);
-
-	return dark;
-}
-//END dark channel2
-
-//estimate airlight by the brightest pixel in dark channel
-int estimateA(Mat DC)
-{
-	double minDC, maxDC;
-	minMaxLoc(DC, &minDC, &maxDC);
-	cout << "estimated airlight is:" << maxDC << endl;
-	return maxDC;
-}
+////estimate airlight by the brightest pixel in dark channel
+//int estimateAirlight(Mat DC)
+//{
+//	double minDC, maxDC;
+//	minMaxLoc(DC, &minDC, &maxDC);
+//	cout << "estimated airlight is:" << maxDC << endl;
+//	return maxDC;
+//}
 
 //estimate airlight by the 0.1% brightest pixels in dark channel
-int estimateAAdvance(Mat DC, Mat inputImage) //DC - darkChannel
+int estimateAirlight(Mat DC, Mat inputImage) //DC - darkChannel
 {
 	double minDC, maxDC;
 	int size = DC.rows*DC.cols;
@@ -181,7 +181,7 @@ Mat estimateTransmission(Mat DC, int airlight) //DC - darkChannel
 
 
 //dehazing foggy image
-Mat getDehazed(Mat sourceImg, Mat transmissionImg, int airlight)
+Mat removeFog(Mat sourceImg, Mat transmissionImg, int airlight)
 {
 	double t0 = 0.1;
 	double tmax;
@@ -206,7 +206,7 @@ Mat getDehazed(Mat sourceImg, Mat transmissionImg, int airlight)
 	}
 	return dehazed;
 }
-Mat removeFog(Mat source, Mat t, int al)
-{
-	return getDehazed(source,t,al);
-}
+//Mat removeFog(Mat source, Mat t, int al)
+//{
+//	return getDehazed(source,t,al);
+//}
